@@ -1,0 +1,22 @@
+﻿<Application x:Class="Client.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Client"
+             xmlns:vm="clr-namespace:Client.ViewModels"
+             xmlns:v="clr-namespace:Client.Views"
+             StartupUri="Views/LoginView.xaml">
+    <Application.Resources>
+        <DataTemplate DataType="{x:Type vm:HomeViewModel}">
+            <v:HomeView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:AddPersonViewModel}">
+            <v:AddPersonView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ModifyPersonViewModel}">
+            <v:ModifyPersonView/>
+        </DataTemplate>
+        <!--<DataTemplate DataType="{x:Type vm:LoginViewModel}">
+            <v:LoginView/>
+        </DataTemplate>-->
+    </Application.Resources>
+</Application>

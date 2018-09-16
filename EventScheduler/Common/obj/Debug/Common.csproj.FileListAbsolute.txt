@@ -1,0 +1,12 @@
+C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_PROJEKAT\EventScheduler\Common\bin\Debug\Common.dll.config
+C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_PROJEKAT\EventScheduler\Common\bin\Debug\Common.dll
+C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_PROJEKAT\EventScheduler\Common\bin\Debug\Common.pdb
+C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_PROJEKAT\EventScheduler\Common\bin\Debug\EntityFramework.dll
+C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_PROJEKAT\EventScheduler\Common\bin\Debug\EntityFramework.SqlServer.dll
+C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_PROJEKAT\EventScheduler\Common\bin\Debug\EntityFramework.xml
+C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_PROJEKAT\EventScheduler\Common\bin\Debug\EntityFramework.SqlServer.xml
+C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_PROJEKAT\EventScheduler\Common\obj\Debug\Common.csprojAssemblyReference.cache
+C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_PROJEKAT\EventScheduler\Common\obj\Debug\Common.csproj.CoreCompileInputs.cache
+C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_PROJEKAT\EventScheduler\Common\obj\Debug\Common.csproj.CopyComplete
+C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_PROJEKAT\EventScheduler\Common\obj\Debug\Common.dll
+C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_PROJEKAT\EventScheduler\Common\obj\Debug\Common.pdb
