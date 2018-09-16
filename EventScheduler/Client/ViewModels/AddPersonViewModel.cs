@@ -34,9 +34,10 @@ namespace Client.ViewModels
                 Password = parameters[1] as String,
                 FirstName = parameters[2] as String,
                 LastName = parameters[3] as String,
-                //Role = ((Int32)parameters[4] == 0) ? ERole.REGULAR : ERole.ADMIN
+                Role = (bool)parameters[4] ? ERole.REGULAR : ERole.ADMIN,
             };
 
+            /*
             if ((bool)parameters[4])
             {
                 PersonToAdd.Role = ERole.REGULAR;
@@ -45,6 +46,7 @@ namespace Client.ViewModels
             {
                 PersonToAdd.Role = ERole.ADMIN;
             }
+            */
 
             if (Proxy.Instance.BasicOperations.AddPerson(PersonToAdd))
             {

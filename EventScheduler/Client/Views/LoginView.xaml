@@ -39,7 +39,7 @@
                 <MultiBinding Converter="{StaticResource multiConverter}">
                     <Binding Path="Text" ElementName="username" />
                     <Binding Path="Text" ElementName="password" />
-                    <Binding ElementName="LoginWindow" />
+                    <Binding ElementName="LoginUserControl" />
                 </MultiBinding>
             </Button.CommandParameter>
         </Button>

@@ -19,5 +19,8 @@ namespace Common.Contracts
 
         [OperationContract]
         bool ModifyPerson(Person person);
+
+        [OperationContract]
+        Person GetSinglePeson(String username);
     }
 }

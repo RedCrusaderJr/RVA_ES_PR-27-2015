@@ -6,14 +6,23 @@
 		xmlns:local="clr-namespace:Client"
 		xmlns:view="clr-namespace:Client.Views"
 		mc:Ignorable="d"
-		Title="EventShedulerWindow" Height="300" Width="400">
+		Title="EventShedulerWindow" Height="500" Width="800">
 	<Grid>
 		<Grid.RowDefinitions>
+			<RowDefinition Height="20"/>
 			<RowDefinition Height="*"/>
+			<RowDefinition Height="20"/>
 		</Grid.RowDefinitions>
 		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="20"/>
 			<ColumnDefinition Width="*"/>
+			<ColumnDefinition Width="200"/>
+			<ColumnDefinition Width="20"/>
 		</Grid.ColumnDefinitions>
-		<view:LoginView Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center"/>
+		<view:LoginView Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center"/>
+		<view:MessagesView Grid.Row="1" Grid.Column="2" />
+		<StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left">
+			<Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" FontWeight="UltraBold"/>
+		</StackPanel>
 	</Grid>
 </Window>

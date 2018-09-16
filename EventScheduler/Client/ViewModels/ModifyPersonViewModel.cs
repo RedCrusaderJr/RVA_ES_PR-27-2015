@@ -28,6 +28,7 @@ namespace Client.ViewModels
                 Password = person.Password,
                 FirstName = person.FirstName,
                 LastName = person.LastName,
+                Role = person.Role,
             };
         }
 

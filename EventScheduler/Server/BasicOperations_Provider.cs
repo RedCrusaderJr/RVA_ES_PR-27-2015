@@ -46,5 +46,17 @@ namespace Server
 
             return false;
         }
+
+        public Person GetSinglePeson(string username)
+        {
+            Person person = DBManager.Instance.GetSinglePeson(username);
+
+            if(person == null)
+            {
+                return new Person();
+            }
+
+            return person;
+        }
     }
 }
