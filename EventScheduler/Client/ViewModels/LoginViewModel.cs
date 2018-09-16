@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace Client.ViewModels
@@ -13,7 +14,7 @@ namespace Client.ViewModels
     public class LoginViewModel
     {
         public ICommand LoginCommand { get; set; }
-        public Window CurrentWindow { get; set; }
+        public UserControl CurrentUserControl { get; set; }
         public Person LoggedInPerson { get; set; }
         
         public LoginViewModel()
@@ -28,7 +29,7 @@ namespace Client.ViewModels
 
             String username = parameters[0] as String;
             String password = parameters[1] as String;
-            CurrentWindow = parameters[2] as Window;
+            CurrentUserControl = parameters[2] as UserControl;
 
             try
             {
@@ -47,9 +48,10 @@ namespace Client.ViewModels
                         Height = 600, 
                         Content = new HomeViewModel(person),
                     };
-
                     newWindow.Show();
-                    CurrentWindow.Close();
+
+                    Window currentWindow = Window.GetWindow(CurrentUserControl);
+                    currentWindow.Close();
                 }
             }
             catch(Exception e)

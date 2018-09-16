@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Client\App.xaml
-4664091388
+5-1290583199
 
-20-1213298263
+17-664766096
 171233780553
-Views\AddPersonView.xaml;Views\HomeView.xaml;Views\ModifyPersonView.xaml;Views\LoginView.xaml;
+EventShedulerWindow.xaml;Views\AddPersonView.xaml;Views\HomeView.xaml;Views\ModifyPersonView.xaml;Views\LoginView.xaml;
 
-True
+False
 

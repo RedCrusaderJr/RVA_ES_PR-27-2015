@@ -53,7 +53,9 @@ namespace Client.ViewModels
                 Content = new ModifyPersonViewModel(LoggedInPerson),
             };
 
-            window.Show();
+            window.ShowDialog();
+
+
         }
 
         private bool ModifyPersonCanExecute(object parameter)
@@ -69,11 +71,11 @@ namespace Client.ViewModels
             UserControl uc = parameters[0] as UserControl;
             Window currentWindow = Window.GetWindow(uc);
          
-            UserControl newWindow = UserControl.Ge
+            Window newWindow = new Win
 
             currentWindow.Close();
-            newWindow.Show();
-            */    
+            newWindow.Show();    
+            */
         }
 
         private bool LogOutCanExecute(object parameter)

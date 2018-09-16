@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_PROJEKAT\EventScheduler\Client\obj\Debug\
+C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Client\obj\Debug\
 Client
 none
 false
 DEBUG;TRACE
-C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_PROJEKAT\EventScheduler\Client\App.xaml
-4664091388
+C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Client\App.xaml
+5-1290583199
 
-20-1213298263
-171328463554
-Views\AddPersonView.xaml;Views\HomeView.xaml;Views\ModifyPersonView.xaml;Views\LoginView.xaml;
+21107313851
+171233780553
+EventShedulerWindow.xaml;Views\AddPersonView.xaml;Views\HomeView.xaml;Views\ModifyPersonView.xaml;Views\LoginView.xaml;
 
 True
 

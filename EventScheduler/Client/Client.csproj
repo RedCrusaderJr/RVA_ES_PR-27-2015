@@ -64,6 +64,9 @@
     <Compile Include="Commands\RelayCommand.cs" />
     <Compile Include="Converters\MultiCloneConverter.cs" />
     <Compile Include="Converters\RadioButtonCheckedConverter.cs" />
+    <Compile Include="EventShedulerWindow.xaml.cs">
+      <DependentUpon>EventShedulerWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Proxy.cs" />
     <Compile Include="ViewModels\AddPersonViewModel.cs" />
     <Compile Include="ViewModels\HomeViewModel.cs" />
@@ -115,6 +118,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="EventShedulerWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\AddPersonView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
