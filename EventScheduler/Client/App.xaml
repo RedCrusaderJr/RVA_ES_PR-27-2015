@@ -3,20 +3,57 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Client"
              xmlns:vm="clr-namespace:Client.ViewModels"
+             xmlns:avm="clr-namespace:Client.ViewModels.AccountViewModels"
+             xmlns:evm="clr-namespace:Client.ViewModels.EventViewModels"
+             xmlns:pvm="clr-namespace:Client.ViewModels.PersonViewModels"
              xmlns:v="clr-namespace:Client.Views"
+             xmlns:av="clr-namespace:Client.Views.AccountViews"
+             xmlns:ev="clr-namespace:Client.Views.EventViews"
+             xmlns:pv="clr-namespace:Client.Views.PersonViews"
              StartupUri="EventShedulerWindow.xaml">
     <Application.Resources>
         <DataTemplate DataType="{x:Type vm:HomeViewModel}">
             <v:HomeView/>
         </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:AddPersonViewModel}">
-            <v:AddPersonView/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:ModifyPersonViewModel}">
-            <v:ModifyPersonView/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:LoginViewModel}">
+        <!--<DataTemplate DataType="{x:Type vm:LoginViewModel}">
             <v:LoginView/>
+        </DataTemplate>-->
+        
+        
+        <DataTemplate DataType="{x:Type avm:CreateNewAccountViewModel}">
+            <av:CreateNewAccountView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type avm:ModifyAccountViewModel}">
+            <av:ModifyAccountView/>
+        </DataTemplate>
+        
+        
+        <DataTemplate DataType="{x:Type evm:AddEventViewModel}">
+            <ev:AddEventView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type evm:DeleteEventConfirmationViewModel}">
+            <ev:DeleteEventConfirmationView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type evm:EventDetailsViewModel}">
+            <ev:EventDetailsView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type evm:ModifyEventViewModel}">
+            <ev:ModifyEventView/>
+        </DataTemplate>
+
+        
+        <DataTemplate DataType="{x:Type pvm:AddPersonViewModel}">
+            <pv:AddPersonView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type pvm:DeletePersonConfirmationViewModel}">
+            <pv:DeletePersonConfirmationView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type pvm:ModifyPersonViewModel}">
+            <pv:ModifyPersonView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type pvm:PersonDetailsViewModel}">
+            <pv:PersonDetailsView/>
+        </DataTemplate>
+
     </Application.Resources>
 </Application>

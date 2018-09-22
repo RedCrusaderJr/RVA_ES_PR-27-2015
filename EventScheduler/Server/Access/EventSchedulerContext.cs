@@ -15,6 +15,7 @@ namespace Server.Access
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<EventSchedulerContext, Configuration>());
         }
 
+        public DbSet<PersonWithAccount> PeopleWithAccounts { get; set; }
         public DbSet<Person> People { get; set; }
         public DbSet<Event> Events { get; set; }
     }

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace Client.ViewModels
 {
@@ -15,12 +16,12 @@ namespace Client.ViewModels
     {
         public ICommand LoginCommand { get; set; }
         public UserControl CurrentUserControl { get; set; }
-        public Person LoggedInPerson { get; set; }
+        public PersonWithAccount LoggedInPerson { get; set; }
         
         public LoginViewModel()
         {
             LoginCommand = new RelayCommand(Execute, CanExecute);
-            LoggedInPerson = new Person();
+            LoggedInPerson = new PersonWithAccount();
         }
 
         private void Execute(object parameter)
@@ -33,8 +34,8 @@ namespace Client.ViewModels
 
             try
             {
-                Person person = Proxy.Instance.BasicOperations.Login(username, password);
-                if(person == null)
+                PersonWithAccount personWithAccount = AccountProxy.Instance.AccountServices.Login(username, password);
+                if(personWithAccount == null)
                 {
                     MessageBox.Show("Username or password is incorrect.");
                 }
@@ -42,13 +43,43 @@ namespace Client.ViewModels
                 {
                     MessageBox.Show("Successfull login!");
 
+                    //PROBAJ BILO STA DRUGO nekako preko resource-a
+                    /*
+                    var parent = VisualTreeHelper.GetParent(CurrentUserControl);
+                    var grid = VisualTreeHelper.GetChild(parent, 1);
+                    UserControl messageView = VisualTreeHelper.GetChild(grid, 4) as UserControl;
+                    TextBlock tb = VisualTreeHelper.GetChild(VisualTreeHelper.GetChild(messageView, 1), 3) as TextBlock;
+
+                    tb.Text += "Successfull login!";
+
+                    /*
+                    CurrentUserControl.Content = new HomeViewModel(person);
+                    CurrentUserControl.Width = 1200;
+                    CurrentUserControl.Height = 600;
+                    */
+
+                    /*
+                    UserControl HomeViewUserControl = new UserControl()
+                    {
+                        Width = 1200,
+                        Height = 600,
+                        Content = new HomeViewModel(person),
+                    }; 
+                    */
+
+                    //CurrentUserControl.Content = new HomeViewModel(personWithAccount);
+                    //CurrentUserControl.Width = 1200;
+                    //CurrentUserControl.Height = 800;
+                    
+                    
                     Window newWindow = new Window()
                     {
                         Width = 1200,
                         Height = 600, 
-                        Content = new HomeViewModel(person),
+                        Content = new HomeViewModel(personWithAccount),
                     };
                     newWindow.Show();
+                    
 
                     Window currentWindow = Window.GetWindow(CurrentUserControl);
                     currentWindow.Close();

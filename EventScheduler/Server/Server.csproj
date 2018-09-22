@@ -66,10 +66,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Access\Configuration.cs" />
-    <Compile Include="Access\DBManager.cs" />
+    <Compile Include="Access\DbManager.cs" />
     <Compile Include="Access\EventSchedulerContext.cs" />
-    <Compile Include="BasicOperations_Provider.cs" />
-    <Compile Include="BasicOperations_Server.cs" />
+    <Compile Include="Providers\EventServices_Provider.cs" />
+    <Compile Include="Providers\PersonServices_Provider.cs" />
+    <Compile Include="Providers\AccountServices_Provider.cs" />
+    <Compile Include="EventServices_Server.cs" />
+    <Compile Include="PersonServices_Server.cs" />
+    <Compile Include="AccountServices_Server.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

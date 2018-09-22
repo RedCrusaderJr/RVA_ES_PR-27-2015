@@ -57,6 +57,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AccountProxy.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -64,15 +65,42 @@
     <Compile Include="Commands\RelayCommand.cs" />
     <Compile Include="Converters\MultiCloneConverter.cs" />
     <Compile Include="Converters\RadioButtonCheckedConverter.cs" />
+    <Compile Include="EventProxy.cs" />
     <Compile Include="EventShedulerWindow.xaml.cs">
       <DependentUpon>EventShedulerWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Proxy.cs" />
-    <Compile Include="ViewModels\AddPersonViewModel.cs" />
+    <Compile Include="PersonProxy.cs" />
+    <Compile Include="ViewModels\EventViewModels\AddEventViewModel.cs" />
+    <Compile Include="ViewModels\PersonViewModels\AddPersonViewModel.cs" />
+    <Compile Include="ViewModels\AccountViewModels\CreateNewAccountViewModel.cs" />
+    <Compile Include="ViewModels\EventViewModels\DeleteEventConfirmationViewModel.cs" />
+    <Compile Include="ViewModels\PersonViewModels\DeletePersonConfirmationViewModel.cs" />
+    <Compile Include="ViewModels\EventViewModels\EventDetailsViewModel.cs" />
     <Compile Include="ViewModels\HomeViewModel.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
-    <Compile Include="ViewModels\ModifyPersonViewModel.cs" />
-    <Compile Include="Views\AddPersonView.xaml.cs">
+    <Compile Include="ViewModels\AccountViewModels\ModifyAccountViewModel.cs" />
+    <Compile Include="ViewModels\EventViewModels\ModifyEventViewModel.cs" />
+    <Compile Include="ViewModels\PersonViewModels\ModifyPersonViewModel.cs" />
+    <Compile Include="ViewModels\PersonViewModels\PersonDetailsViewModel.cs" />
+    <Compile Include="Views\AccountViews\CreateNewAccountView.xaml.cs">
+      <DependentUpon>CreateNewAccountView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\AccountViews\ModifyAccountView.xaml.cs">
+      <DependentUpon>ModifyAccountView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EventViews\AddEventView.xaml.cs">
+      <DependentUpon>AddEventView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EventViews\DeleteEventConfirmationView.xaml.cs">
+      <DependentUpon>DeleteEventConfirmationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EventViews\EventDetailsView.xaml.cs">
+      <DependentUpon>EventDetailsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EventViews\ModifyEventView.xaml.cs">
+      <DependentUpon>ModifyEventView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PersonViews\AddPersonView.xaml.cs">
       <DependentUpon>AddPersonView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\HomeView.xaml.cs">
@@ -81,11 +109,17 @@
     <Compile Include="Views\MessagesView.xaml.cs">
       <DependentUpon>MessagesView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ModifyPersonView.xaml.cs">
+    <Compile Include="Views\PersonViews\DeletePersonConfirmationView.xaml.cs">
+      <DependentUpon>DeletePersonConfirmationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PersonViews\ModifyPersonView.xaml.cs">
       <DependentUpon>ModifyPersonView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\LoginView.xaml.cs">
       <DependentUpon>LoginView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PersonViews\PersonDetailsView.xaml.cs">
+      <DependentUpon>PersonDetailsView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -125,7 +159,31 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\AddPersonView.xaml">
+    <Page Include="Views\AccountViews\CreateNewAccountView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AccountViews\ModifyAccountView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EventViews\AddEventView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EventViews\DeleteEventConfirmationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EventViews\EventDetailsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EventViews\ModifyEventView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\PersonViews\AddPersonView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -137,7 +195,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\ModifyPersonView.xaml">
+    <Page Include="Views\PersonViews\DeletePersonConfirmationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\PersonViews\ModifyPersonView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -145,6 +207,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\PersonViews\PersonDetailsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

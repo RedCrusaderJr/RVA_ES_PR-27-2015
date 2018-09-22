@@ -1,4 +1,6 @@
-﻿using Common.Models;
+﻿using Common.IAccess;
+using Common.IModels;
+using Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace Server.Access
 {
-    class DBManager
+    class DbManager : IPersonDbManager, IPersonWithAccountDbManager, IEventDbManager
     {
         #region Instance
-        private static DBManager _instance;
+        private static DbManager _instance;
         private static readonly object syncLock = new object();
-        private DBManager() { }
-        public static DBManager Instance
+        private DbManager() { }
+        public static DbManager Instance
         {
             get
             {
@@ -23,7 +25,7 @@ namespace Server.Access
                     {
                         if(_instance == null)
                         {
-                            _instance = new DBManager();
+                            _instance = new DbManager();
                         }
                     }
                 }
@@ -34,62 +36,78 @@ namespace Server.Access
         #endregion
 
         #region Person
-        public bool AddPerson(Person person)
+        public bool AddPerson(Person personToAdd)
         {
             using (EventSchedulerContext dbContext = new EventSchedulerContext())
             {
-                bool found = dbContext.People.Any(p => p.Username.Equals(person.Username));
-                if(found)
+                bool found = dbContext.People.Any(p => p.PersonID.Equals(personToAdd.PersonID));
+                if (found)
                 {
                     return false;
                 }
 
-                dbContext.People.Add(person);
+                dbContext.People.Add(personToAdd);
                 dbContext.SaveChanges();
                 return true;
             }
         }
 
-        public bool ModifyPerson(Person person)
+        public bool ModifyPerson(Person personToModify)
         {
             using (EventSchedulerContext dbContext = new EventSchedulerContext())
             {
-                bool found = dbContext.People.Any(p => p.Username.Equals(person.Username));
+                bool found = dbContext.People.Any(p => p.PersonID.Equals(personToModify.PersonID));
                 if (found)
                 {
-                    Person foundPerson = dbContext.People.SingleOrDefault(p => p.Username.Equals(person.Username));
+                    Person foundPerson = dbContext.People.SingleOrDefault(p => p.PersonID.Equals(personToModify.PersonID));
                     dbContext.People.Attach(foundPerson);
 
-                    foundPerson.Username = person.Username;
-                    foundPerson.Password = person.Password;
-                    foundPerson.FirstName = person.FirstName;
-                    foundPerson.LastName = person.LastName;
-                    foundPerson.Role = person.Role;
+                    foundPerson.PersonID = personToModify.PersonID;
+                    foundPerson.FirstName = personToModify.FirstName;
+                    foundPerson.LastName = personToModify.LastName;
+                    personToModify.ScheduledEvents.ForEach(e => foundPerson.ScheduleParticipationInEvent(e));
 
                     dbContext.SaveChanges();
                     return true;
                 }
-                
+
                 return false;
             }
         }
 
-        public Person GetSinglePeson(String username)
+        public bool DeletePerson(Person personToDelete)
         {
             using (EventSchedulerContext dbContext = new EventSchedulerContext())
             {
-                return dbContext.People.FirstOrDefault(p => p.Username.Equals(username));
+                bool found = dbContext.People.Any(p => p.PersonID.Equals(personToDelete.PersonID));
+                if (found)
+                {
+                    Person foundPerson = dbContext.People.SingleOrDefault(p => p.PersonID.Equals(personToDelete.PersonID));
+                    dbContext.People.Remove(foundPerson);
+                    dbContext.SaveChanges();
+                    return true;
+                }
+
+                return false;
             }
         }
 
-        public Dictionary<String, Person> GetAllPeople()
+        public Person GetSinglePerson(int personId)
         {
             using (EventSchedulerContext dbContext = new EventSchedulerContext())
             {
-                Dictionary<String, Person> people = dbContext.People.ToDictionary(p => p.Username, p => p);
+                return dbContext.People.FirstOrDefault(p => p.PersonID.Equals(personId));
+            }
+        }
+
+        public Dictionary<int, Person> GetAllPeople()
+        {
+            using (EventSchedulerContext dbContext = new EventSchedulerContext())
+            {
+                Dictionary<int, Person> people = dbContext.People.ToDictionary(p => p.PersonID, p => p);
                 if (people == null)
                 {
-                    people = new Dictionary<String, Person>();
+                    people = new Dictionary<int, Person>();
                 }
 
                 return people;
@@ -97,28 +115,161 @@ namespace Server.Access
         }
         #endregion
 
-        #region Event
-        public bool AddEvent(Event newEvent)
+        #region PersonWithAccount
+        public bool AddPersonWithAccount(PersonWithAccount personWithAccountToAdd)
         {
             using (EventSchedulerContext dbContext = new EventSchedulerContext())
             {
-                bool found = dbContext.Events.Any(e => e.EventID.Equals(newEvent.EventID));
+                bool found = dbContext.PeopleWithAccounts.Any(p => p.PersonID.Equals(personWithAccountToAdd.PersonID)
+                                                                   || p.Username.Equals(personWithAccountToAdd.Username));
                 if (found)
                 {
                     return false;
                 }
 
-                dbContext.Events.Add(newEvent);
+                dbContext.PeopleWithAccounts.Add(personWithAccountToAdd);
                 dbContext.SaveChanges();
                 return true;
             }
         }
 
-        public Event GetSingleEvent(String id)
+        public bool ModifyPersonWithAccount(PersonWithAccount personWithAccountToModify)
         {
             using (EventSchedulerContext dbContext = new EventSchedulerContext())
             {
-                return dbContext.Events.FirstOrDefault(e => e.EventID.Equals(id));
+                bool found = dbContext.PeopleWithAccounts.Any(p => p.PersonID.Equals(personWithAccountToModify.PersonID));
+                if (found)
+                {
+                    PersonWithAccount foundPersonWithAccount = dbContext.PeopleWithAccounts.SingleOrDefault(p => p.PersonID.Equals(personWithAccountToModify.PersonID));
+                    dbContext.PeopleWithAccounts.Attach(foundPersonWithAccount);
+
+                    foundPersonWithAccount.PersonID = personWithAccountToModify.PersonID;
+                    foundPersonWithAccount.Username = personWithAccountToModify.Username;
+                    foundPersonWithAccount.Password = personWithAccountToModify.Password;
+                    foundPersonWithAccount.Role = personWithAccountToModify.Role;
+                    foundPersonWithAccount.FirstName = personWithAccountToModify.FirstName;
+                    foundPersonWithAccount.LastName = personWithAccountToModify.LastName;
+                    personWithAccountToModify.ScheduledEvents.ForEach(e => foundPersonWithAccount.ScheduleParticipationInEvent(e));
+
+                    dbContext.SaveChanges();
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
+        public bool DeletePersonWithAccount(PersonWithAccount personWithAccountToDelete)
+        {
+            using (EventSchedulerContext dbContext = new EventSchedulerContext())
+            {
+                bool found = dbContext.PeopleWithAccounts.Any(p => p.PersonID.Equals(personWithAccountToDelete.PersonID));
+                if (found)
+                {
+                    PersonWithAccount foundPersonWithAccount = dbContext.PeopleWithAccounts.SingleOrDefault(p => p.PersonID.Equals(personWithAccountToDelete.PersonID));
+                    dbContext.PeopleWithAccounts.Remove(foundPersonWithAccount);
+                    dbContext.SaveChanges();
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
+        public PersonWithAccount GetSinglePersonWithAccount(Int32 personWithAccountId)
+        {
+            using (EventSchedulerContext dbContext = new EventSchedulerContext())
+            {
+                return dbContext.PeopleWithAccounts.FirstOrDefault(p => p.PersonID.Equals(personWithAccountId));
+            }
+        }
+
+        public PersonWithAccount GetSinglePersonWithAccountByUsername(String personWithAccountUsername)
+        {
+            using (EventSchedulerContext dbContext = new EventSchedulerContext())
+            {
+                return dbContext.PeopleWithAccounts.FirstOrDefault(p => p.Username.Equals(personWithAccountUsername));
+            }
+        }
+
+        public Dictionary<int, PersonWithAccount> GetAllPeopleWithAccounts()
+        {
+            using (EventSchedulerContext dbContext = new EventSchedulerContext())
+            {
+                Dictionary<int, PersonWithAccount> peopleWithAccounts = dbContext.PeopleWithAccounts.ToDictionary(p => p.PersonID, p => p);
+                if (peopleWithAccounts == null)
+                {
+                    peopleWithAccounts = new Dictionary<int, PersonWithAccount>();
+                }
+
+                return peopleWithAccounts;
+            }
+        }
+        #endregion
+
+        #region Event
+        public bool AddEvent(Event eventToAdd)
+        {
+            using (EventSchedulerContext dbContext = new EventSchedulerContext())
+            {
+                bool found = dbContext.Events.Any(e => e.EventID.Equals(eventToAdd.EventID));
+                if (found)
+                {
+                    return false;
+                }
+
+                dbContext.Events.Add(eventToAdd);
+                dbContext.SaveChanges();
+                return true;
+            }
+        }
+
+        public bool ModifyEvent(Event eventToModify)
+        {
+            using (EventSchedulerContext dbContext = new EventSchedulerContext())
+            {
+                bool found = dbContext.Events.Any(p => p.EventID.Equals(eventToModify.EventID));
+                if (found)
+                {
+                    Event foundEvent = dbContext.Events.SingleOrDefault(e => e.EventID.Equals(eventToModify.EventID));
+                    dbContext.Events.Attach(foundEvent);
+
+                    foundEvent.LastEditTimeStamp = eventToModify.LastEditTimeStamp;
+                    foundEvent.ScheduledDateTimeBeging = eventToModify.ScheduledDateTimeBeging;
+                    foundEvent.ScheduledDateTimeEnd = eventToModify.ScheduledDateTimeEnd;
+                    foundEvent.Description = eventToModify.Description;
+                    eventToModify.Participants.ForEach(p => foundEvent.AddParticipant(p));
+
+                    dbContext.SaveChanges();
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
+        public bool DeleteEvent(Event eventToDelete)
+        {
+            using (EventSchedulerContext dbContext = new EventSchedulerContext())
+            {
+                bool found = dbContext.Events.Any(p => p.EventID.Equals(eventToDelete.EventID));
+                if (found)
+                {
+                    Event foundEvent = dbContext.Events.SingleOrDefault(e => e.EventID.Equals(eventToDelete.EventID));
+                    dbContext.Events.Remove(foundEvent);
+                    dbContext.SaveChanges();
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
+        public Event GetSingleEvent(Int32 eventId)
+        {
+            using (EventSchedulerContext dbContext = new EventSchedulerContext())
+            {
+                return dbContext.Events.FirstOrDefault(e => e.EventID.Equals(eventId));
             }
         }
 
@@ -136,6 +287,5 @@ namespace Server.Access
             }
         }
         #endregion
-
     }
 }

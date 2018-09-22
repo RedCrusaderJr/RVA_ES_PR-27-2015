@@ -1,4 +1,6 @@
 ﻿<UserControl x:Class="Client.Views.HomeView"
+        Name="HomeUserControl"
+             
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,9 +8,8 @@
         xmlns:local="clr-namespace:Client.Views"
         xmlns:converter="clr-namespace:Client.Converters"
         mc:Ignorable="d"
-        Name="HomeUserControl"
         Background="White"
-        Height="450" Width="1200"
+        Height="600" Width="1000"
         HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
     <UserControl.Resources>
         <converter:MultiCloneConverter x:Key="multiConverter"/>
@@ -16,6 +17,7 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="40"/>
+            <ColumnDefinition Width="200"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="40"/>
@@ -24,10 +26,11 @@
             <RowDefinition Height="20"/>
             <RowDefinition Height="40"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Name="HomeTextBlock" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Yu Gothic UI Semibold" FontSize="16">
+        <TextBlock Name="HomeTextBlock" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Yu Gothic UI Semibold" FontSize="16">
             <TextBlock.Text>
                 <MultiBinding StringFormat="{}Username: {0}     First name: {1}     Last name: {2}">
                     <Binding Path="LoggedInPerson.Username"/>
@@ -36,10 +39,9 @@
                 </MultiBinding>
             </TextBlock.Text>
         </TextBlock>
-        
-        <StatusBar Grid.Row="1" Grid.Column="2" HorizontalAlignment="Right" Background="Transparent">
-            <Button Command="{ Binding AddPersonCommand }"  Content="Add" Height="25" Width="100" Margin="0,0,10,0"/>
-            <Button Command="{ Binding ModifyPersonCommand }" Content="Modify" Height="25" Width="100" Margin="0,0,10,0">
+
+        <StatusBar Grid.Row="1" Grid.Column="3" HorizontalAlignment="Right" Background="Transparent">
+            <Button Command="{ Binding ModifyPersonalAccountCommand }" Content="Modify" Height="25" Width="100" Margin="0,0,10,0">
                 <Button.CommandParameter>
                     <MultiBinding Converter="{StaticResource multiConverter}">
                         <Binding ElementName="HomeTextBlock"/>
@@ -54,6 +56,115 @@
                 </Button.CommandParameter>
             </Button>
         </StatusBar>
-        <Separator Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Bottom"/>
+
+        <StackPanel Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,10,0,0">
+            <Button Command="{ Binding AddPersonCommand }"  Content="Add Person" Height="25" Width="150" Margin="0,10,0,0"/>
+            <Button Command="{ Binding ModifyPersonCommand }"  Content="Modify Person" Height="25" Width="150" Margin="0,10,0,0">
+                <Button.CommandParameter>
+                    <MultiBinding Converter="{StaticResource multiConverter}">
+                        <Binding ElementName="HomeTextBlock"/>
+                    </MultiBinding>
+                </Button.CommandParameter>
+            </Button>
+            <Button Command="{ Binding DeletePersonCommand }"  Content="Delete Person" Height="25" Width="150" Margin="0,10,0,0"/>
+            <Separator Margin="10"/>
+            <Button Command="{ Binding AddEventCommand }"  Content="Add Event" Height="25" Width="150" Margin="0,10,0,0"/>
+            <Button Command="{ Binding ModifyEventCommand }"  Content="Modify Event" Height="25" Width="150" Margin="0,10,0,0"/>
+            <Button Command="{ Binding DeleteEventCommand }"  Content="Delete Event" Height="25" Width="150" Margin="0,10,0,0"/>
+            <Separator Margin="10"/>
+            <Button Command="{ Binding CreateAccountCommand }" Name="btnCreateAccount" Content="Create new Account" Height="25" Width="150" Margin="0,10,0,0"/>
+            <Button Command="{ Binding DeleteAccountCommand }" Name="btnDeleteAccount" Content="Delete Account" Height="25" Width="150" Margin="0,10,0,0"/>
+            <Button Command="{ Binding ModifyAccountCommand }" Name="btnModifyAccount" Content="Modify Account" Height="25" Width="150" Margin="0,10,0,0"/>
+            <Separator Margin="10"/>
+        </StackPanel>
+        <StatusBar Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2" HorizontalAlignment="Right" VerticalAlignment="Center" Background="White">
+            <Button Command="{ Binding ShowPeopleCommand }"  Content="Show All People" Height="25" Width="150" Margin="10,10,0,0">
+                <Button.CommandParameter>
+                    <MultiBinding Converter="{StaticResource multiConverter}">
+                        <Binding ElementName="PeopleTable"/>
+                        <Binding ElementName="EventsTable"/>
+                        <Binding ElementName="AccountsTable"/>
+                    </MultiBinding>
+                </Button.CommandParameter>
+            </Button>
+            <Button Command="{ Binding ShowEventsCommand }"  Content="Show All Events" Height="25" Width="150" Margin="10,10,0,0">
+                <Button.CommandParameter>
+                    <MultiBinding Converter="{StaticResource multiConverter}">
+                        <Binding ElementName="PeopleTable"/>
+                        <Binding ElementName="EventsTable"/>
+                        <Binding ElementName="AccountsTable"/>
+                    </MultiBinding>
+                </Button.CommandParameter>
+            </Button>
+            <Button Command="{ Binding ShowAccountsCommand }"  Content="Show All Accounts" Height="25" Width="150" Margin="10,10,0,0">
+                <Button.CommandParameter>
+                    <MultiBinding Converter="{StaticResource multiConverter}">
+                        <Binding ElementName="PeopleTable"/>
+                        <Binding ElementName="EventsTable"/>
+                        <Binding ElementName="AccountsTable"/>
+                    </MultiBinding>
+                </Button.CommandParameter>
+            </Button>
+        </StatusBar>
+        
+
+        <DataGrid Name="PeopleTable" Visibility="Visible" ItemsSource="{Binding PeopleList, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedPerson, Mode=OneWayToSource}" IsReadOnly="True" SelectionMode="Single" AutoGenerateColumns="False" Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="2">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding PersonID}" Header="Person ID" Width="*"/>
+                <DataGridTextColumn Binding="{Binding FirstName}" Header="First Name" Width="*"/>
+                <DataGridTextColumn Binding="{Binding LastName}" Header="Last Name" Width="*"/>
+                <DataGridTextColumn Header="Actions" Width="*"/>
+            </DataGrid.Columns>
+            <!--<DataGrid.RowDetailsTemplate>
+                <DataTemplate>
+                    <Border BorderThickness="0" Background="BlanchedAlmond" Padding="10">
+                        <StackPanel Orientation="Vertical">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontSize="12" Text="Email: " VerticalAlignment="Center" />
+                                <TextBlock FontSize="16" Foreground="MidnightBlue" Text="{Binding EmailAddress}" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontSize="12" Text="Phone: " VerticalAlignment="Center" />
+                                <TextBlock FontSize="16" Foreground="MidnightBlue" Text="{Binding Phone}" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontSize="12" Text="Sales Person: " VerticalAlignment="Center" />
+                                <TextBlock FontSize="16" Foreground="MidnightBlue" Text="{Binding SalesPerson}" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </DataGrid.RowDetailsTemplate>-->
+            <DataGrid.InputBindings>
+                <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding PersonDetailsCommand}" CommandParameter="{Binding ElementName=PeopleTable, Path=SelectedItem}"/>
+            </DataGrid.InputBindings>
+        </DataGrid>
+        <DataGrid Name="EventsTable" Visibility="Collapsed" ItemsSource="{Binding EventsList, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedEvent, Mode=OneWayToSource}" IsReadOnly="True" SelectionMode="Single" AutoGenerateColumns="False" Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="2">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding EventID}" Header="Event ID" Width="*"/>
+                <DataGridTextColumn Binding="{Binding EventTitle}" Header="Event Title" Width="*"/>
+                <DataGridTextColumn Binding="{Binding ScheduledDateTimeBeging}" Header="Scheduled Beging" Width="*"/>
+                <DataGridTextColumn Binding="{Binding ScheduledDateTimeEnd}" Header="Scheduled End" Width="*"/>
+                <DataGridTextColumn Header="Actions" Width="*"/>
+            </DataGrid.Columns>
+            <DataGrid.InputBindings>
+                <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding EventDetailsCommand}" CommandParameter="{Binding ElementName=EventsTable, Path=SelectedItem}"/>
+            </DataGrid.InputBindings>
+        </DataGrid>
+        <DataGrid Name="AccountsTable" Visibility="Collapsed" ItemsSource="{Binding AccountsList, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedPersonWithAccount, Mode=OneWayToSource}" IsReadOnly="True" SelectionMode="Single" AutoGenerateColumns="False" Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="2">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding PersonID}" Header="Person ID" Width="*"/>
+                <DataGridTextColumn Binding="{Binding Username}" Header="Username" Width="*"/>
+                <DataGridTextColumn Binding="{Binding Password}" Header="Password" Width="*"/>
+                <DataGridTextColumn Binding="{Binding FirstName}" Header="First Name" Width="*"/>
+                <DataGridTextColumn Binding="{Binding LastName}" Header="Last Name" Width="*"/>
+                <DataGridTextColumn Binding="{Binding Role}" Header="Role" Width="*"/>
+                <DataGridTextColumn Header="Actions" Width="*"/>
+            </DataGrid.Columns>
+            <DataGrid.InputBindings>
+                <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding AccountDetailsCommand}" CommandParameter="{Binding ElementName=AccountsTable, Path=SelectedItem}"/>
+            </DataGrid.InputBindings>
+        </DataGrid>
+        <Separator Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" VerticalAlignment="Bottom"/>
     </Grid>
 </UserControl>
