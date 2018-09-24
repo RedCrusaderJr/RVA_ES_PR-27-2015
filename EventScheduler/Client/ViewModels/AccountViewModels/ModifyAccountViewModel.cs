@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,8 +19,9 @@ namespace Client.ViewModels.AccountViewModels
         public Window CurrentWindow { get; set; }
         public Account SelectedAccount { get; set; }
         public Account AccountToModify { get; set; }
+        public ObservableCollection<Account> AccountsList { get; set;}
 
-        public ModifyAccountViewModel(Account selectedAccount)
+        public ModifyAccountViewModel(Account selectedAccount, ObservableCollection<Account> accountsList)
         {
             ModifyAccountCommand = new RelayCommand(ModifyAccountExecute, ModifyAccountCanExecute);
             SelectedAccount = selectedAccount;
@@ -30,6 +32,7 @@ namespace Client.ViewModels.AccountViewModels
                 LastName = SelectedAccount.LastName,
                 Role = SelectedAccount.Role,
             };
+            AccountsList = accountsList;
         }
 
         private void ModifyAccountExecute(object parameter)
@@ -38,6 +41,11 @@ namespace Client.ViewModels.AccountViewModels
 
             if (AccountProxy.Instance.AccountServices.ModifyAccount(AccountToModify))
             {
+                Account AccountInTheList = AccountsList.First(a => a.Username.Equals(AccountToModify.Username));
+                AccountInTheList.Password = AccountToModify.Password;
+                AccountInTheList.FirstName = AccountToModify.FirstName;
+                AccountInTheList.LastName = AccountToModify.LastName;
+
                 UserControl uc = parameters[0] as UserControl;
                 Window window = Window.GetWindow(uc);
                 window.Close();

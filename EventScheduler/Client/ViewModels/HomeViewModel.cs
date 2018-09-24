@@ -306,13 +306,12 @@ namespace Client.ViewModels
             {
                 Width = 600,
                 Height = 600,
-                Content = new CreateNewAccountViewModel(),
+                Content = new CreateNewAccountViewModel(AccountsList),
             };
 
             window.ShowDialog();
 
-            PeopleList = new ObservableCollection<Person>(PersonProxy.Instance.PersonServices.GetAllPeople());
-            AccountsList = new ObservableCollection<Account>(AccountProxy.Instance.AccountServices.GetAllAccounts());
+            
         }
         private bool CreateAccountCanExecute(object parameter)
         {
@@ -327,7 +326,7 @@ namespace Client.ViewModels
             {
                 Width = 500,
                 Height = 600,
-                Content = new ModifyAccountViewModel(SelectedAccount),
+                Content = new ModifyAccountViewModel(SelectedAccount, AccountsList),
             };
 
             window.ShowDialog();
@@ -358,7 +357,7 @@ namespace Client.ViewModels
             {
                 Width = 500,
                 Height = 600,
-                Content = new ModifyAccountViewModel(LoggedInAccount),
+                Content = new ModifyAccountViewModel(LoggedInAccount, AccountsList),
             };
 
             window.ShowDialog();

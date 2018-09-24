@@ -3,6 +3,7 @@ using Client.Proxies;
 using Common.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,11 +20,13 @@ namespace Client.ViewModels.AccountViewModels
         public Window CurrentWindow { get; set; }
         public Account AccountToAdd { get; set; }
         public ERole SelectedOption { get; set; }
+        public ObservableCollection<Account> AccountsList { get; set; }
 
 
-        public CreateNewAccountViewModel()
+        public CreateNewAccountViewModel(ObservableCollection<Account> accounts)
         {
             CreateNewAccountCommand = new RelayCommand(CreateNewAccountExecute, CreateNewAccountCanExecute);
+            AccountsList = accounts;
         }
 
         private void CreateNewAccountExecute(object parameter)
@@ -48,6 +51,7 @@ namespace Client.ViewModels.AccountViewModels
    
             if (AccountProxy.Instance.AccountServices.CreateNewAccount(AccountToAdd))
             {
+                AccountsList.Add(AccountToAdd);
                 CurrentWindow = Window.GetWindow(CreateNewAccountUserControl);
                 CurrentWindow.Close();
             }
