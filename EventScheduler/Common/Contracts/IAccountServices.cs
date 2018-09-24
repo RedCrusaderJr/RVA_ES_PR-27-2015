@@ -12,27 +12,27 @@ namespace Common.Contracts
     public interface IAccountServices
     {
         [OperationContract]
-        PersonWithAccount Login(string username, string password);
+        Account Login(string username, string password);
 
         [OperationContract]
-        bool CreateNewAccount(PersonWithAccount person);
+        bool CreateNewAccount(Account account);
+
+        //[OperationContract]
+        //bool CreateAccountWithExistingPerson(Account account);
+        
+        [OperationContract]
+        bool ModifyAccount(Account account);
 
         [OperationContract]
-        bool CreateAccountWithExistingPerson(PersonWithAccount person);
+        bool DeleteAccount(Account account);
+
+        //[OperationContract]
+        //bool DeleteAccountWithPerson(Account account);
 
         [OperationContract]
-        bool ModifyAccount(PersonWithAccount person);
+        Account GetSingleAccount(String username);
 
         [OperationContract]
-        bool DeleteAccount(PersonWithAccount person);
-
-        [OperationContract]
-        bool DeleteAccountWithPerson(PersonWithAccount person);
-
-        [OperationContract]
-        PersonWithAccount GetSingleAccount(String username);
-
-        [OperationContract]
-        List<PersonWithAccount> GetAllAccounts();
+        List<Account> GetAllAccounts();
     }
 }

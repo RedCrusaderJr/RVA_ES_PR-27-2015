@@ -1,4 +1,5 @@
 ﻿using Client.Commands;
+using Client.Proxies;
 using Common.Models;
 using System;
 using System.Collections.Generic;
@@ -16,12 +17,11 @@ namespace Client.ViewModels
     {
         public ICommand LoginCommand { get; set; }
         public UserControl CurrentUserControl { get; set; }
-        public PersonWithAccount LoggedInPerson { get; set; }
+        public Account LoggedInPerson { get; set; }
         
         public LoginViewModel()
         {
             LoginCommand = new RelayCommand(Execute, CanExecute);
-            LoggedInPerson = new PersonWithAccount();
         }
 
         private void Execute(object parameter)
@@ -34,8 +34,8 @@ namespace Client.ViewModels
 
             try
             {
-                PersonWithAccount personWithAccount = AccountProxy.Instance.AccountServices.Login(username, password);
-                if(personWithAccount == null)
+                Account account = AccountProxy.Instance.AccountServices.Login(username, password);
+                if(account == null)
                 {
                     MessageBox.Show("Username or password is incorrect.");
                 }
@@ -51,38 +51,14 @@ namespace Client.ViewModels
                     TextBlock tb = VisualTreeHelper.GetChild(VisualTreeHelper.GetChild(messageView, 1), 3) as TextBlock;
 
                     tb.Text += "Successfull login!";
-
-                    /*
-                    CurrentUserControl.Content = new HomeViewModel(person);
-                    CurrentUserControl.Width = 1200;
-                    CurrentUserControl.Height = 600;
                     */
+                  
 
-                    /*
-                    UserControl HomeViewUserControl = new UserControl()
-                    {
-                        Width = 1200,
-                        Height = 600,
-                        Content = new HomeViewModel(person),
-                    }; 
-                    */
-
-                    //CurrentUserControl.Content = new HomeViewModel(personWithAccount);
-                    //CurrentUserControl.Width = 1200;
-                    //CurrentUserControl.Height = 800;
-                    
-                    
-                    Window newWindow = new Window()
-                    {
-                        Width = 1200,
-                        Height = 600, 
-                        Content = new HomeViewModel(personWithAccount),
-                    };
-                    newWindow.Show();
-                    
-
-                    Window currentWindow = Window.GetWindow(CurrentUserControl);
-                    currentWindow.Close();
+                    CurrentUserControl.Content = new HomeViewModel(account);
+                    CurrentUserControl.VerticalContentAlignment = VerticalAlignment.Top;
+                    CurrentUserControl.HorizontalContentAlignment = HorizontalAlignment.Left;
+                    CurrentUserControl.Width = 1500;
+                    CurrentUserControl.Height = 1000;
                 }
             }
             catch(Exception e)

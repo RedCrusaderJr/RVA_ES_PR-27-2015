@@ -7,33 +7,36 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Common.Models
 {
+    [DataContract]
     public class Person : IPerson, INotifyPropertyChanged
-    {
-
+    { 
         #region Fields
-        private Int32 _personID;
         private String _firstName;
         private String _lastName;
+        private String _jmbg;
+        private DateTime _lastEditTimeStamp;
         private List<Event> _scheduledEvents;
         #endregion
 
         #region Properties
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Int32 PersonID
+        [DataMember]
+        public string JMBG
         {
-            get => _personID;
+            get => _jmbg;
             set
             {
-                _personID = value;
+                _jmbg = value;
+                OnPropertyChanged("JMBG");
             }
         }
-
+        [DataMember]
         public string FirstName
         {
             get => _firstName;
@@ -43,7 +46,7 @@ namespace Common.Models
                 OnPropertyChanged("FirstName");
             }
         }
-
+        [DataMember]
         public string LastName
         {
             get => _lastName;
@@ -53,7 +56,17 @@ namespace Common.Models
                 OnPropertyChanged("LastName");
             }
         }
-
+        [DataMember]
+        public DateTime LastEditTimeStamp
+        {
+            get => _lastEditTimeStamp;
+            set
+            {
+                _lastEditTimeStamp = value;
+                OnPropertyChanged("LastEditTimeStamp");
+            }
+        }
+        [DataMember]
         public List<Event> ScheduledEvents
         {
             get
@@ -70,7 +83,18 @@ namespace Common.Models
 
         public Person()
         {
+            LastEditTimeStamp = DateTime.Now;
             ScheduledEvents = new List<Event>();
+        }
+
+        public Person(String jmbg, String firstName, String lastName)
+        {
+            JMBG = jmbg;
+            LastEditTimeStamp = DateTime.Now;
+            ScheduledEvents = new List<Event>();
+
+            FirstName = firstName;
+            LastName = lastName;
         }
 
         public bool ScheduleParticipationInEvent(Event e)

@@ -13,12 +13,12 @@ namespace Common.Helpers
         //STA CE BITI SA KOPIJAMA OBJEKATA
         public bool Equals(Event x, Event y)
         {
-            return x.EventID == y.EventID;
+            return x.EventId == y.EventId;
         }
 
         public int GetHashCode(Event obj)
         {
-            return obj.EventID;
+            return obj.EventId;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Client.Commands;
+using Client.Proxies;
 using Common.Models;
 using System;
 using System.Collections.Generic;

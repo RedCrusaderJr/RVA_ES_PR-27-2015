@@ -14,6 +14,6 @@ namespace Common.IAccess
         Boolean ModifyEvent(Event eventToModify);
         Boolean DeleteEvent(Event eventToDelete);
         Event GetSingleEvent(Int32 eventId);
-        Dictionary<Int32, Event> GetAllEvents();
+        List<Event> GetAllEvents();
     }
 }

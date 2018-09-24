@@ -19,13 +19,13 @@ namespace Server.Access
 
         protected override void Seed(EventSchedulerContext context)
         {
-            PersonWithAccount admin = new PersonWithAccount("admin", "admin", ERole.ADMIN)
+            //Person adminPerson = new Person("006", "Pera", "Peric");
+            Account admin = new Account("admin", "admin", ERole.ADMIN)
             {
                 FirstName = "Pera",
                 LastName = "Peric",
             };
-
-            DbManager.Instance.AddPersonWithAccount(admin);
+            DbManager.Instance.AddAccount(admin);
         }
     }
 }

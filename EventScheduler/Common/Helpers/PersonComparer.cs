@@ -12,12 +12,12 @@ namespace Common.Helpers
         //STA CE BITI SA KOPIJAMA OBJEKATA
         public bool Equals(Person x, Person y)
         {
-            return x.PersonID == y.PersonID;
+            return x.JMBG == y.JMBG;
         }
 
         public int GetHashCode(Person obj)
         {
-            return obj.PersonID;
+            return obj.GetHashCode();
         }
     }
 }

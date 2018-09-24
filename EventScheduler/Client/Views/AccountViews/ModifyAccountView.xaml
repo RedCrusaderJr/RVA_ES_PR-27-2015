@@ -37,12 +37,12 @@
         <Label Content="First name" Grid.Row="4" Grid.Column="1" Margin="0,30,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="25"/>
         <Label Content="Last name" Grid.Row="5" Grid.Column="1" Margin="0,30,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="25"/>
 
-        <TextBox Text="{Binding PersonToModify.Username}" Name="Username" Grid.Row="2" Grid.Column="2" Margin="0,30,0,0" Width="180" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20" IsEnabled="False"/>
-        <TextBox Text="{Binding PersonToModify.Password}" Name="Password" Grid.Row="3" Grid.Column="2" Margin="0,30,0,0" Width="180" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20"/>
-        <TextBox Text="{Binding PersonToModify.FirstName}" Name="FirstName" Grid.Row="4" Grid.Column="2" Margin="0,30,0,0" Width="180" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20"/>
-        <TextBox Text="{Binding PersonToModify.LastName}" Name="LastName" Grid.Row="5" Grid.Column="2" Margin="0,30,0,0" Width="180" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20"/>
+        <TextBox Text="{Binding AccountToModify.Username}" Name="Username" Grid.Row="2" Grid.Column="2" Margin="0,30,0,0" Width="180" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20" IsEnabled="False"/>
+        <TextBox Text="{Binding AccountToModify.Password}" Name="Password" Grid.Row="3" Grid.Column="2" Margin="0,30,0,0" Width="180" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20"/>
+        <TextBox Text="{Binding AccountToModify.FirstName}" Name="FirstName" Grid.Row="4" Grid.Column="2" Margin="0,30,0,0" Width="180" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20"/>
+        <TextBox Text="{Binding AccountToModify.LastName}" Name="LastName" Grid.Row="5" Grid.Column="2" Margin="0,30,0,0" Width="180" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20"/>
 
-        <Button Command="{Binding ModifyPersonCommand}" Content="SAVE" Grid.Row="6" Grid.Column="2" Margin="0,30,10,10" Width="140" Height="40" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20">
+        <Button Command="{Binding ModifyAccountCommand}" Content="SAVE" Grid.Row="6" Grid.Column="2" Margin="0,30,10,10" Width="140" Height="40" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20">
             <Button.CommandParameter>
                 <MultiBinding Converter="{StaticResource multiConverter}">
                     <Binding ElementName="ModifyAccountUserControl"/>

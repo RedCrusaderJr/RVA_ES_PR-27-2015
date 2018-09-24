@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -21,6 +22,8 @@ namespace Server
             accountServer.Open();
             personServer.Open();
             eventServer.Open();
+
+            //Process.Start(@"C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Client\bin\Debug\Client");
 
             Console.ReadLine();
             accountServer.Close();

@@ -1,4 +1,5 @@
 ﻿using Client.Commands;
+using Client.Proxies;
 using Client.ViewModels.AccountViewModels;
 using Client.ViewModels.EventViewModels;
 using Client.ViewModels.PersonViewModels;
@@ -39,15 +40,15 @@ namespace Client.ViewModels
         public ICommand LogOutCommand { get; set; }
         #endregion
 
-        public PersonWithAccount LoggedInPerson { get; set; }
+        public Account LoggedInAccount { get; set; }
         public Person SelectedPerson { get; set; }
         public Event SelectedEvent { get; set; }
-        public PersonWithAccount SelectedPersonWithAccount { get; set; }
+        public Account SelectedAccount { get; set; }
         public ObservableCollection<Person> PeopleList { get; set; }
         public ObservableCollection<Event> EventsList { get; set; }
-        public ObservableCollection<PersonWithAccount> AccountsList { get; set; }
+        public ObservableCollection<Account> AccountsList { get; set; }
 
-        public HomeViewModel(PersonWithAccount person)
+        public HomeViewModel(Account person)
         {
             AddPersonCommand = new RelayCommand(AddPersonExecute, AddPersonCanExecute);
             ModifyPersonCommand = new RelayCommand(ModifyPersonExecute, ModifyPersonCanExecute);
@@ -69,10 +70,11 @@ namespace Client.ViewModels
 
             LogOutCommand = new RelayCommand(LogOutExecute, LogOutCanExecute);
 
-            LoggedInPerson = person;
-            PeopleList = new ObservableCollection<Person>(PersonProxy.Instance.PersonServices.GetAllPeople());
+            LoggedInAccount = person;
+            
             EventsList = new ObservableCollection<Event>(EventProxy.Instance.EventServices.GetAllEvents());
-            AccountsList = new ObservableCollection<PersonWithAccount>(AccountProxy.Instance.AccountServices.GetAllAccounts());
+            AccountsList = new ObservableCollection<Account>(AccountProxy.Instance.AccountServices.GetAllAccounts());
+            PeopleList = new ObservableCollection<Person>(PersonProxy.Instance.PersonServices.GetAllPeople());
         }
 
         #region PersonCommandExecutions
@@ -96,7 +98,7 @@ namespace Client.ViewModels
 
         private void ModifyPersonExecute(object parameter)
         {
-            int modifiedPersonId = SelectedPerson.PersonID;
+            string modifiedPersonId = SelectedPerson.JMBG;
 
             Window window = new Window()
             {
@@ -108,14 +110,16 @@ namespace Client.ViewModels
             window.ShowDialog();
 
             PeopleList = new ObservableCollection<Person>(PersonProxy.Instance.PersonServices.GetAllPeople());
-            AccountsList = new ObservableCollection<PersonWithAccount>(AccountProxy.Instance.AccountServices.GetAllAccounts());
+            AccountsList = new ObservableCollection<Account>(AccountProxy.Instance.AccountServices.GetAllAccounts());
 
-            if (LoggedInPerson.PersonID == modifiedPersonId)
+            /*
+            if (LoggedInAccount.PersonWithAccount.JMBG == modifiedPersonId)
             {
                 Object[] parameters = parameter as Object[];
                 TextBlock tb = parameters[0] as TextBlock;
-                tb.Text = $"Username: {LoggedInPerson.Username}     First name: {LoggedInPerson.FirstName}     Last name: {LoggedInPerson.LastName}";
+                tb.Text = $"Username: {LoggedInAccount.Username}     First name: {LoggedInAccount.FirstName}     Last name: {LoggedInAccount.LastName}";
             }
+            */
         }
         private bool ModifyPersonCanExecute(object parameter)
         {
@@ -139,7 +143,7 @@ namespace Client.ViewModels
             window.ShowDialog();
 
             PeopleList = new ObservableCollection<Person>(PersonProxy.Instance.PersonServices.GetAllPeople());
-            AccountsList = new ObservableCollection<PersonWithAccount>(AccountProxy.Instance.AccountServices.GetAllAccounts());
+            AccountsList = new ObservableCollection<Account>(AccountProxy.Instance.AccountServices.GetAllAccounts());
         }
         private bool DeletePersonCanExecute(object parameter)
         {
@@ -179,8 +183,7 @@ namespace Client.ViewModels
                                                                          || !(parameters[0] is DataGrid peopleTable)
                                                                          || !(parameters[1] is DataGrid eventsTable)
                                                                          || !(parameters[2] is DataGrid accountsTable)
-                                                                         || accountsTable.Visibility != eventsTable.Visibility
-                                                                         || peopleTable.Visibility != Visibility.Visible)
+                                                                         || peopleTable.Visibility == Visibility.Visible)
             {
                 return false;
             }
@@ -287,8 +290,7 @@ namespace Client.ViewModels
                                                                          || !(parameters[0] is DataGrid peopleTable)
                                                                          || !(parameters[1] is DataGrid eventsTable)
                                                                          || !(parameters[2] is DataGrid accountsTable)
-                                                                         || peopleTable.Visibility != accountsTable.Visibility
-                                                                         || eventsTable.Visibility != Visibility.Visible)
+                                                                         || eventsTable.Visibility == Visibility.Visible)
             {
                 return false;
             }
@@ -310,39 +312,39 @@ namespace Client.ViewModels
             window.ShowDialog();
 
             PeopleList = new ObservableCollection<Person>(PersonProxy.Instance.PersonServices.GetAllPeople());
-            AccountsList = new ObservableCollection<PersonWithAccount>(AccountProxy.Instance.AccountServices.GetAllAccounts());
+            AccountsList = new ObservableCollection<Account>(AccountProxy.Instance.AccountServices.GetAllAccounts());
         }
         private bool CreateAccountCanExecute(object parameter)
         {
-            return LoggedInPerson.Role == ERole.ADMIN;
+            return LoggedInAccount.Role == ERole.ADMIN;
         }
 
         private void ModifyAccountExecute(object parameter)
         {
-            int modifiedPersonId = SelectedPerson.PersonID;
+            string modifiedAccountUsername = SelectedAccount.Username;
 
             Window window = new Window()
             {
                 Width = 500,
                 Height = 600,
-                Content = new ModifyAccountViewModel(SelectedPersonWithAccount),
+                Content = new ModifyAccountViewModel(SelectedAccount),
             };
 
             window.ShowDialog();
 
             PeopleList = new ObservableCollection<Person>(PersonProxy.Instance.PersonServices.GetAllPeople());
-            AccountsList = new ObservableCollection<PersonWithAccount>(AccountProxy.Instance.AccountServices.GetAllAccounts());
+            AccountsList = new ObservableCollection<Account>(AccountProxy.Instance.AccountServices.GetAllAccounts());
 
-            if (LoggedInPerson.PersonID == modifiedPersonId)
+            if (LoggedInAccount.Username == modifiedAccountUsername)
             {
                 Object[] parameters = parameter as Object[];
                 TextBlock tb = parameters[0] as TextBlock;
-                tb.Text = $"Username: {LoggedInPerson.Username}     First name: {LoggedInPerson.FirstName}     Last name: {LoggedInPerson.LastName}";
+                tb.Text = $"Username: {LoggedInAccount.Username}     First name: {LoggedInAccount.FirstName}     Last name: {LoggedInAccount.LastName}";
             }
         }
         private bool ModifyAccountCanExecute(object parameter)
         {
-            if (parameter == null || !(parameter is Object[] parameters) || parameters.Length != 1 || SelectedPersonWithAccount == null)
+            if (parameter == null || !(parameter is Object[] parameters) || parameters.Length != 1 || SelectedAccount == null)
             {
                 return false;
             }
@@ -356,17 +358,18 @@ namespace Client.ViewModels
             {
                 Width = 500,
                 Height = 600,
-                Content = new ModifyAccountViewModel(LoggedInPerson),
+                Content = new ModifyAccountViewModel(LoggedInAccount),
             };
 
             window.ShowDialog();
 
             PeopleList = new ObservableCollection<Person>(PersonProxy.Instance.PersonServices.GetAllPeople());
-            AccountsList = new ObservableCollection<PersonWithAccount>(AccountProxy.Instance.AccountServices.GetAllAccounts());
+            AccountsList = new ObservableCollection<Account>(AccountProxy.Instance.AccountServices.GetAllAccounts());
 
+            LoggedInAccount = AccountsList.FirstOrDefault(a => a.Username.Equals(LoggedInAccount.Username));
             Object[] parameters = parameter as Object[];
             TextBlock tb = parameters[0] as TextBlock;
-            tb.Text = $"Username: {LoggedInPerson.Username}     First name: {LoggedInPerson.FirstName}     Last name: {LoggedInPerson.LastName}";         
+            tb.Text = $"Username: {LoggedInAccount.Username}     First name: {LoggedInAccount.FirstName}     Last name: {LoggedInAccount.LastName}";         
         }
         private bool ModifyPersonalAccountCanExecute(object parameter)
         {
@@ -379,17 +382,17 @@ namespace Client.ViewModels
             {
                 Width = 500,
                 Height = 600,
-                Content = new DeletePersonConfirmationViewModel(SelectedPersonWithAccount),
+                Content = new DeleteAccountConfirmationViewModel(SelectedAccount),
             };
 
             window.ShowDialog();
 
             PeopleList = new ObservableCollection<Person>(PersonProxy.Instance.PersonServices.GetAllPeople());
-            AccountsList = new ObservableCollection<PersonWithAccount>(AccountProxy.Instance.AccountServices.GetAllAccounts());
+            AccountsList = new ObservableCollection<Account>(AccountProxy.Instance.AccountServices.GetAllAccounts());
         }
         private bool DeleteAccountCanExecute(object parameter)
         {
-            return SelectedPersonWithAccount != null;
+            return SelectedAccount != null;
         }
 
         private void ShowAccountsExecute(object parameter)
@@ -409,8 +412,7 @@ namespace Client.ViewModels
                                                                          || !(parameters[0] is DataGrid peopleTable)
                                                                          || !(parameters[1] is DataGrid eventsTable)
                                                                          || !(parameters[2] is DataGrid accountsTable)
-                                                                         || peopleTable.Visibility != eventsTable.Visibility
-                                                                         || accountsTable.Visibility != Visibility.Visible)
+                                                                         || accountsTable.Visibility == Visibility.Visible)
             {
                 return false;
             }
@@ -422,18 +424,12 @@ namespace Client.ViewModels
         {
             Object[] parameters = parameter as Object[];
 
-            UserControl uc = parameters[0] as UserControl;
-            Window currentWindow = Window.GetWindow(uc);
-
-            Window newWindow = new Window()
-            {
-                Width = 400,
-                Height = 400,
-                Content = new LoginViewModel(),
-            };
-
-            newWindow.Show();
-            currentWindow.Close();
+            UserControl CurrentUserControl = parameters[0] as UserControl;
+            CurrentUserControl.Content = new LoginViewModel();
+            CurrentUserControl.VerticalContentAlignment = VerticalAlignment.Top;
+            CurrentUserControl.HorizontalContentAlignment = HorizontalAlignment.Left;
+            CurrentUserControl.Width = 1500;
+            CurrentUserControl.Height = 1000;
         }
         private bool LogOutCanExecute(object parameter)
         {

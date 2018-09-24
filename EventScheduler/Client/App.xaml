@@ -15,11 +15,11 @@
         <DataTemplate DataType="{x:Type vm:HomeViewModel}">
             <v:HomeView/>
         </DataTemplate>
-        <!--<DataTemplate DataType="{x:Type vm:LoginViewModel}">
+        <DataTemplate DataType="{x:Type vm:LoginViewModel}">
             <v:LoginView/>
-        </DataTemplate>-->
-        
-        
+        </DataTemplate>
+
+
         <DataTemplate DataType="{x:Type avm:CreateNewAccountViewModel}">
             <av:CreateNewAccountView/>
         </DataTemplate>

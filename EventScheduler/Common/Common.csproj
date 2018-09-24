@@ -39,6 +39,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -55,7 +56,7 @@
     <Compile Include="Helpers\PersonComparer.cs" />
     <Compile Include="IAccess\IEventDbManager.cs" />
     <Compile Include="IAccess\IPersonDbManager.cs" />
-    <Compile Include="IAccess\IPersonWithAccountDbManager.cs" />
+    <Compile Include="IAccess\IAccountDbManager.cs" />
     <Compile Include="IModels\IAccount.cs" />
     <Compile Include="IModels\IEvent.cs" />
     <Compile Include="IModels\INotifyPerson.cs" />
@@ -63,7 +64,7 @@
     <Compile Include="Models\Enums.cs" />
     <Compile Include="Models\Event.cs" />
     <Compile Include="Models\Person.cs" />
-    <Compile Include="Models\PersonWithAccount.cs" />
+    <Compile Include="Models\Account.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -8,13 +8,15 @@ using System.ComponentModel.DataAnnotations;
 using Common.Helpers;
 using Common.IModels;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
 
 namespace Common.Models
 {
+    [DataContract]
     public class Event : IEvent
     {
         #region Fields
-        private int _eventID;
+        private int _eventId;
         private DateTime _createdTimeStamp;
         private DateTime _lastEditTimeStamp;
         private DateTime _scheduledDateTimeBeging;
@@ -26,39 +28,51 @@ namespace Common.Models
 
         #region Properties
         [Key]
+        [DataMember]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Int32 EventID { get => _eventID; set => _eventID = value; }
+        public Int32 EventId
+        {
+            get => _eventId;
+            set => _eventId = value;
+        }
         [Required]
+        [DataMember]
         public DateTime CreatedTimeStamp
         {
             get => _createdTimeStamp;
             private set => _createdTimeStamp = value;
         }
+        [DataMember]
         public DateTime LastEditTimeStamp
         {
             get => _lastEditTimeStamp;
             set => _lastEditTimeStamp = value;
         }
+        [DataMember]
         public DateTime ScheduledDateTimeBeging
         {
             get => _scheduledDateTimeBeging;
             set => _scheduledDateTimeBeging = value;
         }
+        [DataMember]
         public DateTime ScheduledDateTimeEnd
         {
             get => _scheduledDateTimeEnd;
             set => _scheduledDateTimeEnd = value;
         }
+        [DataMember]
         public string EventTitle
         {
             get => _eventTitle;
             set => _eventTitle = value;
         }
+        [DataMember]
         public String Description
         {
             get => _description;
             set => _description = value;
         }
+        [DataMember]
         public List<Person> Participants
         {
             get => _participants;
@@ -76,8 +90,7 @@ namespace Common.Models
 
         public Event(DateTime scheduledDateTimeBegining, DateTime scheduledDateTimeEnd)
         {
-            EventID = this.GetHashCode();
-            //Participants = new List<Person>();
+            Participants = new List<Person>();
            
             CreatedTimeStamp = DateTime.Now;
             LastEditTimeStamp = CreatedTimeStamp;
@@ -85,15 +98,15 @@ namespace Common.Models
             ScheduledDateTimeEnd = scheduledDateTimeEnd;
         }
 
-        public Event(DateTime scheduledDateTimeBegining, DateTime scheduledDateTimeEnd, String description)
+        public Event(DateTime scheduledDateTimeBegining, DateTime scheduledDateTimeEnd, String title, String description)
         {
-            EventID = this.GetHashCode();
-            //Participants = new List<Person>();
+            Participants = new List<Person>();
 
             CreatedTimeStamp = DateTime.Now;
             LastEditTimeStamp = CreatedTimeStamp;
             ScheduledDateTimeBeging = scheduledDateTimeBegining;
             ScheduledDateTimeEnd = scheduledDateTimeEnd;
+            EventTitle = title;
             Description = description;
         }
 

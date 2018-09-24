@@ -57,7 +57,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AccountProxy.cs" />
+    <Compile Include="Proxies\AccountProxy.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -65,11 +65,12 @@
     <Compile Include="Commands\RelayCommand.cs" />
     <Compile Include="Converters\MultiCloneConverter.cs" />
     <Compile Include="Converters\RadioButtonCheckedConverter.cs" />
-    <Compile Include="EventProxy.cs" />
+    <Compile Include="Proxies\EventProxy.cs" />
     <Compile Include="EventShedulerWindow.xaml.cs">
       <DependentUpon>EventShedulerWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PersonProxy.cs" />
+    <Compile Include="Proxies\PersonProxy.cs" />
+    <Compile Include="ViewModels\AccountViewModels\DeleteAccountConfirmationViewModel.cs" />
     <Compile Include="ViewModels\EventViewModels\AddEventViewModel.cs" />
     <Compile Include="ViewModels\PersonViewModels\AddPersonViewModel.cs" />
     <Compile Include="ViewModels\AccountViewModels\CreateNewAccountViewModel.cs" />

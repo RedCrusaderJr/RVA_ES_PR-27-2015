@@ -7,36 +7,36 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Client.Commands;
+using Client.Proxies;
 using Common.Models;
 
 namespace Client.ViewModels.AccountViewModels
 {
     class ModifyAccountViewModel
     {
-        public ICommand ModifyPersonCommand { get; set; }
+        public ICommand ModifyAccountCommand { get; set; }
         public Window CurrentWindow { get; set; }
-        public PersonWithAccount SelectedPersonWithAccount { get; set; }
-        public Person PersonToModify { get; set; }
+        public Account SelectedAccount { get; set; }
+        public Account AccountToModify { get; set; }
 
-        public ModifyAccountViewModel(PersonWithAccount selectedPersonWithAccount)
+        public ModifyAccountViewModel(Account selectedAccount)
         {
-            ModifyPersonCommand = new RelayCommand(ModifyPersonExecute, ModifyPersonCanExecute);
-            SelectedPersonWithAccount = selectedPersonWithAccount;
-            PersonToModify = new PersonWithAccount()
+            ModifyAccountCommand = new RelayCommand(ModifyAccountExecute, ModifyAccountCanExecute);
+            SelectedAccount = selectedAccount;
+            AccountToModify = new Account(SelectedAccount.Username)
             {
-                Username = selectedPersonWithAccount.Username,
-                Password = selectedPersonWithAccount.Password,
-                FirstName = selectedPersonWithAccount.FirstName,
-                LastName = selectedPersonWithAccount.LastName,
-                Role = selectedPersonWithAccount.Role,
+                Password = SelectedAccount.Password,
+                FirstName = SelectedAccount.FirstName,
+                LastName = SelectedAccount.LastName,
+                Role = SelectedAccount.Role,
             };
         }
 
-        private void ModifyPersonExecute(object parameter)
+        private void ModifyAccountExecute(object parameter)
         {
             Object[] parameters = parameter as Object[];
 
-            if (PersonProxy.Instance.PersonServices.ModifyPerson(PersonToModify))
+            if (AccountProxy.Instance.AccountServices.ModifyAccount(AccountToModify))
             {
                 UserControl uc = parameters[0] as UserControl;
                 Window window = Window.GetWindow(uc);
@@ -48,7 +48,7 @@ namespace Client.ViewModels.AccountViewModels
             }
         }
 
-        private bool ModifyPersonCanExecute(object parameter)
+        private bool ModifyAccountCanExecute(object parameter)
         {
             if (parameter == null || !(parameter is Object[] parameters) || parameters.Length != 1)
             {

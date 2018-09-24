@@ -20,7 +20,7 @@
 			<ColumnDefinition Width="20"/>
 		</Grid.ColumnDefinitions>
 		<view:LoginView Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-		<view:MessagesView Grid.Row="1" Grid.Column="2" />
+		<view:MessagesView Grid.Row="1" Grid.Column="2" x:Name="messagePanel"/>
 		<StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left">
 			<Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" FontWeight="UltraBold"/>
 		</StackPanel>

@@ -44,9 +44,9 @@ namespace Server.Providers
         }
 
         //ADAPTIRA METODE BAZE...
-        public Person GetSinglePerson(int id)
+        public Person GetSinglePerson(string jmbg)
         {
-            Person person = DbManager.Instance.GetSinglePerson(id);
+            Person person = DbManager.Instance.GetSinglePerson(jmbg);
 
             if(person == null)
             {
@@ -58,7 +58,7 @@ namespace Server.Providers
 
         public List<Person> GetAllPeople()
         {
-            return DbManager.Instance.GetAllPeople().Values.ToList();
+            return DbManager.Instance.GetAllPeople();
         }
     }
 }

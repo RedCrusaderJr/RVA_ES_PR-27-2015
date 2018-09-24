@@ -141,7 +141,7 @@ namespace Server.Providers
 
         public List<Event> GetAllEvents()
         {
-            return DbManager.Instance.GetAllEvents().Values.ToList();
+            return DbManager.Instance.GetAllEvents();
         }
     }
 }

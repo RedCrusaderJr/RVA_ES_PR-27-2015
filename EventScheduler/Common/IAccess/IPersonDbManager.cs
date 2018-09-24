@@ -12,7 +12,7 @@ namespace Common.IAccess
         Boolean AddPerson(Person personToAdd);
         Boolean ModifyPerson(Person personToModify);
         Boolean DeletePerson(Person personToDelete);
-        Person GetSinglePerson(Int32 personId);
-        Dictionary<Int32, Person> GetAllPeople();
+        Person GetSinglePerson(String jmbg);
+        List<Person> GetAllPeople();
     }
 }

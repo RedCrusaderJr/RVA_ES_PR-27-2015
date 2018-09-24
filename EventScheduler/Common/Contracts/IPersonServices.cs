@@ -21,7 +21,7 @@ namespace Common.Contracts
         bool DeletePerson(Person person);
 
         [OperationContract]
-        Person GetSinglePerson(Int32 id);
+        Person GetSinglePerson(String jmbg);
 
         [OperationContract]
         List<Person> GetAllPeople();

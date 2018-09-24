@@ -12,15 +12,15 @@ namespace Server.Providers
     class AccountServices_Provider : IAccountServices
     {
         //RETURNING NULL
-        public PersonWithAccount Login(string username, string password)
+        public Account Login(string username, string password)
         {
-            PersonWithAccount personWithAccount = DbManager.Instance.GetSinglePersonWithAccountByUsername(username);
+            Account account = DbManager.Instance.GetSingleAccountByUsername(username);
 
-            if(personWithAccount != null)
+            if(account != null)
             {
-                if(personWithAccount.Password.Equals(password))
+                if(account.Password.Equals(password))
                 {
-                    return personWithAccount;
+                    return account;
                 }
             }
 
@@ -28,9 +28,29 @@ namespace Server.Providers
             return null;
         }
 
-        public bool CreateNewAccount(PersonWithAccount personWithAccountToCreate)
+        public bool CreateNewAccount(Account accountToCreate)
         {
-            if(DbManager.Instance.AddPersonWithAccount(personWithAccountToCreate))
+            if(DbManager.Instance.AddAccount(accountToCreate))
+            {
+                return true;
+            }
+
+            return false;
+        }
+        /*
+        public bool CreateAccountWithExistingPerson(Account accountToCreate)
+        {
+            if (DbManager.Instance.AddAccount(accountToCreate))
+            {
+                return true;
+            }
+
+            return false;
+        }
+        */
+        public bool ModifyAccount(Account accountToModify)
+        {
+            if(DbManager.Instance.ModifyAccount(accountToModify))
             {
                 return true;
             }
@@ -38,11 +58,11 @@ namespace Server.Providers
             return false;
         }
 
-        public bool CreateAccountWithExistingPerson(PersonWithAccount personWithAccountToCreate)
+        public bool DeleteAccount(Account accountToBeDeleted)
         {
-            if(DbManager.Instance.DeletePerson(personWithAccountToCreate as Person))
+            if(DbManager.Instance.DeleteAccount(accountToBeDeleted))
             {
-                if(DbManager.Instance.AddPersonWithAccount(personWithAccountToCreate))
+                if(DbManager.Instance.DeleteAccount(accountToBeDeleted))
                 {
                     return true;
                 }
@@ -51,54 +71,38 @@ namespace Server.Providers
             return false;
         }
 
-        public bool ModifyAccount(PersonWithAccount personWithAccountToModify)
+        /*
+        public bool DeleteAccountWithPerson(Account accountToDelete)
         {
-            if(DbManager.Instance.ModifyPersonWithAccount(personWithAccountToModify))
+            if(!DbManager.Instance.DeleteAccount(accountToDelete))
             {
-                return true;
+                return false;
             }
 
-            return false;
-        }
-
-        public bool DeleteAccount(PersonWithAccount accountToBeDeleted)
-        {
-            if(DbManager.Instance.DeletePersonWithAccount(accountToBeDeleted))
+            if (!DbManager.Instance.DeletePerson(accountToDelete.PersonWithAccount))
             {
-                if(DbManager.Instance.AddPerson(accountToBeDeleted as Person))
-                {
-                    return true;
-                }
+                return false;
             }
 
-            return false;
+            return true;
         }
+        */
 
-        public bool DeleteAccountWithPerson(PersonWithAccount personWithAccountToDelete)
+        public Account GetSingleAccount(string username)
         {
-            if(DbManager.Instance.DeletePersonWithAccount(personWithAccountToDelete))
-            {
-                return true;
-            }
+            Account account = DbManager.Instance.GetSingleAccountByUsername(username);
 
-            return false;
-        }
-
-        public PersonWithAccount GetSingleAccount(string username)
-        {
-            PersonWithAccount personWithAccount = DbManager.Instance.GetSinglePersonWithAccountByUsername(username);
-
-            if (personWithAccount == null)
+            if (account == null)
             {
                 throw new NullReferenceException();
             }
 
-            return personWithAccount;
+            return account;
         }
 
-        public List<PersonWithAccount> GetAllAccounts()
+        public List<Account> GetAllAccounts()
         {
-            return DbManager.Instance.GetAllPeopleWithAccounts().Values.ToList();
+            return DbManager.Instance.GetAllAccounts();
         }
     }
 }
