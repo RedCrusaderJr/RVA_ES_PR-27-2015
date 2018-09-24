@@ -310,7 +310,6 @@ namespace Client.ViewModels
             };
 
             window.ShowDialog();
-
             
         }
         private bool CreateAccountCanExecute(object parameter)
@@ -330,9 +329,6 @@ namespace Client.ViewModels
             };
 
             window.ShowDialog();
-
-            PeopleList = new ObservableCollection<Person>(PersonProxy.Instance.PersonServices.GetAllPeople());
-            AccountsList = new ObservableCollection<Account>(AccountProxy.Instance.AccountServices.GetAllAccounts());
 
             if (LoggedInAccount.Username == modifiedAccountUsername)
             {
@@ -361,9 +357,6 @@ namespace Client.ViewModels
             };
 
             window.ShowDialog();
-
-            PeopleList = new ObservableCollection<Person>(PersonProxy.Instance.PersonServices.GetAllPeople());
-            AccountsList = new ObservableCollection<Account>(AccountProxy.Instance.AccountServices.GetAllAccounts());
 
             LoggedInAccount = AccountsList.FirstOrDefault(a => a.Username.Equals(LoggedInAccount.Username));
             Object[] parameters = parameter as Object[];
