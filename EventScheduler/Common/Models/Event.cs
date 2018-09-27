@@ -19,8 +19,8 @@ namespace Common.Models
         private int _eventId;
         private DateTime _createdTimeStamp;
         private DateTime _lastEditTimeStamp;
-        private DateTime _scheduledDateTimeBeging;
-        private DateTime _scheduledDateTimeEnd;
+        private DateTime? _scheduledDateTimeBeging;
+        private DateTime? _scheduledDateTimeEnd;
         private string _eventTitle;
         private string _description;
         private List<Person> _participants;
@@ -49,19 +49,19 @@ namespace Common.Models
             set => _lastEditTimeStamp = value;
         }
         [DataMember]
-        public DateTime ScheduledDateTimeBeging
+        public DateTime? ScheduledDateTimeBeging
         {
             get => _scheduledDateTimeBeging;
             set => _scheduledDateTimeBeging = value;
         }
         [DataMember]
-        public DateTime ScheduledDateTimeEnd
+        public DateTime? ScheduledDateTimeEnd
         {
             get => _scheduledDateTimeEnd;
             set => _scheduledDateTimeEnd = value;
         }
         [DataMember]
-        public string EventTitle
+        public String EventTitle
         {
             get => _eventTitle;
             set => _eventTitle = value;

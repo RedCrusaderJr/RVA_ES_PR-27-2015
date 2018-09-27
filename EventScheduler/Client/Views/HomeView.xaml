@@ -58,13 +58,7 @@
         </StatusBar>
         <StackPanel Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,10,0,0">
             <Button Command="{ Binding AddPersonCommand }"  Content="Add Person" Height="25" Width="150" Margin="0,10,0,0"/>
-            <Button Command="{ Binding ModifyPersonCommand }"  Content="Modify Person" Height="25" Width="150" Margin="0,10,0,0">
-                <Button.CommandParameter>
-                    <MultiBinding Converter="{StaticResource multiConverter}">
-                        <Binding ElementName="HomeTextBlock"/>
-                    </MultiBinding>
-                </Button.CommandParameter>
-            </Button>
+            <Button Command="{ Binding ModifyPersonCommand }"  Content="Modify Person" Height="25" Width="150" Margin="0,10,0,0"/>
             <Button Command="{ Binding DeletePersonCommand }"  Content="Delete Person" Height="25" Width="150" Margin="0,10,0,0"/>
             <Separator Margin="10"/>
             <Button Command="{ Binding AddEventCommand }"  Content="Add Event" Height="25" Width="150" Margin="0,10,0,0"/>
@@ -73,7 +67,13 @@
             <Separator Margin="10"/>
             <Button Command="{ Binding CreateAccountCommand }" Name="btnCreateAccount" Content="Create new Account" Height="25" Width="150" Margin="0,10,0,0"/>
             <Button Command="{ Binding DeleteAccountCommand }" Name="btnDeleteAccount" Content="Delete Account" Height="25" Width="150" Margin="0,10,0,0"/>
-            <Button Command="{ Binding ModifyAccountCommand }" Name="btnModifyAccount" Content="Modify Account" Height="25" Width="150" Margin="0,10,0,0"/>
+            <Button Command="{ Binding ModifyAccountCommand }" Name="btnModifyAccount" Content="Modify Account" Height="25" Width="150" Margin="0,10,0,0">
+                <Button.CommandParameter>
+                    <MultiBinding Converter="{StaticResource multiConverter}">
+                        <Binding ElementName="HomeTextBlock"/>
+                    </MultiBinding>
+                </Button.CommandParameter>
+            </Button>
             <Separator Margin="10"/>
         </StackPanel>
         <StatusBar Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2" HorizontalAlignment="Right" VerticalAlignment="Center" Background="White">
@@ -105,7 +105,7 @@
                 </Button.CommandParameter>
             </Button>
         </StatusBar>
-        
+
 
         <DataGrid Name="PeopleTable" Visibility="Visible" ItemsSource="{Binding PeopleList, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedPerson, Mode=OneWayToSource}" IsReadOnly="True" SelectionMode="Single" AutoGenerateColumns="False" Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="2">
             <DataGrid.Columns>
@@ -151,7 +151,7 @@
                 <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding EventDetailsCommand}" CommandParameter="{Binding ElementName=EventsTable, Path=SelectedItem}"/>
             </DataGrid.InputBindings>
         </DataGrid>
-        <DataGrid Name="AccountsTable" Visibility="Collapsed" ItemsSource="{Binding AccountsList, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedPersonWithAccount, Mode=OneWayToSource}" IsReadOnly="True" SelectionMode="Single" AutoGenerateColumns="False" Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="2">
+        <DataGrid Name="AccountsTable" Visibility="Collapsed" ItemsSource="{Binding AccountsList, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedAccount, Mode=OneWayToSource}" IsReadOnly="True" SelectionMode="Single" AutoGenerateColumns="False" Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="2">
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Username}" Header="Username" Width="*"/>
                 <DataGridTextColumn Binding="{Binding Password}" Header="Password" Width="*"/>

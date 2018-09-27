@@ -86,6 +86,9 @@
     <Compile Include="Views\AccountViews\CreateNewAccountView.xaml.cs">
       <DependentUpon>CreateNewAccountView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\AccountViews\DeleteAccountConfirmationView.xaml.cs">
+      <DependentUpon>DeleteAccountConfirmationView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\AccountViews\ModifyAccountView.xaml.cs">
       <DependentUpon>ModifyAccountView.xaml</DependentUpon>
     </Compile>
@@ -161,6 +164,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\AccountViews\CreateNewAccountView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AccountViews\DeleteAccountConfirmationView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

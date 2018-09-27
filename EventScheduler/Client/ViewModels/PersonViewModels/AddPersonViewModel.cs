@@ -1,7 +1,9 @@
 ﻿using Client.Commands;
+using Client.Proxies;
 using Common.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,12 +19,12 @@ namespace Client.ViewModels.PersonViewModels
         public Window CurrentWindow { get; set; }
         public Person PersonToAdd { get; set; }
         public ERole SelectedOption { get; set; }
+        public ObservableCollection<Person> PeopleList { get; set; }
 
-
-        public AddPersonViewModel()
+        public AddPersonViewModel(ObservableCollection<Person> peopleList)
         {
             AddPersonCommand = new RelayCommand(AddPersonExecute, AddPersonCanExecute);
-            //SelectedOption = ERole.REGULAR;
+            PeopleList = peopleList;
         }
 
         private void AddPersonExecute(object parameter)
@@ -30,40 +32,28 @@ namespace Client.ViewModels.PersonViewModels
             Object[] parameters = parameter as Object[];
             PersonToAdd = new Person()
             {
-                //Username = parameters[0] as String,
-                //Password = parameters[1] as String,
-                FirstName = parameters[2] as String,
-                LastName = parameters[3] as String,
-                //Role = (bool)parameters[4] ? ERole.REGULAR : ERole.ADMIN,
+                FirstName = parameters[0] as String,
+                LastName = parameters[1] as String,
+                JMBG = parameters[2] as String,
             };
 
-            /*
-            if ((bool)parameters[4])
+            if (PersonProxy.Instance.PersonServices.AddPerson(PersonToAdd))
             {
-                PersonToAdd.Role = ERole.REGULAR;
-            }
-            else if ((bool)parameters[5])
-            {
-                PersonToAdd.Role = ERole.ADMIN;
-            }
-            */
+                PeopleList.Add(PersonToAdd);
 
-            /*
-            if (Proxy.Instance.BasicOperations.AddPerson(PersonToAdd))
-            {
-                UserControl uc = parameters[6] as UserControl;
+                MessageBox.Show("Person successfully added.");
+                UserControl uc = parameters[3] as UserControl;
                 CurrentWindow = Window.GetWindow(uc);
                 CurrentWindow.Close();
             }
             else
             {
                 MessageBox.Show("Error on server or username already exists.");
-                UserControl uc = parameters[6] as UserControl;
+                UserControl uc = parameters[3] as UserControl;
                 CurrentWindow = Window.GetWindow(uc);
                 CurrentWindow.Close();
 
             }
-            */
         }
 
         private bool AddPersonCanExecute(object parameter)
@@ -71,8 +61,7 @@ namespace Client.ViewModels.PersonViewModels
             if(parameter == null || !(parameter is Object[] parameters) || (String)parameters[0] == String.Empty
                                                                         || (String)parameters[1] == String.Empty
                                                                         || (String)parameters[2] == String.Empty
-                                                                        || (String)parameters[3] == String.Empty
-                                                                        || (bool)parameters[4] == (bool)parameters[5])
+                                                                        || !(parameters[3] is UserControl))
             {
                 return false;
             }

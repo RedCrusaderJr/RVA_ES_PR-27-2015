@@ -1,17 +1,44 @@
-﻿using Common.Models;
+﻿using Client.Commands;
+using Client.Proxies;
+using Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace Client.ViewModels.PersonViewModels
 {
     class PersonDetailsViewModel
     {
+        public ICommand ClosePersonDetailsCommand { get; set; }
+        public Person SelectedPerson { get; set; }
+
         public PersonDetailsViewModel(Person selectedPerson)
         {
+            SelectedPerson = selectedPerson;
 
+            ClosePersonDetailsCommand = new RelayCommand(ClosePersonDetailsCommandExecute, ClosePersonDetailsCommandCanExecute);
+        }
+
+        private void ClosePersonDetailsCommandExecute(object obj)
+        {
+            object[] parameters = obj as object[];
+            Window currentWindow = Window.GetWindow((UserControl)parameters[0]);
+            currentWindow.Close();
+        }
+
+        private bool ClosePersonDetailsCommandCanExecute(object arg)
+        {
+            if (arg == null || !(arg is Object[] parameters) || parameters.Length != 1 || !(parameters[0] is UserControl))
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

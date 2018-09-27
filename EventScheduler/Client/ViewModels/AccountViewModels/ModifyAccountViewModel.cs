@@ -41,10 +41,10 @@ namespace Client.ViewModels.AccountViewModels
 
             if (AccountProxy.Instance.AccountServices.ModifyAccount(AccountToModify))
             {
-                Account AccountInTheList = AccountsList.First(a => a.Username.Equals(AccountToModify.Username));
-                AccountInTheList.Password = AccountToModify.Password;
-                AccountInTheList.FirstName = AccountToModify.FirstName;
-                AccountInTheList.LastName = AccountToModify.LastName;
+                Account accountInList = AccountsList.First(a => a.Username.Equals(AccountToModify.Username));
+                accountInList.Password = AccountToModify.Password;
+                accountInList.FirstName = AccountToModify.FirstName;
+                accountInList.LastName = AccountToModify.LastName;
 
                 UserControl uc = parameters[0] as UserControl;
                 Window window = Window.GetWindow(uc);

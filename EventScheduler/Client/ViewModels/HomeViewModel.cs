@@ -71,10 +71,10 @@ namespace Client.ViewModels
             LogOutCommand = new RelayCommand(LogOutExecute, LogOutCanExecute);
 
             LoggedInAccount = person;
-            
+
+            PeopleList = new ObservableCollection<Person>(PersonProxy.Instance.PersonServices.GetAllPeople());
             EventsList = new ObservableCollection<Event>(EventProxy.Instance.EventServices.GetAllEvents());
             AccountsList = new ObservableCollection<Account>(AccountProxy.Instance.AccountServices.GetAllAccounts());
-            PeopleList = new ObservableCollection<Person>(PersonProxy.Instance.PersonServices.GetAllPeople());
         }
 
         #region PersonCommandExecutions
@@ -84,12 +84,10 @@ namespace Client.ViewModels
             {
                 Width = 600,
                 Height = 600,
-                Content = new AddPersonViewModel(),
+                Content = new AddPersonViewModel(PeopleList),
             };
 
             window.ShowDialog();
-
-            PeopleList = new ObservableCollection<Person>(PersonProxy.Instance.PersonServices.GetAllPeople());
         }
         private bool AddPersonCanExecute(object paramter)
         {
@@ -98,32 +96,18 @@ namespace Client.ViewModels
 
         private void ModifyPersonExecute(object parameter)
         {
-            string modifiedPersonId = SelectedPerson.JMBG;
-
             Window window = new Window()
             {
                 Width = 500,
                 Height = 600,
-                Content = new ModifyPersonViewModel(SelectedPerson),
+                Content = new ModifyPersonViewModel(SelectedPerson, PeopleList),
             };
 
             window.ShowDialog();
-
-            PeopleList = new ObservableCollection<Person>(PersonProxy.Instance.PersonServices.GetAllPeople());
-            AccountsList = new ObservableCollection<Account>(AccountProxy.Instance.AccountServices.GetAllAccounts());
-
-            /*
-            if (LoggedInAccount.PersonWithAccount.JMBG == modifiedPersonId)
-            {
-                Object[] parameters = parameter as Object[];
-                TextBlock tb = parameters[0] as TextBlock;
-                tb.Text = $"Username: {LoggedInAccount.Username}     First name: {LoggedInAccount.FirstName}     Last name: {LoggedInAccount.LastName}";
-            }
-            */
         }
         private bool ModifyPersonCanExecute(object parameter)
         {
-            if (parameter == null || !(parameter is Object[] parameters) || parameters.Length != 1 || SelectedPerson == null)
+            if (SelectedPerson == null)
             {
                 return false;
             }
@@ -137,13 +121,10 @@ namespace Client.ViewModels
             {
                 Width = 500,
                 Height = 600,
-                Content = new DeletePersonConfirmationViewModel(SelectedPerson),
+                Content = new DeletePersonConfirmationViewModel(SelectedPerson, PeopleList),
             };
 
             window.ShowDialog();
-
-            PeopleList = new ObservableCollection<Person>(PersonProxy.Instance.PersonServices.GetAllPeople());
-            AccountsList = new ObservableCollection<Account>(AccountProxy.Instance.AccountServices.GetAllAccounts());
         }
         private bool DeletePersonCanExecute(object parameter)
         {
@@ -197,14 +178,12 @@ namespace Client.ViewModels
         {
             Window window = new Window()
             {
-                Width = 600,
-                Height = 600,
-                Content = new AddEventViewModel(),
+                Width = 550,
+                Height = 800,
+                Content = new AddEventViewModel(EventsList),
             };
 
             window.ShowDialog();
-
-            EventsList = new ObservableCollection<Event>(EventProxy.Instance.EventServices.GetAllEvents());
         }
         private bool AddEventCanExecute(object parameter)
         {
@@ -332,6 +311,8 @@ namespace Client.ViewModels
 
             if (LoggedInAccount.Username == modifiedAccountUsername)
             {
+                LoggedInAccount = AccountsList.First(a => a.Username.Equals(LoggedInAccount.Username));
+
                 Object[] parameters = parameter as Object[];
                 TextBlock tb = parameters[0] as TextBlock;
                 tb.Text = $"Username: {LoggedInAccount.Username}     First name: {LoggedInAccount.FirstName}     Last name: {LoggedInAccount.LastName}";
@@ -374,13 +355,10 @@ namespace Client.ViewModels
             {
                 Width = 500,
                 Height = 600,
-                Content = new DeleteAccountConfirmationViewModel(SelectedAccount),
+                Content = new DeleteAccountConfirmationViewModel(SelectedAccount, AccountsList),
             };
 
             window.ShowDialog();
-
-            PeopleList = new ObservableCollection<Person>(PersonProxy.Instance.PersonServices.GetAllPeople());
-            AccountsList = new ObservableCollection<Account>(AccountProxy.Instance.AccountServices.GetAllAccounts());
         }
         private bool DeleteAccountCanExecute(object parameter)
         {

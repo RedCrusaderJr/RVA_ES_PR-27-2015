@@ -12,7 +12,6 @@
         d:DesignHeight="600" d:DesignWidth="500">
     <UserControl.Resources>
         <converter:MultiCloneConverter x:Key="multiConverter" />
-        <converter:RadioButtonCheckedConverter x:Key="RadioButtonCheckedConverter"/>
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -28,39 +27,25 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
 
         <TextBlock Text="New Person" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" FontSize="40" VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="Segoe UI Black"/>
 
-        <Label Content="Username" Grid.Row="2" Grid.Column="1" Margin="0,30,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="25" />
-        <Label Content="Password" Grid.Row="3" Grid.Column="1" Margin="0,30,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="25"/>
-        <Label Content="First name" Grid.Row="4" Grid.Column="1" Margin="0,30,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="25"/>
-        <Label Content="Last name" Grid.Row="5" Grid.Column="1" Margin="0,30,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="25"/>
-        <Label Content="Role" Grid.Row="6" Grid.Column="1" Margin="0,30,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="25"/>
+        <Label Content="First name" Grid.Row="2" Grid.Column="1" Margin="0,30,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="25"/>
+        <Label Content="Last name" Grid.Row="3" Grid.Column="1" Margin="0,30,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="25"/>
+        <Label Content="JMBG" Grid.Row="4" Grid.Column="1" Margin="0,30,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="25"/>
 
+        <TextBox Text="{Binding PersonToAdd.FirstName, UpdateSourceTrigger=PropertyChanged}" Name="firstName" Grid.Row="2" Grid.Column="2" Margin="0,30,0,0" Width="250" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20"/>
+        <TextBox Text="{Binding PersonToAdd.LastName, UpdateSourceTrigger=PropertyChanged}" Name="lastName" Grid.Row="3" Grid.Column="2" Margin="0,30,0,0" Width="250" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20"/>
+        <TextBox Text="{Binding PersonToAdd.JMBG, UpdateSourceTrigger=PropertyChanged}" Name="jmbg" Grid.Row="4" Grid.Column="2" Margin="0,30,0,0" Width="250" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20"/>
 
-        <TextBox Text="{Binding PersonToAdd.Username, UpdateSourceTrigger=PropertyChanged}" Name="username" Grid.Row="2" Grid.Column="2" Margin="0,30,0,0" Width="250" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20"/>
-        <TextBox Text="{Binding PersonToAdd.Password, UpdateSourceTrigger=PropertyChanged}" Name="password" Grid.Row="3" Grid.Column="2" Margin="0,30,0,0" Width="250" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20"/>
-        <TextBox Text="{Binding PersonToAdd.FirstName, UpdateSourceTrigger=PropertyChanged}" Name="firstName" Grid.Row="4" Grid.Column="2" Margin="0,30,0,0" Width="250" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20"/>
-        <TextBox Text="{Binding PersonToAdd.LastName, UpdateSourceTrigger=PropertyChanged}" Name="lastName" Grid.Row="5" Grid.Column="2" Margin="0,30,0,0" Width="250" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20"/>
-
-        <StatusBar Grid.Row="6" Grid.Column="2" Margin="0,30,0,0" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <RadioButton Name="roleRegular" IsChecked="{Binding SelectedOption, Converter={StaticResource RadioButtonCheckedConverter}, ConverterParameter={x:Static common:ERole.REGULAR}}" Content="Regular" GroupName="role" Margin="0,0,20,0" FontSize="24" FontFamily="Yu Gothic UI Semibold"/>
-            <RadioButton Name="roleAdmin" IsChecked="{Binding SelectedOption, Converter={StaticResource RadioButtonCheckedConverter}, ConverterParameter={x:Static common:ERole.ADMIN}}" Content="Admin" GroupName="role" FontSize="24" FontFamily="Yu Gothic UI Semibold"/>
-        </StatusBar>
-     
-        <Button Command="{Binding AddPersonCommand}" Name="addButton" Content="ADD" Grid.Row="7" Grid.Column="2" Margin="0,30,10,10" Width="140" Height="40" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20">
+        <Button Command="{Binding AddPersonCommand}" Name="addButton" Content="ADD" Grid.Row="5" Grid.Column="2" Margin="0,30,10,10" Width="140" Height="40" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20">
             <Button.CommandParameter>
                 <MultiBinding Converter="{StaticResource multiConverter}">
-                    <Binding Path="Text" ElementName="username"/>
-                    <Binding Path="Text" ElementName="password"/>
                     <Binding Path="Text" ElementName="firstName"/>
                     <Binding Path="Text" ElementName="lastName"/>
-                    <Binding Path="IsChecked" ElementName="roleRegular"/>
-                    <Binding Path="IsChecked" ElementName="roleAdmin"/>
+                    <Binding Path="Text" ElementName="jmbg"/>
                     <Binding ElementName="AddPersonUserControl"/>
                 </MultiBinding>
             </Button.CommandParameter>

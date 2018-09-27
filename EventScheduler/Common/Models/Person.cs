@@ -127,22 +127,32 @@ namespace Common.Models
             return true;
         }
 
-        public bool IsAvailableForEvent(DateTime begining, DateTime end)
+        public bool IsAvailableForEvent(DateTime? begining, DateTime? end)
         {
+            if(begining == null || end == null)
+            {
+                return false;
+            }
+
             foreach(Event e in ScheduledEvents)
             {
-                //slobodno vreme pre sastanka?
-                if(DateTime.Compare(begining, e.ScheduledDateTimeBeging) < 0)
+                if(e.ScheduledDateTimeBeging == null || e.ScheduledDateTimeEnd == null)
                 {
-                    if(DateTime.Compare(end, e.ScheduledDateTimeBeging) > 0)
+                    return false;
+                }
+
+                //slobodno vreme pre sastanka?
+                if(DateTime.Compare((DateTime)begining, (DateTime)e.ScheduledDateTimeBeging) < 0)
+                {
+                    if(DateTime.Compare((DateTime)end, (DateTime)e.ScheduledDateTimeBeging) > 0)
                     {
                         return false;
                     }
                 }
                 //slobodno vreme posle sastanka?
-                else if(DateTime.Compare(begining, e.ScheduledDateTimeBeging) > 0)
+                else if(DateTime.Compare((DateTime)begining, (DateTime)e.ScheduledDateTimeBeging) > 0)
                 {
-                    if (DateTime.Compare(begining, e.ScheduledDateTimeEnd) < 0)
+                    if (DateTime.Compare((DateTime)begining, (DateTime)e.ScheduledDateTimeEnd) < 0)
                     {
                         return false;
                     }

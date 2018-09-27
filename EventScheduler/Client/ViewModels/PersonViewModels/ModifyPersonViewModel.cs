@@ -3,6 +3,7 @@ using Client.Proxies;
 using Common.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,21 +17,20 @@ namespace Client.ViewModels.PersonViewModels
     {
         public ICommand ModifyPersonCommand { get; set; }
         public Window CurrentWindow { get; set; }
-        public Person LoggedInPerson { get; set; }
         public Person PersonToModify { get; set; }
+        public ObservableCollection<Person> PeopleList { get; set; }
 
-        public ModifyPersonViewModel(Person person)
+        public ModifyPersonViewModel(Person person, ObservableCollection<Person> peopleList)
         {
             ModifyPersonCommand = new RelayCommand(ModifyPersonExecute, ModifyPersonCanExecute);
-            LoggedInPerson = person;
+            PeopleList = peopleList;
             PersonToModify = new Person()
             {
-                //Username = person.Username,
-                //Password = person.Password,
                 FirstName = person.FirstName,
                 LastName = person.LastName,
-                //Role = person.Role,
+                JMBG = person.JMBG,
             };
+            
         }
 
         private void ModifyPersonExecute(object parameter)
@@ -39,6 +39,13 @@ namespace Client.ViewModels.PersonViewModels
 
             if (PersonProxy.Instance.PersonServices.ModifyPerson(PersonToModify))
             {
+                PersonToModify = PersonProxy.Instance.PersonServices.GetSinglePerson(PersonToModify.JMBG);
+
+                Person personInList = PeopleList.First(p => p.JMBG.Equals(PersonToModify.JMBG));
+                personInList.FirstName = PersonToModify.FirstName;
+                personInList.LastName = PersonToModify.LastName;
+                personInList.LastEditTimeStamp = PersonToModify.LastEditTimeStamp;
+
                 UserControl uc = parameters[0] as UserControl;
                 Window window = Window.GetWindow(uc);
                 window.Close();

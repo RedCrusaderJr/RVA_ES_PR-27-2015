@@ -4,9 +4,48 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Client.Views.PersonViews"
+             xmlns:converter="clr-namespace:Client.Converters"
+             Name="DeletePersonConfirmationUserControl"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             Background="White"
+             d:DesignHeight="600" d:DesignWidth="500">
+    <UserControl.Resources>
+        <converter:MultiCloneConverter x:Key="multiConverter" />
+    </UserControl.Resources>
     <Grid>
-            
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="40"/>
+            <ColumnDefinition Width="150"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="30"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="20"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Delete Person" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" FontSize="40" VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="Segoe UI Black"/>
+
+        <Label Content="First name" Grid.Row="2" Grid.Column="1" Margin="0,30,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="25"/>
+        <Label Content="Last name" Grid.Row="3" Grid.Column="1" Margin="0,30,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="25"/>
+        <Label Content="JMBG" Grid.Row="4" Grid.Column="1" Margin="0,30,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="25"/>
+
+        <TextBox IsReadOnly="True" Text="{Binding PersonToBeDeleted.FirstName}" Name="firstName" Grid.Row="2" Grid.Column="2" Margin="0,30,0,0" Width="250" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20"/>
+        <TextBox IsReadOnly="True" Text="{Binding PersonToBeDeleted.LastName}" Name="lastName" Grid.Row="3" Grid.Column="2" Margin="0,30,0,0" Width="250" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20"/>
+        <TextBox IsReadOnly="True" Text="{Binding PersonToBeDeleted.JMBG}" Name="jmbg" Grid.Row="4" Grid.Column="2" Margin="0,30,0,0" Width="250" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20"/>
+
+
+        <Button Command="{Binding DeletePersonCommand}" Name="delleteButton" Content="DELETE" Grid.Row="5" Grid.Column="2" Margin="0,30,10,10" Width="140" Height="40" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20">
+            <Button.CommandParameter>
+                <MultiBinding Converter="{StaticResource multiConverter}">
+                    <Binding ElementName="DeletePersonConfirmationUserControl"/>
+                </MultiBinding>
+            </Button.CommandParameter>
+        </Button>
     </Grid>
 </UserControl>

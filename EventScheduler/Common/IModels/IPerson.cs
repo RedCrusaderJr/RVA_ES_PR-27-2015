@@ -20,6 +20,6 @@ namespace Common.IModels
 
         Boolean ScheduleParticipationInEvent(Event e);
         Boolean CancleParticipationInEvent(Event e);
-        Boolean IsAvailableForEvent(DateTime begining, DateTime end);
+        Boolean IsAvailableForEvent(DateTime? begining, DateTime? end);
     }
 }

@@ -62,10 +62,10 @@ namespace Server.Providers
         {
             if(DbManager.Instance.DeleteAccount(accountToBeDeleted))
             {
-                if(DbManager.Instance.DeleteAccount(accountToBeDeleted))
-                {
-                    return true;
-                }
+                
+                
+                return true;
+                
             }
 
             return false;
