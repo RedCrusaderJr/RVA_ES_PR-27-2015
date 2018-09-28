@@ -31,7 +31,8 @@ namespace Client.ViewModels.EventViewModels
         {
             if (EventProxy.Instance.EventServices.CancleEvent(EventToBeDeleted))
             {
-                EventList.Remove(EventToBeDeleted);
+                Event foundEvent = EventList.FirstOrDefault(e => e.EventId.Equals(EventToBeDeleted.EventId));
+                EventList.Remove(foundEvent);
                 object[] parameters = obj as object[];
                 Window currentWindow = Window.GetWindow((UserControl)parameters[0]);
                 currentWindow.Close();

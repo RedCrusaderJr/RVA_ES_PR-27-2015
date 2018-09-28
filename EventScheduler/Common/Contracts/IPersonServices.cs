@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 
 namespace Common.Contracts
 {
-    [ServiceContract(CallbackContract = typeof(IPersonServicesCallback))]
+    //(CallbackContract = typeof(IPersonServicesCallback))
+    [ServiceContract]
     public interface IPersonServices
     {
         [OperationContract]
@@ -27,6 +28,7 @@ namespace Common.Contracts
         List<Person> GetAllPeople();
     }
 
+    /*
     public interface IPersonServicesCallback
     {
         [OperationContract]
@@ -38,4 +40,5 @@ namespace Common.Contracts
         [OperationContract]
         void NotifyModifyEvent(Event modifyedEvent);
     }
+    */
 }

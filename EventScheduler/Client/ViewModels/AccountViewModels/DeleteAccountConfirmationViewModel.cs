@@ -31,7 +31,8 @@ namespace Client.ViewModels.AccountViewModels
         {
             if(AccountProxy.Instance.AccountServices.DeleteAccount(AccountToDelete))
             {
-                Accounts.Remove(AccountToDelete);
+                Account foundAccount = Accounts.FirstOrDefault(a => a.Username.Equals(AccountToDelete.Username));
+                Accounts.Remove(foundAccount);
                 object[] parameters = obj as object[];
                 Window currentWindow = Window.GetWindow((UserControl)parameters[0]);
                 currentWindow.Close();

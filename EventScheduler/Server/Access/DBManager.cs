@@ -1,6 +1,9 @@
-﻿using Common.IAccess;
+﻿using Common.BaseClasses;
+using Common.Helpers;
+using Common.IAccess;
 using Common.IModels;
 using Common.Models;
+using Server.Providers.ObserverPattern;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +17,11 @@ namespace Server.Access
         #region Instance
         private static DbManager _instance;
         private static readonly object syncLock = new object();
-        private DbManager() { }
+        private DbManager()
+        {
+            _eventNotifier = new EventNotifier();
+            GetAllPeople().ForEach(p => _eventNotifier.RegisterObserver(new PersonObserver(p)));
+        }
         public static DbManager Instance
         {
             get
@@ -35,6 +42,8 @@ namespace Server.Access
         }
         #endregion
 
+        private EventNotifier _eventNotifier;
+
         #region Person
         public bool AddPerson(Person personToAdd)
         {
@@ -48,6 +57,8 @@ namespace Server.Access
 
                 dbContext.People.Add(personToAdd);
                 dbContext.SaveChanges();
+
+                _eventNotifier.RegisterObserver(new PersonObserver(personToAdd));
                 return true;
             }
         }
@@ -71,7 +82,9 @@ namespace Server.Access
                     dbContext.SaveChanges();
 
                     //OVDE NEGDE NOTIFIKACIJA ZA POTENCIJALNI KONFLIKT
-
+                    IObserverPattern personObserver = _eventNotifier.Observers.FirstOrDefault(p => ((Person)p).JMBG.Equals(personToModify.JMBG));
+                    _eventNotifier.UnregisterObserver(personObserver);
+                    _eventNotifier.RegisterObserver(new PersonObserver(personToModify));
                     return true;
                 }
 
@@ -96,6 +109,9 @@ namespace Server.Access
                     */
                     dbContext.People.Remove(foundPerson);
                     dbContext.SaveChanges();
+
+                    IObserverPattern foundObserver = _eventNotifier.Observers.FirstOrDefault(p => ((Person)p).JMBG.Equals(personToDelete.JMBG));
+                    _eventNotifier.UnregisterObserver(foundObserver);
                     return true;
                 }
 
@@ -209,6 +225,7 @@ namespace Server.Access
                     Account foundAccount = dbContext.Accounts.SingleOrDefault(a => a.Username.Equals(accountToDelete.Username));
                     dbContext.Accounts.Remove(foundAccount);
                     dbContext.SaveChanges();
+
                     return true;
                 }
 
@@ -250,8 +267,14 @@ namespace Server.Access
                     return false;
                 }
 
+                List<Person> foundParticipants = GetAllPeople().Where(p => eventToAdd.Participants.Contains(p, new PersonComparer())).ToList();
+                eventToAdd.Participants.ForEach(p => p = foundParticipants.FirstOrDefault(part => part.JMBG.Equals(p.JMBG)));
+
                 dbContext.Events.Add(eventToAdd);
                 dbContext.SaveChanges();
+
+                _eventNotifier.EvetToBeNotifiedAbout = eventToAdd;
+                _eventNotifier.NotifyAllAdditon();
                 return true;
             }
         }
@@ -275,6 +298,9 @@ namespace Server.Access
                     eventToModify.Participants.ForEach(p => foundEvent.AddParticipant(p));
 
                     dbContext.SaveChanges();
+
+                    _eventNotifier.EvetToBeNotifiedAbout = foundEvent;
+                    _eventNotifier.NotifyAllChange();
                     return true;
                 }
 
@@ -292,6 +318,9 @@ namespace Server.Access
                     Event foundEvent = dbContext.Events.SingleOrDefault(e => e.EventId.Equals(eventToDelete.EventId));
                     dbContext.Events.Remove(foundEvent);
                     dbContext.SaveChanges();
+
+                    _eventNotifier.EvetToBeNotifiedAbout = foundEvent;
+                    _eventNotifier.NotifyAllRemoval();
                     return true;
                 }
 

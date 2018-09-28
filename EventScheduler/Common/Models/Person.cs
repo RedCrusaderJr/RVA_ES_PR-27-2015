@@ -1,4 +1,5 @@
-﻿using Common.Helpers;
+﻿using Common.BaseClasses;
+using Common.Helpers;
 using Common.IModels;
 using System;
 using System.Collections;
@@ -98,6 +99,16 @@ namespace Common.Models
             LastName = lastName;
         }
 
+        public Person(Person person)
+        {
+            JMBG = person.JMBG;
+            LastEditTimeStamp = person.LastEditTimeStamp;
+            ScheduledEvents = new List<Event>(person.ScheduledEvents);
+
+            FirstName = person.FirstName;
+            LastName = person.LastName;
+        }
+
         public bool ScheduleParticipationInEvent(Event e)
         {
             if (ScheduledEvents.Contains(e, new EventComparer()))
@@ -124,7 +135,8 @@ namespace Common.Models
                 return false;
             }
 
-            ScheduledEvents.Remove(e);
+            Event eventToCancleParticipation = ScheduledEvents.FirstOrDefault(ev => ev.EventId.Equals(e.EventId));
+            ScheduledEvents.Remove(eventToCancleParticipation);
             return true;
         }
 
@@ -177,6 +189,8 @@ namespace Common.Models
                 handler(this, new PropertyChangedEventArgs(name));
             }
         }
+
+        
         #endregion
     }
 }

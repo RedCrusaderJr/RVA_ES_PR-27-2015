@@ -46,7 +46,7 @@ namespace Client.ViewModels.EventViewModels
         {
             Object[] parameters = parameter as Object[];
 
-            Participants = new ObservableCollection<Person>(); //TESTIRANJE
+            //Participants = new ObservableCollection<Person>(); //TESTIRANJE
             if (EventProxy.Instance.EventServices.ScheduleEvent(EventToAdd, Participants.ToList()))
             {
                 EventList.Add(EventToAdd);
@@ -81,7 +81,9 @@ namespace Client.ViewModels.EventViewModels
         private void AddPraticipantExecute(object parameter)
         {
             Participants.Add(PersonToParticipate);
-            AvailablePeople.Remove(PersonToParticipate);
+
+            Person foundPerson = AvailablePeople.FirstOrDefault(p => p.JMBG.Equals(PersonToParticipate.JMBG));
+            AvailablePeople.Remove(foundPerson);
         }
         private bool AddPraticipantCanExecute(object parameter)
         {
@@ -125,7 +127,8 @@ namespace Client.ViewModels.EventViewModels
 
         private void RemovePraticipantExecute(object parameter)
         {
-            Participants.Remove(PersonToRevokeParticipation);
+            Person foundPerson = Participants.FirstOrDefault(p => p.JMBG.Equals(PersonToRevokeParticipation.JMBG));
+            Participants.Remove(foundPerson);
         }
         private bool RemovePraticipantCanExecute(object parameter)
         {

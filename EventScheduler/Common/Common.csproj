@@ -49,9 +49,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseClasses\IObserver.cs" />
+    <Compile Include="BaseClasses\BaseNotifier.cs" />
     <Compile Include="Contracts\IAccountServices.cs" />
     <Compile Include="Contracts\IEventServices.cs" />
     <Compile Include="Contracts\IPersonServices.cs" />
+    <Compile Include="Enums.cs" />
     <Compile Include="Helpers\EventComparer.cs" />
     <Compile Include="Helpers\PersonComparer.cs" />
     <Compile Include="IAccess\IEventDbManager.cs" />
@@ -61,10 +64,9 @@
     <Compile Include="IModels\IEvent.cs" />
     <Compile Include="IModels\INotifyPerson.cs" />
     <Compile Include="IModels\IPerson.cs" />
-    <Compile Include="Models\Enums.cs" />
+    <Compile Include="Models\Account.cs" />
     <Compile Include="Models\Event.cs" />
     <Compile Include="Models\Person.cs" />
-    <Compile Include="Models\Account.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

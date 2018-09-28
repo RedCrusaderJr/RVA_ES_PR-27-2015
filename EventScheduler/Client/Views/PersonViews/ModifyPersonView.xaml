@@ -37,7 +37,7 @@
 
         <TextBox Text="{Binding PersonToModify.FirstName}" Name="FirstName" Grid.Row="2" Grid.Column="2" Margin="0,30,0,0" Width="180" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20"/>
         <TextBox Text="{Binding PersonToModify.LastName}" Name="LastName" Grid.Row="3" Grid.Column="2" Margin="0,30,0,0" Width="180" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20"/>
-        <TextBox IsReadOnly="False" Text="{Binding PersonToModify.JMBG}" Name="JMBG" Grid.Row="4" Grid.Column="2" Margin="0,30,0,0" Width="180" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20"/>
+        <TextBox IsReadOnly="True" Text="{Binding PersonToModify.JMBG}" Name="JMBG" Grid.Row="4" Grid.Column="2" Margin="0,30,0,0" Width="180" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20"/>
 
         <Button Command="{Binding ModifyPersonCommand}" Content="SAVE" Grid.Row="5" Grid.Column="2" Margin="0,30,10,10" Width="140" Height="40" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20">
             <Button.CommandParameter>

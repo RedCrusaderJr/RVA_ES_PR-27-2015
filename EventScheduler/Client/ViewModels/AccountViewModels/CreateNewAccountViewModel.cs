@@ -36,10 +36,9 @@ namespace Client.ViewModels.AccountViewModels
             String password = parameters[1] as String;
             String firstName = parameters[2] as String;
             String lastName = parameters[3] as String;
-            String jmbg = parameters[4] as String;
-            object roleRegular = parameters[5];
-            object roleAdmin = parameters[6];
-            UserControl CreateNewAccountUserControl = parameters[7] as UserControl;
+            object roleRegular = parameters[4];
+            object roleAdmin = parameters[5];
+            UserControl CreateNewAccountUserControl = parameters[6] as UserControl;
 
             AccountToAdd = new Account(username)
             {
@@ -70,8 +69,7 @@ namespace Client.ViewModels.AccountViewModels
                                                                         || (String)parameters[1] == String.Empty
                                                                         || (String)parameters[2] == String.Empty
                                                                         || (String)parameters[3] == String.Empty
-                                                                        || (String)parameters[4] == String.Empty
-                                                                        || (bool)parameters[5] == (bool)parameters[6])
+                                                                        || (bool)parameters[4] == (bool)parameters[5])
             {
                 return false;
             }

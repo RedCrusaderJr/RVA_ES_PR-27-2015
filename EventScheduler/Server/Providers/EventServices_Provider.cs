@@ -1,7 +1,9 @@
-﻿using Common.Contracts;
+﻿using Common.BaseClasses;
+using Common.Contracts;
 using Common.Helpers;
 using Common.Models;
 using Server.Access;
+using Server.Providers.ObserverPattern;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Server.Providers
 {
-    class EventServices_Provider : IEventServices
+    public class EventServices_Provider : IEventServices 
     {
         public bool ScheduleEvent(Event eventToSchedule, List<Person> participants)
         {

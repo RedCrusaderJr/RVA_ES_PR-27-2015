@@ -73,7 +73,7 @@ namespace Common.Models
             set => _description = value;
         }
         [DataMember]
-        [InverseProperty("ScheduledEvents")]
+        //[InverseProperty("ScheduledEvents")]
         public List<Person> Participants
         {
             get => _participants;
@@ -143,7 +143,8 @@ namespace Common.Models
                 return false;
             }
 
-            Participants.Remove(participant);
+            Person participantToBeRemoved = Participants.FirstOrDefault(p => p.JMBG.Equals(participant.JMBG));
+            Participants.Remove(participantToBeRemoved);
             return true;
         }
     }

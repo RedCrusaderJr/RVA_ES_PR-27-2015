@@ -34,7 +34,8 @@ namespace Client.ViewModels.PersonViewModels
         {
             if (PersonProxy.Instance.PersonServices.DeletePerson(PersonToBeDeleted))
             {
-                PeopleList.Remove(PersonToBeDeleted);
+                Person foundPerson = PeopleList.FirstOrDefault(p => p.JMBG.Equals(PersonToBeDeleted.JMBG));
+                PeopleList.Remove(foundPerson);
                 object[] parameters = obj as object[];
                 Window currentWindow = Window.GetWindow((UserControl)parameters[0]);
                 currentWindow.Close();

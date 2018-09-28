@@ -47,7 +47,7 @@ namespace Client.ViewModels.EventViewModels
         {
             Object[] parameters = parameter as Object[];
 
-            foreach (Person p in Participants)
+            foreach (Person p in Participants)//Participant to become GetAllPeople.Where..........??
             {
                 if (!EventToModify.Participants.Contains(p, new PersonComparer()))
                 {
@@ -55,19 +55,18 @@ namespace Client.ViewModels.EventViewModels
                 }
             }
 
-            List<Person> toBeRemoved = new List<Person>();
+            List<Person> peopleToBeRemoved = new List<Person>();
             foreach (Person p in EventToModify.Participants)
             {
                 if (!Participants.Contains(p, new PersonComparer()))
                 {
-                    toBeRemoved.Add(p);
+                    peopleToBeRemoved.Add(p);
                 }
             }
+            peopleToBeRemoved.ForEach(p => EventToModify.Participants.Remove(p));
 
-            toBeRemoved.ForEach(p => EventToModify.Participants.Remove(p));
-
-            toBeRemoved = new List<Person>(EventToModify.Participants); //TEST
-            toBeRemoved.ForEach(p => EventToModify.Participants.Remove(p));
+            peopleToBeRemoved = new List<Person>(EventToModify.Participants); //TEST
+            peopleToBeRemoved.ForEach(p => EventToModify.Participants.Remove(p));
 
             if (EventProxy.Instance.EventServices.EditEvent(EventToModify))
             {
@@ -88,13 +87,15 @@ namespace Client.ViewModels.EventViewModels
                     }
                 }
 
+                peopleToBeRemoved = new List<Person>();
                 foreach (Person p in eventInList.Participants)
                 {
                     if (!EventToModify.Participants.Contains(p, new PersonComparer()))
                     {
-                        eventInList.RemoveParticipant(p);
+                        peopleToBeRemoved.Add(p);
                     }
                 }
+                peopleToBeRemoved.ForEach(p => eventInList.RemoveParticipant(p));
 
                 MessageBox.Show("Event successfully modified.");
                 UserControl uc = parameters[0] as UserControl;
@@ -126,7 +127,9 @@ namespace Client.ViewModels.EventViewModels
         private void AddPraticipantExecute(object parameter)
         {
             Participants.Add(PersonToParticipate);
-            AvailablePeople.Remove(PersonToParticipate);
+
+            Person foundPerson = AvailablePeople.FirstOrDefault(p => p.JMBG.Equals(PersonToParticipate.JMBG));
+            AvailablePeople.Remove(foundPerson);
         }
         private bool AddPraticipantCanExecute(object parameter)
         {
@@ -144,8 +147,9 @@ namespace Client.ViewModels.EventViewModels
 
             foreach (Person p in PersonProxy.Instance.PersonServices.GetAllPeople())
             {
-                if (_participantsInitialized && p.IsAvailableForEvent(EventToModify.ScheduledDateTimeBeging, EventToModify.ScheduledDateTimeEnd) && !AvailablePeople.Contains(p, new PersonComparer())
-                                                                                                                     && !Participants.Contains(p, new PersonComparer()))
+                if (_participantsInitialized && p.IsAvailableForEvent(EventToModify.ScheduledDateTimeBeging, EventToModify.ScheduledDateTimeEnd)
+                                                                                                                        && !AvailablePeople.Contains(p, new PersonComparer())
+                                                                                                                        && !Participants.Contains(p, new PersonComparer()))
                 {
                     AvailablePeople.Add(p);
                 }
@@ -170,7 +174,8 @@ namespace Client.ViewModels.EventViewModels
 
         private void RemovePraticipantExecute(object parameter)
         {
-            Participants.Remove(PersonToRevokeParticipation);
+            Person foundPerson = Participants.FirstOrDefault(p => p.JMBG.Equals(PersonToRevokeParticipation.JMBG));
+            Participants.Remove(foundPerson);
         }
         private bool RemovePraticipantCanExecute(object parameter)
         {
