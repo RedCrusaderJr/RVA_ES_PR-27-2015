@@ -67,6 +67,7 @@ namespace Common.Models
             }
         }
         [DataMember]
+        [InverseProperty("Participants")]
         public List<Event> ScheduledEvents
         {
             get

@@ -194,9 +194,9 @@ namespace Client.ViewModels
         {
             Window window = new Window()
             {
-                Width = 500,
-                Height = 600,
-                Content = new ModifyEventViewModel(SelectedEvent),
+                Width = 550,
+                Height = 800,
+                Content = new ModifyEventViewModel(SelectedEvent, EventsList),
             };
 
             window.ShowDialog();
@@ -217,9 +217,9 @@ namespace Client.ViewModels
         {
             Window window = new Window()
             {
-                Width = 500,
-                Height = 600,
-                Content = new DeleteEventConfirmationViewModel(SelectedEvent),
+                Width = 550,
+                Height = 700,
+                Content = new DeleteEventConfirmationViewModel(SelectedEvent, EventsList),
             };
 
             window.ShowDialog();
@@ -240,8 +240,8 @@ namespace Client.ViewModels
         {
             Window window = new Window()
             {
-                Width = 500,
-                Height = 600,
+                Width = 550,
+                Height = 700,
                 Content = new EventDetailsViewModel(SelectedEvent),
             };
 

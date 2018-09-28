@@ -7,8 +7,8 @@
              xmlns:converter="clr-namespace:Client.Converters"
              mc:Ignorable="d" 
              Name="AddEventUserControl"
-        Background="White"
-        d:DesignHeight="800" d:DesignWidth="550">
+             Background="White"
+             d:DesignHeight="800" d:DesignWidth="550">
     <UserControl.Resources>
         <converter:MultiCloneConverter x:Key="multiConverter" />
     </UserControl.Resources>
@@ -57,7 +57,7 @@
                     </Button.CommandParameter>
                 </Button>
             </StackPanel>
-            <ListView ItemsSource="{Binding AvailablePeople, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding PersonToParticipate, Mode=OneWay}" Name="AvailablePeopleList" Height="150" Width="280" SelectionMode="Single">
+            <ListView ItemsSource="{Binding AvailablePeople, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding PersonToParticipate, Mode=OneWayToSource}" Name="AvailablePeopleList" Height="150" Width="280" SelectionMode="Single">
                 <ListView.ItemTemplate>
                     <ItemContainerTemplate>
                         <StackPanel Orientation="Horizontal">
@@ -84,7 +84,7 @@
                     </Button.CommandParameter>
                 </Button>
             </StackPanel>
-            <ListView ItemsSource="{Binding Participatns, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding PersonToRevokeParticipation, Mode=OneWay}" Margin="50,0,0,0" Name="ParticipatnsList" Height="150" Width="280" SelectionMode="Single">
+            <ListView ItemsSource="{Binding Participants, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding PersonToRevokeParticipation, Mode=OneWayToSource}" Margin="50,0,0,0" Name="ParticipatnsList" Height="150" Width="280" SelectionMode="Single">
                 <ListView.ItemTemplate>
                     <ItemContainerTemplate>
                         <StackPanel Orientation="Horizontal">
@@ -102,8 +102,6 @@
         <Button Command="{Binding AddEventCommand}" Name="addButton" Content="ADD" Grid.Row="8" Grid.Column="2" Margin="0,30,10,10" Width="140" Height="40" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20">
             <Button.CommandParameter>
                 <MultiBinding Converter="{StaticResource multiConverter}">
-                    <Binding Path="Text" ElementName="EventTitle"/>
-                    <Binding Path="Text" ElementName="Description"/>
                     <Binding ElementName="AddEventUserControl"/>
                 </MultiBinding>
             </Button.CommandParameter>

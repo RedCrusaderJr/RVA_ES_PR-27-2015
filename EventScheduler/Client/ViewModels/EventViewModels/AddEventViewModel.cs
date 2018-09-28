@@ -45,25 +45,21 @@ namespace Client.ViewModels.EventViewModels
         private void AddEventExecute(object parameter)
         {
             Object[] parameters = parameter as Object[];
-            EventToAdd = new Event()
-            {
-                EventTitle = parameters[0] as String,
-                Description = parameters[1] as String,
-            };
 
+            Participants = new ObservableCollection<Person>(); //TESTIRANJE
             if (EventProxy.Instance.EventServices.ScheduleEvent(EventToAdd, Participants.ToList()))
             {
                 EventList.Add(EventToAdd);
 
-                MessageBox.Show("Person successfully added.");
-                UserControl uc = parameters[2] as UserControl;
+                MessageBox.Show("Event successfully added.");
+                UserControl uc = parameters[0] as UserControl;
                 CurrentWindow = Window.GetWindow(uc);
                 CurrentWindow.Close();
             }
             else
             {
-                MessageBox.Show("Error on server or username already exists.");
-                UserControl uc = parameters[2] as UserControl;
+                MessageBox.Show("Error on server.");
+                UserControl uc = parameters[0] as UserControl;
                 CurrentWindow = Window.GetWindow(uc);
                 CurrentWindow.Close();
 
@@ -71,21 +67,21 @@ namespace Client.ViewModels.EventViewModels
         }
         private bool AddEventCanExecute(object parameter)
         {
-            if (parameter == null || !(parameter is Object[] parameters)|| (String)parameters[0] == String.Empty
-                                                                        || (String)parameters[1] == String.Empty
-                                                                        || EventToAdd.ScheduledDateTimeBeging == null
-                                                                        || EventToAdd.ScheduledDateTimeEnd == null
-                                                                        || !(parameters[2] is UserControl))
+            if (parameter == null || !(parameter is Object[] parameters) || EventToAdd.ScheduledDateTimeBeging == null
+                                                                         || EventToAdd.ScheduledDateTimeEnd == null
+                                                                         || !(parameters[0] is UserControl)
+                                                                         || Participants.Count == 0)
             {
                 return false;
             }
 
             return true;
         }
-
+  
         private void AddPraticipantExecute(object parameter)
         {
             Participants.Add(PersonToParticipate);
+            AvailablePeople.Remove(PersonToParticipate);
         }
         private bool AddPraticipantCanExecute(object parameter)
         {
@@ -103,14 +99,21 @@ namespace Client.ViewModels.EventViewModels
 
             foreach (Person p in PersonProxy.Instance.PersonServices.GetAllPeople())
             {
-                if (!AvailablePeople.Contains(p, new PersonComparer()))
+                if (p.IsAvailableForEvent(EventToAdd.ScheduledDateTimeBeging, EventToAdd.ScheduledDateTimeEnd) && !AvailablePeople.Contains(p, new PersonComparer())
+                                                                                                               && !Participants.Contains(p, new PersonComparer()))
                 {
                     AvailablePeople.Add(p);
                 }
             }
             ((StatusBar)arguments[0]).Visibility = Visibility.Visible;
 
+            if(((ListView)arguments[1]).SelectedItem == null)
+            {
+                return false;
+            }
+
             ListView AvailablePeopleList = (ListView)arguments[1];
+            PersonToParticipate = AvailablePeopleList.SelectedItem as Person;
 
             if (PersonToParticipate.JMBG == null)
             {
@@ -141,7 +144,13 @@ namespace Client.ViewModels.EventViewModels
             ((StatusBar)arguments[0]).Visibility = Visibility.Visible;
 
 
+            if(((ListView)parameters[1]).SelectedItem == null)
+            {
+                return false;
+            }
+
             ListView PatricipantsList = (ListView)arguments[1];
+            PersonToRevokeParticipation = PatricipantsList.SelectedItem as Person;
 
             if (PersonToRevokeParticipation.JMBG == null)
             {

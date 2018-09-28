@@ -73,6 +73,7 @@ namespace Common.Models
             set => _description = value;
         }
         [DataMember]
+        [InverseProperty("ScheduledEvents")]
         public List<Person> Participants
         {
             get => _participants;

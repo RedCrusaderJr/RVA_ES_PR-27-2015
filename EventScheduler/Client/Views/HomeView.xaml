@@ -141,7 +141,7 @@
         </DataGrid>
         <DataGrid Name="EventsTable" Visibility="Collapsed" ItemsSource="{Binding EventsList, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True}" SelectedItem="{Binding SelectedEvent, Mode=OneWayToSource}" IsReadOnly="True" SelectionMode="Single" AutoGenerateColumns="False" Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="2">
             <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding EventID}" Header="Event ID" Width="*"/>
+                <DataGridTextColumn Binding="{Binding EventId}" Header="Event ID" Width="*"/>
                 <DataGridTextColumn Binding="{Binding EventTitle}" Header="Event Title" Width="*"/>
                 <DataGridTextColumn Binding="{Binding ScheduledDateTimeBeging}" Header="Scheduled Beging" Width="*"/>
                 <DataGridTextColumn Binding="{Binding ScheduledDateTimeEnd}" Header="Scheduled End" Width="*"/>
