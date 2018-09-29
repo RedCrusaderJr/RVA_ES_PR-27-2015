@@ -1,5 +1,6 @@
 ﻿using Client.Commands;
 using Client.Proxies;
+using Client.ViewModels.EventViewModels;
 using Common.Models;
 using System;
 using System.Collections.Generic;
@@ -15,13 +16,16 @@ namespace Client.ViewModels.PersonViewModels
     class PersonDetailsViewModel
     {
         public ICommand ClosePersonDetailsCommand { get; set; }
+        public ICommand EventDetailsCommand { get; set; }
         public Person SelectedPerson { get; set; }
+        public Event SelectedEvent { get; set; }
 
         public PersonDetailsViewModel(Person selectedPerson)
         {
             SelectedPerson = selectedPerson;
 
             ClosePersonDetailsCommand = new RelayCommand(ClosePersonDetailsCommandExecute, ClosePersonDetailsCommandCanExecute);
+            EventDetailsCommand = new RelayCommand(EventDetailsExecute, EventDetailsCanExecute);
         }
 
         private void ClosePersonDetailsCommandExecute(object obj)
@@ -39,6 +43,23 @@ namespace Client.ViewModels.PersonViewModels
             }
 
             return true;
+        }
+
+        private void EventDetailsExecute(object obj)
+        {
+            Window window = new Window()
+            {
+                Width = 550,
+                Height = 700,
+                Content = new EventDetailsViewModel(SelectedEvent),
+            };
+
+            window.ShowDialog();
+        }
+
+        private bool EventDetailsCanExecute(object arg)
+        {
+            return SelectedEvent != null;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Common.BaseClasses;
+﻿using Common.BaseObserverPattern;
 using Common.Helpers;
 using Common.Models;
 using Server.Access;
@@ -24,7 +24,7 @@ namespace Server.Providers.ObserverPattern
                 return;
             }
 
-            if (!IsAvailableForEvent(eventToBeNotifiedAbout.ScheduledDateTimeBeging, eventToBeNotifiedAbout.ScheduledDateTimeEnd))
+            if (IsAvailableForEvent(eventToBeNotifiedAbout.ScheduledDateTimeBeging, eventToBeNotifiedAbout.ScheduledDateTimeEnd))
             {
                 ScheduleParticipationInEvent(eventToBeNotifiedAbout);
                 DbManager.Instance.ModifyPerson(this);

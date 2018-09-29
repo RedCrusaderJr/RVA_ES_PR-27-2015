@@ -57,6 +57,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="EventSchedulerWindowViewModel.cs" />
     <Compile Include="Proxies\AccountProxy.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
@@ -66,12 +67,13 @@
     <Compile Include="Converters\MultiCloneConverter.cs" />
     <Compile Include="Converters\RadioButtonCheckedConverter.cs" />
     <Compile Include="Proxies\EventProxy.cs" />
-    <Compile Include="EventShedulerWindow.xaml.cs">
-      <DependentUpon>EventShedulerWindow.xaml</DependentUpon>
+    <Compile Include="EventSchedulerWindowView.xaml.cs">
+      <DependentUpon>EventSchedulerWindowView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Proxies\PersonProxy.cs" />
     <Compile Include="ViewModels\AccountViewModels\DeleteAccountConfirmationViewModel.cs" />
     <Compile Include="ViewModels\EventViewModels\AddEventViewModel.cs" />
+    <Compile Include="ViewModels\MessagesViewModel.cs" />
     <Compile Include="ViewModels\PersonViewModels\AddPersonViewModel.cs" />
     <Compile Include="ViewModels\AccountViewModels\CreateNewAccountViewModel.cs" />
     <Compile Include="ViewModels\EventViewModels\DeleteEventConfirmationViewModel.cs" />
@@ -159,7 +161,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="EventShedulerWindow.xaml">
+    <Page Include="EventSchedulerWindowView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

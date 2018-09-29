@@ -10,15 +10,21 @@
              xmlns:av="clr-namespace:Client.Views.AccountViews"
              xmlns:ev="clr-namespace:Client.Views.EventViews"
              xmlns:pv="clr-namespace:Client.Views.PersonViews"
-             StartupUri="EventShedulerWindow.xaml">
+             StartupUri="EventSchedulerWindowView.xaml">
     <Application.Resources>
+        <DataTemplate DataType="{x:Type local:EventSchedulerWindowViewModel}">
+            <local:EventSchedulerWindowView/>
+        </DataTemplate>
+        
         <DataTemplate DataType="{x:Type vm:HomeViewModel}">
             <v:HomeView/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:LoginViewModel}">
             <v:LoginView/>
         </DataTemplate>
-
+        <DataTemplate DataType="{x:Type vm:MessagesViewModel}">
+            <v:MessagesView/>
+        </DataTemplate>
 
         <DataTemplate DataType="{x:Type avm:CreateNewAccountViewModel}">
             <av:CreateNewAccountView/>

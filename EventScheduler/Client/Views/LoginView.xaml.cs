@@ -23,7 +23,6 @@ namespace Client.Views
         public LoginView()
         {
             InitializeComponent();
-            this.DataContext = new LoginViewModel();
         }
     }
 }

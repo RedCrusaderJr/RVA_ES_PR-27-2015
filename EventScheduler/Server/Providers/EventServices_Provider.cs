@@ -1,5 +1,4 @@
-﻿using Common.BaseClasses;
-using Common.Contracts;
+﻿using Common.Contracts;
 using Common.Helpers;
 using Common.Models;
 using Server.Access;
@@ -14,121 +13,136 @@ namespace Server.Providers
 {
     public class EventServices_Provider : IEventServices 
     {
-        public bool ScheduleEvent(Event eventToSchedule, List<Person> participants)
+        public Event ScheduleEvent(Event eventToSchedule, List<Person> participants)
         {
             List<Person> participantsToAdd = participants.Where(p => !eventToSchedule.Participants.Contains(p, new PersonComparer())).ToList();
             participantsToAdd.ForEach(p => eventToSchedule.AddParticipant(p));
 
-            if(DbManager.Instance.AddEvent(eventToSchedule))
+            Event scheduledEvent = DbManager.Instance.AddEvent(eventToSchedule);
+            if (scheduledEvent != null)
             {
                 //TODO: NOTIFY ALL PERSONS THAT NEED TO BE NOTIFIED....
-                return true;
+                scheduledEvent.Participants.ForEach(p => p.ScheduledEvents = new List<Event>());
+                return scheduledEvent;
             }
 
-            return false;
+            return null;
         }
 
-        public bool CancleEvent(Event eventToCancle)
+        public Event CancleEvent(Event eventToCancle)
         {
-            if(DbManager.Instance.DeleteEvent(eventToCancle))
+            Event cancledEvent = DbManager.Instance.DeleteEvent(eventToCancle);
+            if (cancledEvent != null)
             {
                 //TODO: NOTIFY ALL PERSONS THAT NEED TO BE NOTIFIED....
-                return true;
+                cancledEvent.Participants.ForEach(p => p.ScheduledEvents = new List<Event>());
+                return cancledEvent;
             }
 
-            return false;
+            return null;
         }
 
-        public bool EditEvent(Event eventToEdit)
-        {
-            if(DbManager.Instance.ModifyEvent(eventToEdit))
+        public Event EditEvent(Event eventToEdit)
+         {
+            Event editedEvent = DbManager.Instance.ModifyEvent(eventToEdit);
+            if (editedEvent != null)
             {
                 //TODO: NOTIFY...
-                return true;
+                editedEvent.Participants.ForEach(p => p.ScheduledEvents = new List<Event>());
+                return editedEvent;
             }
 
-            return false;
+            return null;
         }
 
-        public bool RescheduleEvent(Int32 eventId, DateTime newBegining, DateTime newEnd)
+        public Event RescheduleEvent(Int32 eventId, DateTime newBegining, DateTime newEnd)
         {
             Event foundEvent = DbManager.Instance.GetSingleEvent(eventId);
             if(foundEvent == null)
             {
-                return false;
+                return null;
             }
 
             foundEvent.ScheduledDateTimeBeging = newBegining;
             foundEvent.ScheduledDateTimeEnd = newEnd;
             foundEvent.LastEditTimeStamp = DateTime.Now;
 
-            if(DbManager.Instance.ModifyEvent(foundEvent))
+            Event rescheduledEvent = DbManager.Instance.ModifyEvent(foundEvent);
+            if(rescheduledEvent != null)
             {
                 //TODO: NOTIFY
-                return true;
+                rescheduledEvent.Participants.ForEach(p => p.ScheduledEvents = new List<Event>());
+                return rescheduledEvent;
             }
 
-            return false;
+            return null;
         }
 
-        public bool AddParticipants(Int32 eventId, List<Person> participants)
+        public Event AddParticipants(Int32 eventId, List<Person> participants)
         {
             Event foundEvent = DbManager.Instance.GetSingleEvent(eventId);
             if (foundEvent == null)
             {
-                return false;
+                return null;
             }
 
             List<Person> participantsToAdd = participants.Where(p => !foundEvent.Participants.Contains(p, new PersonComparer())).ToList();
             participantsToAdd.ForEach(p => foundEvent.AddParticipant(p));
-            
-            if (DbManager.Instance.ModifyEvent(foundEvent))
+
+            Event modifiedEvent = DbManager.Instance.ModifyEvent(foundEvent);
+            if(modifiedEvent != null)
             {
                 //TODO: NOTIFY
-                return true;
+                modifiedEvent.Participants.ForEach(p => p.ScheduledEvents = new List<Event>());
+                return modifiedEvent;
             }
 
-            return false;
+            return null;
         }
 
-        public bool RemoveParticipants(Int32 eventId, List<Person> participants)
+        public Event RemoveParticipants(Int32 eventId, List<Person> participants)
         {
             Event foundEvent = DbManager.Instance.GetSingleEvent(eventId);
             if (foundEvent == null)
             {
-                return false;
+                return null;
             }
 
             List<Person> participantsToRemove = participants.Where(p => foundEvent.Participants.Contains(p, new PersonComparer())).ToList();
             participantsToRemove.ForEach(p => foundEvent.RemoveParticipant(p));
 
-            if (DbManager.Instance.ModifyEvent(foundEvent))
+            Event modifiedEvent = DbManager.Instance.ModifyEvent(foundEvent);
+            if (modifiedEvent != null)
             {
                 //TODO: NOTIFY
-                return true;
+                modifiedEvent.Participants.ForEach(p => p.ScheduledEvents = new List<Event>());
+                return modifiedEvent;
             }
 
-            return false;
+            return null;
         }
 
-        public bool EditEventDescription(Int32 eventId, string newDescription)
+        public Event EditEventDescription(Int32 eventId, string newDescription)
         {
             Event foundEvent = DbManager.Instance.GetSingleEvent(eventId);
             if (foundEvent == null)
             {
-                return false;
+                return null;
             }
 
             foundEvent.Description = newDescription;
 
-            if (DbManager.Instance.ModifyEvent(foundEvent))
+            Event modifiedEvent = DbManager.Instance.ModifyEvent(foundEvent);
+            if (modifiedEvent != null)
             {
-                return true;
+                modifiedEvent.Participants.ForEach(p => p.ScheduledEvents = new List<Event>());
+                return modifiedEvent;
             }
 
-            return false;
+            return null;
         }
 
+        /*
         public Event GetSingleEvent(Int32 eventId)
         {
             Event foundEvent = DbManager.Instance.GetSingleEvent(eventId);
@@ -141,9 +155,30 @@ namespace Server.Providers
             return foundEvent;
         }
 
+        
         public List<Event> GetAllEvents()
         {
             return DbManager.Instance.GetAllEvents();
+        }
+        */
+        public Event GetSingleEvent(int eventId)
+        { 
+            Event foundEvent = DbManager.Instance.GetSingleEvent(eventId);
+
+            if (foundEvent == null)
+            {
+                throw new NullReferenceException();
+            }
+
+            foundEvent.Participants.ForEach(p => p.ScheduledEvents = new List<Event>());
+            return foundEvent;
+        }
+
+        public List<Event> GetAllEvents()
+        {
+            List<Event> events = DbManager.Instance.GetAllEvents();
+            events.ForEach(e => e.Participants.ForEach(p => p.ScheduledEvents = new List<Event>()));
+            return events;
         }
     }
 }

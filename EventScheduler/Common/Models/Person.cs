@@ -1,5 +1,4 @@
-﻿using Common.BaseClasses;
-using Common.Helpers;
+﻿using Common.Helpers;
 using Common.IModels;
 using System;
 using System.Collections;
@@ -15,7 +14,7 @@ using System.Threading.Tasks;
 namespace Common.Models
 {
     [DataContract]
-    public class Person : IPerson, INotifyPropertyChanged
+    public class Person : IPerson, INotifyPropertyChanged, ICloneable
     { 
         #region Fields
         private String _firstName;
@@ -76,7 +75,7 @@ namespace Common.Models
                 return _scheduledEvents;
             }
 
-            private set
+            set
             {
                 _scheduledEvents = value;
             }
@@ -179,6 +178,67 @@ namespace Common.Models
             return true;
         }
 
+        public bool IsAvailableForEventExcludingOneSpecificEvent(DateTime? begining, DateTime? end, Event specificEvent)
+        {
+            if (begining == null || end == null)
+            {
+                return false;
+            }
+
+            foreach (Event e in ScheduledEvents.Where(se => !se.EventId.Equals(specificEvent.EventId)))
+            {
+                if (e.ScheduledDateTimeBeging == null || e.ScheduledDateTimeEnd == null)
+                {
+                    return false;
+                }
+
+                //slobodno vreme pre sastanka?
+                if (DateTime.Compare((DateTime)begining, (DateTime)e.ScheduledDateTimeBeging) < 0)
+                {
+                    if (DateTime.Compare((DateTime)end, (DateTime)e.ScheduledDateTimeBeging) > 0)
+                    {
+                        return false;
+                    }
+                }
+                //slobodno vreme posle sastanka?
+                else if (DateTime.Compare((DateTime)begining, (DateTime)e.ScheduledDateTimeBeging) > 0)
+                {
+                    if (DateTime.Compare((DateTime)begining, (DateTime)e.ScheduledDateTimeEnd) < 0)
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public object Clone()
+        {
+            Person personDuplicate = new Person()
+            {
+                JMBG = this.JMBG + "_copy",
+                FirstName = this.FirstName,
+                LastName = this.LastName,
+                LastEditTimeStamp = this.LastEditTimeStamp,
+            };
+
+            if (this.ScheduledEvents.Count != 0)
+            {
+                this.ScheduledEvents.ForEach(e => personDuplicate.ScheduledEvents.Add(e));
+            }
+            else
+            {
+                personDuplicate.ScheduledEvents = new List<Event>();
+            }
+
+            return personDuplicate;
+        }
+
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string name)
@@ -189,8 +249,6 @@ namespace Common.Models
                 handler(this, new PropertyChangedEventArgs(name));
             }
         }
-
-        
         #endregion
     }
 }

@@ -16,7 +16,7 @@ namespace Common.IModels
         
         DateTime LastEditTimeStamp { get; set; }
 
-        List<Event> ScheduledEvents {get; }
+        List<Event> ScheduledEvents { get; set; }
 
         Boolean ScheduleParticipationInEvent(Event e);
         Boolean CancleParticipationInEvent(Event e);

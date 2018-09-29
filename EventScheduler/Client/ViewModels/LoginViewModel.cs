@@ -18,10 +18,15 @@ namespace Client.ViewModels
         public ICommand LoginCommand { get; set; }
         public UserControl CurrentUserControl { get; set; }
         public Account LoggedInPerson { get; set; }
-        
-        public LoginViewModel()
+        public UserControl MessagesUserControl { get; set; }
+        public TextBlock InfoBlock { get; set; }
+
+        public LoginViewModel(UserControl messagesUserControl)
         {
             LoginCommand = new RelayCommand(Execute, CanExecute);
+            MessagesUserControl = messagesUserControl;
+            //TAKO BLIZU A TAKO DALEKO
+            InfoBlock = MessagesUserControl.FindName("InfoBlock") as TextBlock;
         }
 
         private void Execute(object parameter)
@@ -37,24 +42,15 @@ namespace Client.ViewModels
                 Account account = AccountProxy.Instance.AccountServices.Login(username, password);
                 if(account == null)
                 {
+                    //InfoBlock.Text += "Username or password is incorrect.\n";
                     MessageBox.Show("Username or password is incorrect.");
                 }
                 else
                 {
+                    //InfoBlock.Text += "Successfull login!\n";
                     MessageBox.Show("Successfull login!");
 
-                    //PROBAJ BILO STA DRUGO nekako preko resource-a
-                    /*
-                    var parent = VisualTreeHelper.GetParent(CurrentUserControl);
-                    var grid = VisualTreeHelper.GetChild(parent, 1);
-                    UserControl messageView = VisualTreeHelper.GetChild(grid, 4) as UserControl;
-                    TextBlock tb = VisualTreeHelper.GetChild(VisualTreeHelper.GetChild(messageView, 1), 3) as TextBlock;
-
-                    tb.Text += "Successfull login!";
-                    */
-                  
-
-                    CurrentUserControl.Content = new HomeViewModel(account);
+                    CurrentUserControl.Content = new HomeViewModel(account, MessagesUserControl);
                     CurrentUserControl.VerticalContentAlignment = VerticalAlignment.Top;
                     CurrentUserControl.HorizontalContentAlignment = HorizontalAlignment.Left;
                     CurrentUserControl.Width = 1500;
@@ -63,6 +59,7 @@ namespace Client.ViewModels
             }
             catch(Exception e)
             {
+                //InfoBlock.Text += $"Problem with connection. Message: {e.Message}";
                 MessageBox.Show($"Problem with connection. Message: {e.Message}");
             }
         }

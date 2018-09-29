@@ -1,4 +1,4 @@
-﻿using Common.BaseClasses;
+﻿using Common.BaseObserverPattern;
 using Common.Helpers;
 using Common.IAccess;
 using Common.IModels;
@@ -6,6 +6,7 @@ using Common.Models;
 using Server.Providers.ObserverPattern;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -118,15 +119,29 @@ namespace Server.Access
                 return false;
             }
         }
-
+        
+        /*
         public Person GetSinglePerson(string jmbg)
         {
             using (EventSchedulerContext dbContext = new EventSchedulerContext())
             {
-                return dbContext.People.FirstOrDefault(p => p.JMBG.Equals(jmbg));
+                Person foundPerson = dbContext.People.FirstOrDefault(p => p.JMBG.Equals(jmbg));
+                return foundPerson;
+            }
+        }
+        */
+        public Person GetSinglePerson(string jmbg)
+        {
+            using (EventSchedulerContext dbContext = new EventSchedulerContext())
+            {
+                Person foundPerson = dbContext.People
+                                              .Include(p => p.ScheduledEvents)
+                                              .FirstOrDefault(p => p.JMBG.Equals(jmbg));
+                return foundPerson;
             }
         }
 
+        /*
         public List<Person> GetAllPeople()
         {
             using (EventSchedulerContext dbContext = new EventSchedulerContext())
@@ -137,6 +152,21 @@ namespace Server.Access
                     people = new List<Person>();
                 }
 
+                return people;
+            }
+        }
+        */
+        public List<Person> GetAllPeople()
+        {
+            using (EventSchedulerContext dbContext = new EventSchedulerContext())
+            {
+                List<Person> people = dbContext.People
+                                               .Include(p => p.ScheduledEvents)
+                                               .ToList();
+                if (people == null)
+                {
+                    people = new List<Person>();
+                }
                 return people;
             }
         }
@@ -257,29 +287,42 @@ namespace Server.Access
         #endregion
 
         #region Event
-        public bool AddEvent(Event eventToAdd)
+        public Event AddEvent(Event eventToAdd)
         {
             using (EventSchedulerContext dbContext = new EventSchedulerContext())
             {
                 bool found = dbContext.Events.Any(e => e.EventId.Equals(eventToAdd.EventId));
                 if (found)
                 {
-                    return false;
+                    return null;
                 }
 
-                List<Person> foundParticipants = GetAllPeople().Where(p => eventToAdd.Participants.Contains(p, new PersonComparer())).ToList();
-                eventToAdd.Participants.ForEach(p => p = foundParticipants.FirstOrDefault(part => part.JMBG.Equals(p.JMBG)));
+                List<String> ParticipantsIds = new List<string>(eventToAdd.Participants.Select(p => p.JMBG));
+                List<Person> SelectedParticipants = new List<Person>(eventToAdd.Participants);
 
-                dbContext.Events.Add(eventToAdd);
+                eventToAdd.EmptyTheListOfParticipants();
+                foreach(String pId in ParticipantsIds)
+                {
+                    Person participant = dbContext.People.FirstOrDefault(p => p.JMBG.Equals(pId));
+                    if(participant == null)
+                    {
+                        participant = new Person(SelectedParticipants.FirstOrDefault(p => p.JMBG.Equals(pId)));
+                    }
+
+                    dbContext.People.Attach(participant);
+                    eventToAdd.AddParticipant(participant);
+                }
+
+                Event addedEvent = dbContext.Events.Add(eventToAdd);
                 dbContext.SaveChanges();
 
-                _eventNotifier.EvetToBeNotifiedAbout = eventToAdd;
+                _eventNotifier.EvetToBeNotifiedAbout = addedEvent;
                 _eventNotifier.NotifyAllAdditon();
-                return true;
+                return addedEvent;
             }
         }
 
-        public bool ModifyEvent(Event eventToModify)
+        public Event ModifyEvent(Event eventToModify)
         {
             using (EventSchedulerContext dbContext = new EventSchedulerContext())
             {
@@ -295,20 +338,42 @@ namespace Server.Access
                     foundEvent.ScheduledDateTimeEnd = eventToModify.ScheduledDateTimeEnd;
                     foundEvent.EventTitle = eventToModify.EventTitle;
                     foundEvent.Description = eventToModify.Description;
-                    eventToModify.Participants.ForEach(p => foundEvent.AddParticipant(p));
 
                     dbContext.SaveChanges();
 
+                    List<String> ParticipantsIds = new List<string>(eventToModify.Participants.Select(p => p.JMBG));
+                    List<Person> SelectedParticipants = new List<Person>(eventToModify.Participants);
+
+                    foundEvent.Participants = new List<Person>();
+                    foreach (String pId in ParticipantsIds)
+                    {
+                        Person participant = dbContext.People.Include(p => p.ScheduledEvents).FirstOrDefault(p => p.JMBG.Equals(pId));
+                        if (participant == null)
+                        {
+                            participant = new Person(SelectedParticipants.FirstOrDefault(p => p.JMBG.Equals(pId)));
+                        }
+
+                        dbContext.People.Attach(participant);
+
+                        participant.ScheduledEvents.ForEach(e => e.Participants = new List<Person>());
+
+                        dbContext.Events.Attach(foundEvent); //TREBA LI ATTACH
+                       
+                        foundEvent.AddParticipant(participant);
+                       
+                        dbContext.SaveChanges();                //ORGANIZYJ SAVE CHANGES
+                    }
+
                     _eventNotifier.EvetToBeNotifiedAbout = foundEvent;
                     _eventNotifier.NotifyAllChange();
-                    return true;
+                    return foundEvent;
                 }
 
-                return false;
+                return null;
             }
         }
 
-        public bool DeleteEvent(Event eventToDelete)
+        public Event DeleteEvent(Event eventToDelete)
         {
             using (EventSchedulerContext dbContext = new EventSchedulerContext())
             {
@@ -316,26 +381,40 @@ namespace Server.Access
                 if (found)
                 {
                     Event foundEvent = dbContext.Events.SingleOrDefault(e => e.EventId.Equals(eventToDelete.EventId));
-                    dbContext.Events.Remove(foundEvent);
+                    Event removedEvent = dbContext.Events.Remove(foundEvent);
                     dbContext.SaveChanges();
 
                     _eventNotifier.EvetToBeNotifiedAbout = foundEvent;
                     _eventNotifier.NotifyAllRemoval();
-                    return true;
+                    return removedEvent;
                 }
 
-                return false;
+                return null;
             }
         }
 
+        /*
         public Event GetSingleEvent(Int32 eventId)
         {
             using (EventSchedulerContext dbContext = new EventSchedulerContext())
             {
-                return dbContext.Events.FirstOrDefault(e => e.EventId.Equals(eventId));
+                Event foundEvent = dbContext.Events.FirstOrDefault(e => e.EventId.Equals(eventId));
+                return foundEvent;
             }
         }
-
+        */
+        public Event GetSingleEvent(Int32 eventId)
+        {
+            using (EventSchedulerContext dbContext = new EventSchedulerContext())
+            {
+                Event foundEvent = dbContext.Events
+                                            .Include(e => e.Participants)
+                                            .FirstOrDefault(e => e.EventId.Equals(eventId));
+                return foundEvent;
+            }
+        }
+       
+        /*
         public List<Event> GetAllEvents()
         {
             using (EventSchedulerContext dbContext = new EventSchedulerContext())
@@ -346,6 +425,21 @@ namespace Server.Access
                     events = new List<Event>();
                 }
 
+                return events;
+            }
+        }
+        */
+        public List<Event> GetAllEvents()
+        {
+            using (EventSchedulerContext dbContext = new EventSchedulerContext())
+            {
+                List<Event> events = dbContext.Events
+                                              .Include(e => e.Participants)
+                                              .ToList();
+                if (events == null)
+                {
+                    events = new List<Event>();
+                }
                 return events;
             }
         }

@@ -48,8 +48,14 @@ namespace Client.ViewModels
         public ObservableCollection<Event> EventsList { get; set; }
         public ObservableCollection<Account> AccountsList { get; set; }
 
-        public HomeViewModel(Account person)
+        public UserControl MessageUserControl { get; set; }
+        public TextBlock InfoBlock { get; set; }
+
+        public HomeViewModel(Account person, UserControl messageUserControl)
         {
+            MessageUserControl = messageUserControl;
+            InfoBlock = MessageUserControl.FindName("InfoBlock") as TextBlock;
+
             AddPersonCommand = new RelayCommand(AddPersonExecute, AddPersonCanExecute);
             ModifyPersonCommand = new RelayCommand(ModifyPersonExecute, ModifyPersonCanExecute);
             DeletePersonCommand = new RelayCommand(DeletePersonExecute, DeletePersonCanExecute);
@@ -135,7 +141,7 @@ namespace Client.ViewModels
         {
             Window window = new Window()
             {
-                Width = 500,
+                Width = 800,
                 Height = 600,
                 Content = new PersonDetailsViewModel(SelectedPerson),
             };
@@ -395,7 +401,7 @@ namespace Client.ViewModels
             Object[] parameters = parameter as Object[];
 
             UserControl CurrentUserControl = parameters[0] as UserControl;
-            CurrentUserControl.Content = new LoginViewModel();
+            CurrentUserControl.Content = new LoginViewModel(MessageUserControl);
             CurrentUserControl.VerticalContentAlignment = VerticalAlignment.Top;
             CurrentUserControl.HorizontalContentAlignment = HorizontalAlignment.Left;
             CurrentUserControl.Width = 1500;

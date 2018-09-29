@@ -73,11 +73,11 @@ namespace Common.Models
             set => _description = value;
         }
         [DataMember]
-        //[InverseProperty("ScheduledEvents")]
+        [InverseProperty("ScheduledEvents")]
         public List<Person> Participants
         {
             get => _participants;
-            private set => _participants = value;
+            set => _participants = value;
         }
         #endregion
 
@@ -146,6 +146,11 @@ namespace Common.Models
             Person participantToBeRemoved = Participants.FirstOrDefault(p => p.JMBG.Equals(participant.JMBG));
             Participants.Remove(participantToBeRemoved);
             return true;
+        }
+
+        public void EmptyTheListOfParticipants()
+        {
+            Participants = new List<Person>();
         }
     }
 }

@@ -67,6 +67,7 @@
             <Button.CommandParameter>
                 <MultiBinding Converter="{StaticResource multiConverter}">
                     <Binding ElementName="EventDetailsUserControl"/>
+                    <Binding ElementName="Participatns"/>
                 </MultiBinding>
             </Button.CommandParameter>
         </Button>

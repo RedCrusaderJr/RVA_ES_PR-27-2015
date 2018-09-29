@@ -17,7 +17,7 @@ namespace Common.IModels
         String EventTitle { get; set; }
         String Description { get; set; }
 
-        List<Person> Participants { get; }
+        List<Person> Participants { get; set; }
 
         Boolean AddParticipant(Person participant);
         Boolean RemoveParticipant(Person participant);

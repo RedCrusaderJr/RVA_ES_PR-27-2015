@@ -44,6 +44,7 @@ namespace Server.Providers
         }
 
         //ADAPTIRA METODE BAZE...
+        /*
         public Person GetSinglePerson(string jmbg)
         {
             Person person = DbManager.Instance.GetSinglePerson(jmbg);
@@ -56,9 +57,30 @@ namespace Server.Providers
             return person;
         }
 
+        
         public List<Person> GetAllPeople()
         {
             return DbManager.Instance.GetAllPeople();
+        }
+        */
+        public Person GetSinglePerson(string jmbg)
+        {
+            Person person = DbManager.Instance.GetSinglePerson(jmbg);
+
+            if (person == null)
+            {
+                throw new NullReferenceException();
+            }
+
+            person.ScheduledEvents.ForEach(e => e.Participants = new List<Person>());
+            return person;
+        }
+
+        public List<Person> GetAllPeople()
+        {
+            List<Person> people = DbManager.Instance.GetAllPeople();
+            people.ForEach(p => p.ScheduledEvents.ForEach(e => e.Participants = new List<Person>()));
+            return people;
         }
     }
 }

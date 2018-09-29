@@ -1,4 +1,4 @@
-﻿using Common.BaseClasses;
+﻿using Common.BaseObserverPattern;
 using Common.Models;
 using System;
 using System.Collections.Generic;
@@ -16,24 +16,27 @@ namespace Server.Providers.ObserverPattern
 
         public override void NotifyAllAdditon()
         {
-            foreach (PersonObserver p in Observers)
+            for(int i=0; i < Observers.Count; i ++)
             {
+                PersonObserver p = Observers[i] as PersonObserver;
                 p.NotifyAdditon(this);
             }
         }
 
         public override void NotifyAllChange()
         {
-            foreach (PersonObserver p in Observers)
+            for (int i = 0; i < Observers.Count; i++)
             {
+                PersonObserver p = Observers[i] as PersonObserver;
                 p.NotifyChange(this);
             }
         }
 
         public override void NotifyAllRemoval()
         {
-            foreach (PersonObserver p in Observers)
+            for (int i = 0; i < Observers.Count; i++)
             {
+                PersonObserver p = Observers[i] as PersonObserver;
                 p.NotifyRemoval(this);
             }
         }

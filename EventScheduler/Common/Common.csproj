@@ -49,8 +49,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseClasses\IObserver.cs" />
-    <Compile Include="BaseClasses\BaseNotifier.cs" />
+    <Compile Include="BaseObserverPattern\IObserver.cs" />
+    <Compile Include="BaseObserverPattern\BaseNotifier.cs" />
     <Compile Include="Contracts\IAccountServices.cs" />
     <Compile Include="Contracts\IEventServices.cs" />
     <Compile Include="Contracts\IPersonServices.cs" />

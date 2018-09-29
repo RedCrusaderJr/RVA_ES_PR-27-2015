@@ -10,9 +10,9 @@ namespace Common.IAccess
 {
     public interface IEventDbManager
     {
-        Boolean AddEvent(Event eventToAdd);
-        Boolean ModifyEvent(Event eventToModify);
-        Boolean DeleteEvent(Event eventToDelete);
+        Event AddEvent(Event eventToAdd);
+        Event ModifyEvent(Event eventToModify);
+        Event DeleteEvent(Event eventToDelete);
         Event GetSingleEvent(Int32 eventId);
         List<Event> GetAllEvents();
     }

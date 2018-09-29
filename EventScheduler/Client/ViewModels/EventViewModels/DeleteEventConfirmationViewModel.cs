@@ -18,18 +18,20 @@ namespace Client.ViewModels.EventViewModels
         public ICommand DeleteEventCommand { get; set; }
         public Event EventToBeDeleted { get; set; }
         public ObservableCollection<Event> EventList { get; set; }
+        public ObservableCollection<Person> Participants { get; set; }
 
         public DeleteEventConfirmationViewModel(Event eventToBeDeleted, ObservableCollection<Event> eventList)
         {
             EventToBeDeleted = eventToBeDeleted;
             EventList = eventList;
-
+            Participants = new ObservableCollection<Person>(EventToBeDeleted.Participants);
             DeleteEventCommand = new RelayCommand(DeleteEventExecute, DeleteEventCanExecute);
         }
 
         private void DeleteEventExecute(object obj)
         {
-            if (EventProxy.Instance.EventServices.CancleEvent(EventToBeDeleted))
+            Event deletedEvent = EventProxy.Instance.EventServices.CancleEvent(EventToBeDeleted);
+            if (deletedEvent != null)
             {
                 Event foundEvent = EventList.FirstOrDefault(e => e.EventId.Equals(EventToBeDeleted.EventId));
                 EventList.Remove(foundEvent);
@@ -38,7 +40,6 @@ namespace Client.ViewModels.EventViewModels
                 currentWindow.Close();
             }
         }
-
         private bool DeleteEventCanExecute(object arg)
         {
             if (arg == null || !(arg is Object[] parameters) || parameters.Length != 1

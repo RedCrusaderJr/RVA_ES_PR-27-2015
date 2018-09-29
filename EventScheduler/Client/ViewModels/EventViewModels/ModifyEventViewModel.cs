@@ -27,7 +27,6 @@ namespace Client.ViewModels.EventViewModels
         public Person PersonToRevokeParticipation { get; set; }
         public ObservableCollection<Person> AvailablePeople { get; set; }
         public ObservableCollection<Person> Participants { get; set; }
-        private bool _participantsInitialized = false;
 
         public ModifyEventViewModel(Event eventToModify, ObservableCollection<Event> eventList)
         {
@@ -39,8 +38,8 @@ namespace Client.ViewModels.EventViewModels
             EventToModify = eventToModify;
             PersonToParticipate = new Person();
             PersonToRevokeParticipation = new Person();
-            AvailablePeople = new ObservableCollection<Person>();
-            Participants = new ObservableCollection<Person>();
+            AvailablePeople = new ObservableCollection<Person>(PersonProxy.Instance.PersonServices.GetAllPeople().Where(p => p.IsAvailableForEvent(EventToModify.ScheduledDateTimeBeging, EventToModify.ScheduledDateTimeEnd)));
+            Participants = new ObservableCollection<Person>(EventToModify.Participants);
         }
 
         private void ModifyEventExecute(object parameter)
@@ -65,21 +64,19 @@ namespace Client.ViewModels.EventViewModels
             }
             peopleToBeRemoved.ForEach(p => EventToModify.Participants.Remove(p));
 
-            peopleToBeRemoved = new List<Person>(EventToModify.Participants); //TEST
-            peopleToBeRemoved.ForEach(p => EventToModify.Participants.Remove(p));
-
-            if (EventProxy.Instance.EventServices.EditEvent(EventToModify))
+            Event editedEvent = EventProxy.Instance.EventServices.EditEvent(EventToModify);
+            if (editedEvent != null)
             {
-                EventToModify = EventProxy.Instance.EventServices.GetSingleEvent(EventToModify.EventId);
+                //EventToModify = EventProxy.Instance.EventServices.GetSingleEvent(EventToModify.EventId); //OSLANJAM SE NA EVENT PROSLEDJEN IZ BAZE IMA LI ON PARTICIPANTE?????????
 
-                Event eventInList = EventList.First(p => p.EventId.Equals(EventToModify.EventId));
-                eventInList.EventTitle = EventToModify.EventTitle;
-                eventInList.Description = EventToModify.Description;
-                eventInList.LastEditTimeStamp = EventToModify.LastEditTimeStamp;
-                eventInList.ScheduledDateTimeBeging = EventToModify.ScheduledDateTimeBeging;
-                eventInList.ScheduledDateTimeEnd = EventToModify.ScheduledDateTimeEnd;
+                Event eventInList = EventList.First(p => p.EventId.Equals(editedEvent.EventId));
+                eventInList.EventTitle = editedEvent.EventTitle;
+                eventInList.Description = editedEvent.Description;
+                eventInList.LastEditTimeStamp = editedEvent.LastEditTimeStamp;
+                eventInList.ScheduledDateTimeBeging = editedEvent.ScheduledDateTimeBeging;
+                eventInList.ScheduledDateTimeEnd = editedEvent.ScheduledDateTimeEnd;
 
-                foreach (Person p in EventToModify.Participants)
+                foreach (Person p in editedEvent.Participants)
                 {
                     if(!eventInList.Participants.Contains(p, new PersonComparer()))
                     {
@@ -90,7 +87,7 @@ namespace Client.ViewModels.EventViewModels
                 peopleToBeRemoved = new List<Person>();
                 foreach (Person p in eventInList.Participants)
                 {
-                    if (!EventToModify.Participants.Contains(p, new PersonComparer()))
+                    if (!editedEvent.Participants.Contains(p, new PersonComparer()))
                     {
                         peopleToBeRemoved.Add(p);
                     }
@@ -145,11 +142,18 @@ namespace Client.ViewModels.EventViewModels
                 return false;
             }
 
-            foreach (Person p in PersonProxy.Instance.PersonServices.GetAllPeople())
+            foreach (Person p in PersonProxy.Instance.PersonServices.GetAllPeople().Where(per => per.IsAvailableForEvent(EventToModify.ScheduledDateTimeBeging, EventToModify.ScheduledDateTimeEnd)))
             {
-                if (_participantsInitialized && p.IsAvailableForEvent(EventToModify.ScheduledDateTimeBeging, EventToModify.ScheduledDateTimeEnd)
-                                                                                                                        && !AvailablePeople.Contains(p, new PersonComparer())
-                                                                                                                        && !Participants.Contains(p, new PersonComparer()))
+                if (!AvailablePeople.Contains(p, new PersonComparer()) && !Participants.Contains(p, new PersonComparer()))
+                {
+                    AvailablePeople.Add(p);
+                }
+            }
+            foreach(Person p in EventToModify.Participants)
+            {
+                if(p.IsAvailableForEventExcludingOneSpecificEvent(EventToModify.ScheduledDateTimeBeging, EventToModify.ScheduledDateTimeEnd, EventToModify)
+                                                                                                      && !AvailablePeople.Contains(p, new PersonComparer())
+                                                                                                      && !Participants.Contains(p, new PersonComparer())) 
                 {
                     AvailablePeople.Add(p);
                 }
@@ -191,15 +195,16 @@ namespace Client.ViewModels.EventViewModels
                 return false;
             }
 
-            foreach (Person p in EventToModify.Participants)
+            List<Person> peopleToRemove = new List<Person>();
+            foreach (Person p in Participants)
             {
-                if (p.IsAvailableForEvent(EventToModify.ScheduledDateTimeBeging, EventToModify.ScheduledDateTimeEnd) && !AvailablePeople.Contains(p, new PersonComparer())
-                                                                                                                     && !Participants.Contains(p, new PersonComparer()))
+                if (!p.IsAvailableForEvent(EventToModify.ScheduledDateTimeBeging, EventToModify.ScheduledDateTimeEnd) && !EventToModify.Participants.Contains(p, new PersonComparer()))
                 {
-                    AvailablePeople.Add(p);
+                    peopleToRemove.Add(p);
                 }
             }
-            _participantsInitialized = true;
+            peopleToRemove.ForEach(p => Participants.Remove(p));
+
             ((StatusBar)arguments[0]).Visibility = Visibility.Visible;
 
 

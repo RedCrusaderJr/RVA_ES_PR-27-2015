@@ -46,10 +46,10 @@ namespace Client.ViewModels.EventViewModels
         {
             Object[] parameters = parameter as Object[];
 
-            //Participants = new ObservableCollection<Person>(); //TESTIRANJE
-            if (EventProxy.Instance.EventServices.ScheduleEvent(EventToAdd, Participants.ToList()))
+            Event scheduledEvent = EventProxy.Instance.EventServices.ScheduleEvent(EventToAdd, Participants.ToList());
+            if(scheduledEvent != null)
             {
-                EventList.Add(EventToAdd);
+                EventList.Add(scheduledEvent);
 
                 MessageBox.Show("Event successfully added.");
                 UserControl uc = parameters[0] as UserControl;
@@ -99,10 +99,9 @@ namespace Client.ViewModels.EventViewModels
                 return false;
             }
 
-            foreach (Person p in PersonProxy.Instance.PersonServices.GetAllPeople())
+            foreach (Person p in PersonProxy.Instance.PersonServices.GetAllPeople().Where(per => per.IsAvailableForEvent(EventToAdd.ScheduledDateTimeBeging, EventToAdd.ScheduledDateTimeEnd)))
             {
-                if (p.IsAvailableForEvent(EventToAdd.ScheduledDateTimeBeging, EventToAdd.ScheduledDateTimeEnd) && !AvailablePeople.Contains(p, new PersonComparer())
-                                                                                                               && !Participants.Contains(p, new PersonComparer()))
+                if (!AvailablePeople.Contains(p, new PersonComparer()) && !Participants.Contains(p, new PersonComparer()))
                 {
                     AvailablePeople.Add(p);
                 }
@@ -143,6 +142,16 @@ namespace Client.ViewModels.EventViewModels
                 ((StatusBar)arguments[0]).Visibility = Visibility.Collapsed;
                 return false;
             }
+
+            List<Person> peopleToRemove = new List<Person>();
+            foreach (Person p in Participants)
+            {
+                if (!p.IsAvailableForEvent(EventToAdd.ScheduledDateTimeBeging, EventToAdd.ScheduledDateTimeEnd))
+                {
+                    peopleToRemove.Add(p);
+                }
+            }
+            peopleToRemove.ForEach(p => Participants.Remove(p));
 
             ((StatusBar)arguments[0]).Visibility = Visibility.Visible;
 
