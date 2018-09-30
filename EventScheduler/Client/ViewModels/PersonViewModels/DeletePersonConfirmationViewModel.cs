@@ -1,11 +1,13 @@
 ﻿using Client.Commands;
 using Client.Proxies;
+using Common.Contracts;
 using Common.IModels;
 using Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -20,22 +22,35 @@ namespace Client.ViewModels.PersonViewModels
         public ICommand DeletePersonCommand { get; set; }
         public Person PersonToBeDeleted { get; set; }
         public ObservableCollection<Person> PeopleList { get; set; }
-        
+        public IPersonServices PersonProxy { get; set; }
 
-        public DeletePersonConfirmationViewModel(Person personToBeDeleted, ObservableCollection<Person> peopleList)
+        public DeletePersonConfirmationViewModel(Person personToBeDeleted, ObservableCollection<Person> peopleList, IPersonServices personProxy)
         {
             PersonToBeDeleted = personToBeDeleted;
             PeopleList = peopleList;
 
             DeletePersonCommand = new RelayCommand(DeleteAccountExecute, DeleteAccountCanExecute);
+
+            PersonProxy = personProxy;
         }
 
         private void DeleteAccountExecute(object obj)
         {
-            if (PersonProxy.Instance.PersonServices.DeletePerson(PersonToBeDeleted))
+            Person deletedPerson = PersonProxy.DeletePerson(PersonToBeDeleted);
+            if(deletedPerson != null)
             {
-                Person foundPerson = PeopleList.FirstOrDefault(p => p.JMBG.Equals(PersonToBeDeleted.JMBG));
+                /*
+                Person foundPerson = PeopleList.FirstOrDefault(p => p.JMBG.Equals(deletedPerson.JMBG));
                 PeopleList.Remove(foundPerson);
+                */
+                MessageBox.Show("Person successfully deleted.");
+                object[] parameters = obj as object[];
+                Window currentWindow = Window.GetWindow((UserControl)parameters[0]);
+                currentWindow.Close();
+            }
+            else
+            {
+                MessageBox.Show("Error while deleting - server side");
                 object[] parameters = obj as object[];
                 Window currentWindow = Window.GetWindow((UserControl)parameters[0]);
                 currentWindow.Close();

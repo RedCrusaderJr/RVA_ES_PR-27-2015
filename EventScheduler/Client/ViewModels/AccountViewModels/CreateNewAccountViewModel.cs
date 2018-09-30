@@ -1,10 +1,12 @@
 ﻿using Client.Commands;
 using Client.Proxies;
+using Common.Contracts;
 using Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -21,12 +23,14 @@ namespace Client.ViewModels.AccountViewModels
         public Account AccountToAdd { get; set; }
         public ERole SelectedOption { get; set; }
         public ObservableCollection<Account> AccountsList { get; set; }
+        public IAccountServices AccountProxy { get; set; }
 
 
-        public CreateNewAccountViewModel(ObservableCollection<Account> accounts)
+        public CreateNewAccountViewModel(ObservableCollection<Account> accounts, IAccountServices accountProxy)
         {
             CreateNewAccountCommand = new RelayCommand(CreateNewAccountExecute, CreateNewAccountCanExecute);
             AccountsList = accounts;
+            AccountProxy = accountProxy;
         }
 
         private void CreateNewAccountExecute(object parameter)
@@ -47,10 +51,13 @@ namespace Client.ViewModels.AccountViewModels
                 Password = password,
                 Role = (bool)roleRegular ? ERole.REGULAR : ERole.ADMIN,
             };
-   
-            if (AccountProxy.Instance.AccountServices.CreateNewAccount(AccountToAdd))
+
+            Account createdAccount = AccountProxy.CreateNewAccount(AccountToAdd);
+            if (createdAccount != null)
             {
-                AccountsList.Add(AccountToAdd);
+                AccountsList.Add(createdAccount);
+
+                MessageBox.Show("Account successfuly added.");
                 CurrentWindow = Window.GetWindow(CreateNewAccountUserControl);
                 CurrentWindow.Close();
             }

@@ -1,10 +1,12 @@
 ﻿using Client.Commands;
 using Client.Proxies;
+using Common.Contracts;
 using Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -18,23 +20,38 @@ namespace Client.ViewModels.EventViewModels
         public ICommand DeleteEventCommand { get; set; }
         public Event EventToBeDeleted { get; set; }
         public ObservableCollection<Event> EventList { get; set; }
+        public ObservableCollection<Person> PeopleList { get; set; }
         public ObservableCollection<Person> Participants { get; set; }
 
-        public DeleteEventConfirmationViewModel(Event eventToBeDeleted, ObservableCollection<Event> eventList)
+        public IEventServices EventProxy { get; set; }
+
+        public DeleteEventConfirmationViewModel(Event eventToBeDeleted, ObservableCollection<Event> eventList, ObservableCollection<Person> peopleList, IEventServices eventProxy)
         {
             EventToBeDeleted = eventToBeDeleted;
             EventList = eventList;
+            PeopleList = peopleList;
             Participants = new ObservableCollection<Person>(EventToBeDeleted.Participants);
             DeleteEventCommand = new RelayCommand(DeleteEventExecute, DeleteEventCanExecute);
+
+            EventProxy = eventProxy;
         }
 
         private void DeleteEventExecute(object obj)
         {
-            Event deletedEvent = EventProxy.Instance.EventServices.CancleEvent(EventToBeDeleted);
+            Event deletedEvent = EventProxy.CancleEvent(EventToBeDeleted);
             if (deletedEvent != null)
             {
-                Event foundEvent = EventList.FirstOrDefault(e => e.EventId.Equals(EventToBeDeleted.EventId));
+                /*
+                Event foundEvent = EventList.FirstOrDefault(e => e.EventId.Equals(deletedEvent.EventId));
                 EventList.Remove(foundEvent);
+
+                foreach(Person p in deletedEvent.Participants)
+                {
+                    Person foundPerson = PeopleList.FirstOrDefault(per => per.JMBG.Equals(p.JMBG));
+                    PeopleList.Remove(foundPerson);
+                    PeopleList.Add(p);
+                }
+                */
                 object[] parameters = obj as object[];
                 Window currentWindow = Window.GetWindow((UserControl)parameters[0]);
                 currentWindow.Close();

@@ -8,31 +8,40 @@ using System.Threading.Tasks;
 
 namespace Common.Contracts
 {
-    [ServiceContract]
+    [ServiceContract(CallbackContract = typeof(IAccountServicesCallback))]
     public interface IAccountServices
     {
         [OperationContract]
-        Account Login(string username, string password);
+        Account CreateNewAccount(Account account);
 
         [OperationContract]
-        bool CreateNewAccount(Account account);
-
-        //[OperationContract]
-        //bool CreateAccountWithExistingPerson(Account account);
-        
-        [OperationContract]
-        bool ModifyAccount(Account account);
+        Account ModifyAccount(Account account);
 
         [OperationContract]
-        bool DeleteAccount(Account account);
-
-        //[OperationContract]
-        //bool DeleteAccountWithPerson(Account account);
+        Account DeleteAccount(Account account);
 
         [OperationContract]
         Account GetSingleAccount(String username);
 
         [OperationContract]
         List<Account> GetAllAccounts();
+
+        [OperationContract]
+        void Subscribe();
+
+        [OperationContract]
+        void Unsubscribe();
+    }
+
+    public interface IAccountServicesCallback
+    {
+        [OperationContract]
+        void NotifyAccountAddition(Account addedAccount);
+
+        [OperationContract]
+        void NotifyAccountRemoval(Account removedAccount);
+
+        [OperationContract]
+        void NotifyAccountModification(Account modifiedAccount);
     }
 }

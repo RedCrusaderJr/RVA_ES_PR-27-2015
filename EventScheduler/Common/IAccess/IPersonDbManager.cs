@@ -9,9 +9,9 @@ namespace Common.IAccess
 {
     public interface IPersonDbManager
     {
-        Boolean AddPerson(Person personToAdd);
-        Boolean ModifyPerson(Person personToModify);
-        Boolean DeletePerson(Person personToDelete);
+        Person AddPerson(Person personToAdd);
+        Person ModifyPerson(Person personToModify);
+        Person DeletePerson(Person personToDelete);
         Person GetSinglePerson(String jmbg);
         List<Person> GetAllPeople();
     }

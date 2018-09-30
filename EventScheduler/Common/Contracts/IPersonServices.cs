@@ -8,37 +8,40 @@ using System.Threading.Tasks;
 
 namespace Common.Contracts
 {
-    //(CallbackContract = typeof(IPersonServicesCallback))
-    [ServiceContract]
+    [ServiceContract(CallbackContract = typeof(IPersonServicesCallback))]
     public interface IPersonServices
     {
         [OperationContract]
-        bool AddPerson(Person person);
+        Person AddPerson(Person person);
 
         [OperationContract]
-        bool ModifyPerson(Person person);
+        Person ModifyPerson(Person person);
 
         [OperationContract]
-        bool DeletePerson(Person person);
+        Person DeletePerson(Person person);
 
         [OperationContract]
         Person GetSinglePerson(String jmbg);
 
         [OperationContract]
         List<Person> GetAllPeople();
+
+        [OperationContract]
+        void Subscribe();
+
+        [OperationContract]
+        void Unsubscribe();
     }
 
-    /*
     public interface IPersonServicesCallback
     {
         [OperationContract]
-        void NotifyAddEvent(Event addedEvent);
+        void NotifyPersonAddition(Person addedPerson);
 
         [OperationContract]
-        void NotifyDeleteEvent(Event removedEvent);
+        void NotifyPersonRemoval(Person removedPerson);
 
         [OperationContract]
-        void NotifyModifyEvent(Event modifyedEvent);
+        void NotifyPersonModification(Person modifiedPerson);
     }
-    */
 }

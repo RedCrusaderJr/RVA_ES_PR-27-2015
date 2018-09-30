@@ -10,6 +10,21 @@ namespace Client.Proxies
 {
     public class AccountProxy
     {
+        public static IAccountServices ConnectToAccountService(InstanceContext instanceContext)
+        {
+            NetTcpBinding binding = new NetTcpBinding()
+            {
+                CloseTimeout = new TimeSpan(0, 10, 0),
+                OpenTimeout = new TimeSpan(0, 10, 0),
+                ReceiveTimeout = new TimeSpan(0, 10, 0),
+                SendTimeout = new TimeSpan(0, 10, 0),
+            };
+            DuplexChannelFactory<IAccountServices> accountChannelFactory = new DuplexChannelFactory<IAccountServices>(instanceContext, binding, new EndpointAddress("net.tcp://localhost:6001/IAccountServices"));
+            IAccountServices accountProxy = accountChannelFactory.CreateChannel();
+            return accountProxy;
+        }
+
+        /*
         #region Instance
         private static AccountProxy _instance;
         private static readonly object syncLock = new object();
@@ -45,5 +60,6 @@ namespace Client.Proxies
         #endregion
 
         public IAccountServices AccountServices { get; }
+        */
     }
 }

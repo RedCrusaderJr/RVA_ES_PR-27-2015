@@ -4,89 +4,56 @@ using Server.Access;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Server.Providers
 {
+    [ServiceBehavior(ConcurrencyMode=ConcurrencyMode.Reentrant)]
     class AccountServices_Provider : IAccountServices
     {
-        //RETURNING NULL
-        public Account Login(string username, string password)
+        public Account CreateNewAccount(Account accountToCreate)
         {
-            Account account = DbManager.Instance.GetSingleAccountByUsername(username);
-
-            if(account != null)
+            Account createdAccount = DbManager.Instance.AddAccount(accountToCreate);
+            if (createdAccount != null)
             {
-                if(account.Password.Equals(password))
-                {
-                    return account;
-                }
+                IAccountServicesCallback currentCallbackProxy = OperationContext.Current.GetCallbackChannel<IAccountServicesCallback>();
+                AccountServiceCallback.Instance.NotifyAllAccountAddition(createdAccount, currentCallbackProxy);
+
+                return createdAccount;
             }
 
-            //throw new NullReferenceException();
             return null;
         }
 
-        public bool CreateNewAccount(Account accountToCreate)
+        public Account ModifyAccount(Account accountToModify)
         {
-            if(DbManager.Instance.AddAccount(accountToCreate))
+            Account modifiedAccount = DbManager.Instance.ModifyAccount(accountToModify);
+            if (modifiedAccount != null)
             {
-                return true;
+                IAccountServicesCallback currentCallbackProxy = OperationContext.Current.GetCallbackChannel<IAccountServicesCallback>();
+                AccountServiceCallback.Instance.NotifyAllAccountModification(modifiedAccount, currentCallbackProxy);
+
+                return modifiedAccount;
             }
 
-            return false;
-        }
-        /*
-        public bool CreateAccountWithExistingPerson(Account accountToCreate)
-        {
-            if (DbManager.Instance.AddAccount(accountToCreate))
-            {
-                return true;
-            }
-
-            return false;
-        }
-        */
-        public bool ModifyAccount(Account accountToModify)
-        {
-            if(DbManager.Instance.ModifyAccount(accountToModify))
-            {
-                return true;
-            }
-
-            return false;
+            return null;
         }
 
-        public bool DeleteAccount(Account accountToBeDeleted)
+        public Account DeleteAccount(Account accountToBeDeleted)
         {
-            if(DbManager.Instance.DeleteAccount(accountToBeDeleted))
+            Account deletedAccount = DbManager.Instance.DeleteAccount(accountToBeDeleted);
+            if (deletedAccount != null)
             {
-                
-                
-                return true;
-                
+                IAccountServicesCallback currentCallbackProxy = OperationContext.Current.GetCallbackChannel<IAccountServicesCallback>();
+                AccountServiceCallback.Instance.NotifyAllAccountRemoval(deletedAccount, currentCallbackProxy);
+
+                return deletedAccount;   
             }
 
-            return false;
+            return null;
         }
-
-        /*
-        public bool DeleteAccountWithPerson(Account accountToDelete)
-        {
-            if(!DbManager.Instance.DeleteAccount(accountToDelete))
-            {
-                return false;
-            }
-
-            if (!DbManager.Instance.DeletePerson(accountToDelete.PersonWithAccount))
-            {
-                return false;
-            }
-
-            return true;
-        }
-        */
 
         public Account GetSingleAccount(string username)
         {
@@ -94,7 +61,7 @@ namespace Server.Providers
 
             if (account == null)
             {
-                throw new NullReferenceException();
+                return null;
             }
 
             return account;
@@ -103,6 +70,18 @@ namespace Server.Providers
         public List<Account> GetAllAccounts()
         {
             return DbManager.Instance.GetAllAccounts();
+        }
+
+        public void Subscribe()
+        {
+            IAccountServicesCallback currentCallbackProxy = OperationContext.Current.GetCallbackChannel<IAccountServicesCallback>();
+            AccountServiceCallback.Instance.Subscribe(currentCallbackProxy);
+        }
+
+        public void Unsubscribe()
+        {
+            IAccountServicesCallback currentCallbackProxy = OperationContext.Current.GetCallbackChannel<IAccountServicesCallback>();
+            AccountServiceCallback.Instance.Unsubscribe(currentCallbackProxy);
         }
     }
 }

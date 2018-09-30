@@ -9,10 +9,9 @@ namespace Common.IAccess
 {
     public interface IAccountDbManager
     {
-        Boolean AddAccount(Account accountToAdd);
-        //Boolean AddAccount(Account accountToAdd, Person personToAdd);
-        Boolean ModifyAccount(Account accountToModify);
-        Boolean DeleteAccount(Account accountToDelete);
+        Account AddAccount(Account accountToAdd);
+        Account ModifyAccount(Account accountToModify);
+        Account DeleteAccount(Account accountToDelete);
         Account GetSingleAccountByUsername(String accountUsername);
         List<Account> GetAllAccounts();
     }

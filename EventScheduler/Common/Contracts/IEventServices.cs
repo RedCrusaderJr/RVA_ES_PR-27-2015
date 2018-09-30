@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Common.Contracts
 {
-    [ServiceContract]
+    [ServiceContract(CallbackContract = typeof(IEventServicesCallback))]
     public interface IEventServices
     {
         [OperationContract]
@@ -37,5 +37,23 @@ namespace Common.Contracts
 
         [OperationContract]
         List<Event> GetAllEvents();
+
+        [OperationContract]
+        void Subscribe();
+
+        [OperationContract]
+        void Unsubscribe();
+    }
+
+    public interface IEventServicesCallback
+    {
+        [OperationContract]
+        void NotifyEventAddition(Event addedEvent);
+
+        [OperationContract]
+        void NotifyEventRemoval(Event removedEvent);
+
+        [OperationContract]
+        void NotifyEventModification(Event modifiedEvent);
     }
 }

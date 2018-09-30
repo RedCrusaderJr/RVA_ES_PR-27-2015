@@ -39,7 +39,7 @@ namespace Client.ViewModels
 
             try
             {
-                Account account = AccountProxy.Instance.AccountServices.Login(username, password);
+                Account account = LoginProxy.ConnectToLoginService().Login(username, password);
                 if(account == null)
                 {
                     //InfoBlock.Text += "Username or password is incorrect.\n";

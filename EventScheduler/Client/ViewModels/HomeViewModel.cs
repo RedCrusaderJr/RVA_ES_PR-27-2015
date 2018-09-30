@@ -3,11 +3,14 @@ using Client.Proxies;
 using Client.ViewModels.AccountViewModels;
 using Client.ViewModels.EventViewModels;
 using Client.ViewModels.PersonViewModels;
+using Common.Contracts;
+using Common.Helpers;
 using Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -16,13 +19,17 @@ using System.Windows.Input;
 
 namespace Client.ViewModels
 {
-    public class HomeViewModel
+    [CallbackBehavior(UseSynchronizationContext = false)]
+    public class HomeViewModel : IPersonServicesCallback, IEventServicesCallback, IAccountServicesCallback 
     {
         #region ICommands
         public ICommand AddPersonCommand { get; set; }
         public ICommand ModifyPersonCommand { get; set; }
         public ICommand DeletePersonCommand { get; set; }
         public ICommand PersonDetailsCommand { get; set; }
+        public ICommand DuplicatePersonCommand { get; set; }
+        public ICommand UndoPersonCommand { get; set; }
+        public ICommand RedoPersonCommand { get; set; }
         public ICommand ShowPeopleCommand { get; set; }
 
         public ICommand AddEventCommand { get; set; }
@@ -48,6 +55,10 @@ namespace Client.ViewModels
         public ObservableCollection<Event> EventsList { get; set; }
         public ObservableCollection<Account> AccountsList { get; set; }
 
+        IPersonServices _personProxy;
+        IAccountServices _accountProxy;
+        IEventServices _eventProxy;
+
         public UserControl MessageUserControl { get; set; }
         public TextBlock InfoBlock { get; set; }
 
@@ -60,6 +71,9 @@ namespace Client.ViewModels
             ModifyPersonCommand = new RelayCommand(ModifyPersonExecute, ModifyPersonCanExecute);
             DeletePersonCommand = new RelayCommand(DeletePersonExecute, DeletePersonCanExecute);
             PersonDetailsCommand = new RelayCommand(PersonDetailsExecute, PersonDetailsCanExecute);
+            DuplicatePersonCommand = new RelayCommand(DuplicatePersonExecute, DuplicatePersonCanExecute);
+            UndoPersonCommand = new RelayCommand(UndoPersonExecute, UndoPersonCanExecute);
+            RedoPersonCommand = new RelayCommand(RedoPersonExecute, RedoPersonCanExecute);
             ShowPeopleCommand = new RelayCommand(ShowPeopleExecute, ShowPeopleCanExecute);
 
             AddEventCommand = new RelayCommand(AddEventExecute, AddEventCanExecute);
@@ -76,11 +90,27 @@ namespace Client.ViewModels
 
             LogOutCommand = new RelayCommand(LogOutExecute, LogOutCanExecute);
 
+            InstanceContext instanceContext = new InstanceContext(this);
+            _personProxy = PersonProxy.ConnectToPersonService(instanceContext);
+            _accountProxy = AccountProxy.ConnectToAccountService(instanceContext);
+            _eventProxy = EventProxy.ConnectToAccountService(instanceContext);
+
+            _personProxy.Subscribe();
+            _accountProxy.Subscribe();
+            _eventProxy.Subscribe();
+
             LoggedInAccount = person;
 
-            PeopleList = new ObservableCollection<Person>(PersonProxy.Instance.PersonServices.GetAllPeople());
-            EventsList = new ObservableCollection<Event>(EventProxy.Instance.EventServices.GetAllEvents());
-            AccountsList = new ObservableCollection<Account>(AccountProxy.Instance.AccountServices.GetAllAccounts());
+            PeopleList = new ObservableCollection<Person>(_personProxy.GetAllPeople());
+            AccountsList = new ObservableCollection<Account>(_accountProxy.GetAllAccounts());
+            EventsList = new ObservableCollection<Event>(_eventProxy.GetAllEvents());
+        }
+
+        ~HomeViewModel()
+        {
+            _personProxy.Unsubscribe();
+            _accountProxy.Unsubscribe();
+            _eventProxy.Unsubscribe();
         }
 
         #region PersonCommandExecutions
@@ -90,13 +120,42 @@ namespace Client.ViewModels
             {
                 Width = 600,
                 Height = 600,
-                Content = new AddPersonViewModel(PeopleList),
+                Content = new AddPersonViewModel(PeopleList, _personProxy),
             };
 
             window.ShowDialog();
         }
         private bool AddPersonCanExecute(object paramter)
         {
+            List<Person> UpdatedListOfPeople = _personProxy.GetAllPeople();
+
+            foreach(Person p in UpdatedListOfPeople)
+            {
+                if(!PeopleList.Contains(p, new PersonComparer()))
+                {
+                    PeopleList.Add(p);
+                }
+                else
+                {
+                    Person foundPerson = PeopleList.FirstOrDefault(pe => pe.JMBG.Equals(p.JMBG));
+                    if(foundPerson.LastEditTimeStamp != p.LastEditTimeStamp)
+                    {
+                        PeopleList.Remove(foundPerson);
+                        PeopleList.Add(p);
+                    }
+                }
+            }
+
+            List<Person> peopleToBeRemoved = new List<Person>();
+            foreach (Person p in PeopleList)
+            {
+                if (!UpdatedListOfPeople.Contains(p, new PersonComparer()))
+                {
+                    peopleToBeRemoved.Add(p);
+                }
+            }
+            peopleToBeRemoved.ForEach(p => PeopleList.Remove(p));
+
             return true;
         }
 
@@ -106,7 +165,7 @@ namespace Client.ViewModels
             {
                 Width = 500,
                 Height = 600,
-                Content = new ModifyPersonViewModel(SelectedPerson, PeopleList),
+                Content = new ModifyPersonViewModel(SelectedPerson, PeopleList, _personProxy),
             };
 
             window.ShowDialog();
@@ -127,7 +186,7 @@ namespace Client.ViewModels
             {
                 Width = 500,
                 Height = 600,
-                Content = new DeletePersonConfirmationViewModel(SelectedPerson, PeopleList),
+                Content = new DeletePersonConfirmationViewModel(SelectedPerson, PeopleList, _personProxy),
             };
 
             window.ShowDialog();
@@ -153,6 +212,42 @@ namespace Client.ViewModels
             return SelectedPerson != null;
         }
 
+        private void DuplicatePersonExecute(object parameter)
+        {
+            Person duplicatedPerson = _personProxy.AddPerson((Person)SelectedPerson.Duplicate());
+            if (duplicatedPerson != null)
+            {
+                MessageBox.Show("Successful duplication.");
+                PeopleList.Add(duplicatedPerson);
+            }
+            else
+            {
+                MessageBox.Show("Unsuccessful duplication.");
+            }
+        }
+        private bool DuplicatePersonCanExecute(object parameter)
+        {
+            return SelectedPerson != null;
+        }
+
+        private void UndoPersonExecute(object parameter)
+        {
+            throw new NotImplementedException();
+        }
+        private bool UndoPersonCanExecute(object parameter)
+        {
+            return false;
+        }
+
+        private void RedoPersonExecute(object parameter)
+        {
+            throw new NotImplementedException();
+        }
+        private bool RedoPersonCanExecute(object parameter)
+        {
+            return false;
+        }
+
         private void ShowPeopleExecute(object parameter)
         {
             Object[] parameters = parameter as Object[];
@@ -176,7 +271,7 @@ namespace Client.ViewModels
             }
 
             return true;
-        } 
+        }
         #endregion
 
         #region EventCommandExecutions
@@ -186,13 +281,42 @@ namespace Client.ViewModels
             {
                 Width = 550,
                 Height = 800,
-                Content = new AddEventViewModel(EventsList),
+                Content = new AddEventViewModel(EventsList, PeopleList, _eventProxy, _personProxy),
             };
 
             window.ShowDialog();
         }
         private bool AddEventCanExecute(object parameter)
         {
+            List<Event> UpdatedListOfEvents = _eventProxy.GetAllEvents();
+             
+            foreach (Event e in UpdatedListOfEvents)
+            {
+                if (!EventsList.Contains(e, new EventComparer()))
+                {
+                    EventsList.Add(e);
+                }
+                else
+                {
+                    Event foundEvent = EventsList.FirstOrDefault(ev => ev.EventId.Equals(e.EventId));
+                    if(foundEvent.LastEditTimeStamp != e.LastEditTimeStamp)
+                    {
+                        EventsList.Remove(foundEvent);
+                        EventsList.Add(e);
+                    }
+                }
+            }
+
+            List<Event> eventsToBeRemoved = new List<Event>();
+            foreach (Event e in EventsList)
+            {
+                if (!UpdatedListOfEvents.Contains(e, new EventComparer()))
+                {
+                    eventsToBeRemoved.Add(e);
+                }
+            }
+            eventsToBeRemoved.ForEach(e => EventsList.Remove(e));
+
             return true;
         }
 
@@ -202,12 +326,10 @@ namespace Client.ViewModels
             {
                 Width = 550,
                 Height = 800,
-                Content = new ModifyEventViewModel(SelectedEvent, EventsList),
+                Content = new ModifyEventViewModel(SelectedEvent, EventsList, PeopleList, _eventProxy, _personProxy),
             };
 
             window.ShowDialog();
-
-            EventsList = new ObservableCollection<Event>(EventProxy.Instance.EventServices.GetAllEvents());
         }
         private bool ModifyEventCanExecute(object parameter)
         {
@@ -225,12 +347,10 @@ namespace Client.ViewModels
             {
                 Width = 550,
                 Height = 700,
-                Content = new DeleteEventConfirmationViewModel(SelectedEvent, EventsList),
+                Content = new DeleteEventConfirmationViewModel(SelectedEvent, EventsList, PeopleList, _eventProxy),
             };
 
             window.ShowDialog();
-
-            EventsList = new ObservableCollection<Event>(EventProxy.Instance.EventServices.GetAllEvents());
         }
         private bool DeleteEventCanExecute(object parameter)
         {
@@ -291,7 +411,7 @@ namespace Client.ViewModels
             {
                 Width = 600,
                 Height = 600,
-                Content = new CreateNewAccountViewModel(AccountsList),
+                Content = new CreateNewAccountViewModel(AccountsList, _accountProxy),
             };
 
             window.ShowDialog();
@@ -310,7 +430,7 @@ namespace Client.ViewModels
             {
                 Width = 500,
                 Height = 600,
-                Content = new ModifyAccountViewModel(SelectedAccount, AccountsList),
+                Content = new ModifyAccountViewModel(SelectedAccount, AccountsList, _accountProxy),
             };
 
             window.ShowDialog();
@@ -340,7 +460,7 @@ namespace Client.ViewModels
             {
                 Width = 500,
                 Height = 600,
-                Content = new ModifyAccountViewModel(LoggedInAccount, AccountsList),
+                Content = new ModifyAccountViewModel(LoggedInAccount, AccountsList, _accountProxy),
             };
 
             window.ShowDialog();
@@ -361,7 +481,7 @@ namespace Client.ViewModels
             {
                 Width = 500,
                 Height = 600,
-                Content = new DeleteAccountConfirmationViewModel(SelectedAccount, AccountsList),
+                Content = new DeleteAccountConfirmationViewModel(SelectedAccount, AccountsList, _accountProxy),
             };
 
             window.ShowDialog();
@@ -415,7 +535,95 @@ namespace Client.ViewModels
             }
 
             return true;
-        } 
+        }
+        #endregion
+
+        //CALLBACKS
+        #region IPersonServicesCallback
+        public void NotifyPersonAddition(Person addedPerson)
+        {
+            if(!PeopleList.Contains(addedPerson, new PersonComparer()))
+            {
+                PeopleList.Add(addedPerson);
+            }
+        }
+
+        public void NotifyPersonRemoval(Person removedPerson)
+        {
+            if(PeopleList.Contains(removedPerson, new PersonComparer()))
+            {
+                Person foundPerson = PeopleList.FirstOrDefault(p => p.JMBG.Equals(removedPerson.JMBG));
+                PeopleList.Remove(foundPerson);
+            }
+        }
+
+        public void NotifyPersonModification(Person modifiedPerson)
+        {
+            if (PeopleList.Contains(modifiedPerson, new PersonComparer()))
+            {
+                Person foundPerson = PeopleList.FirstOrDefault(p => p.JMBG.Equals(modifiedPerson.JMBG));
+                PeopleList.Remove(foundPerson);
+                PeopleList.Add(modifiedPerson);
+            }
+        }
+        #endregion
+
+        #region IEventServicesCallback
+        public void NotifyEventAddition(Event addedEvent)
+        {
+            if (!EventsList.Contains(addedEvent, new EventComparer()))
+            {
+                EventsList.Add(addedEvent);
+            }
+        }
+
+        public void NotifyEventRemoval(Event removedEvent)
+        {
+            if (EventsList.Contains(removedEvent, new EventComparer()))
+            {
+                Event foundEvent = EventsList.FirstOrDefault(e => e.EventId.Equals(removedEvent.EventId));
+                EventsList.Remove(foundEvent);
+            }
+        }
+
+        public void NotifyEventModification(Event modifiedEvent)
+        {
+            if (EventsList.Contains(modifiedEvent, new EventComparer()))
+            {
+                Event foundEvent = EventsList.FirstOrDefault(e => e.EventId.Equals(modifiedEvent.EventId));
+                EventsList.Remove(foundEvent);
+                EventsList.Add(modifiedEvent);
+            }
+        }
+        #endregion
+
+        #region IAccountServicesCallback
+        public void NotifyAccountAddition(Account addedAccount)
+        {
+            if (!AccountsList.Contains(addedAccount, new AccountComparer()))
+            {
+                AccountsList.Add(addedAccount);
+            }
+        }
+
+        public void NotifyAccountRemoval(Account removedAccount)
+        {
+            if (AccountsList.Contains(removedAccount, new AccountComparer()))
+            {
+                Account foundAccount = AccountsList.FirstOrDefault(a => a.Username.Equals(removedAccount.Username));
+                AccountsList.Remove(foundAccount);
+            }
+        }
+
+        public void NotifyAccountModification(Account modifiedAccount)
+        {
+            if (AccountsList.Contains(modifiedAccount, new AccountComparer()))
+            {
+                Account foundAccount = AccountsList.FirstOrDefault(a => a.Username.Equals(modifiedAccount.Username));
+                AccountsList.Remove(foundAccount);
+                AccountsList.Add(modifiedAccount);
+            }
+        }
         #endregion
     }
 }

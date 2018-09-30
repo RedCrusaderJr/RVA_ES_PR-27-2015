@@ -1,11 +1,13 @@
 ﻿using Client.Commands;
 using Client.Proxies;
+using Common.Contracts;
 using Common.Helpers;
 using Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -23,33 +25,47 @@ namespace Client.ViewModels.EventViewModels
         public Window CurrentWindow { get; set; }
         public Event EventToAdd { get; set; }
         public ObservableCollection<Event> EventList { get; set; }
+        public ObservableCollection<Person> PeopleList { get; set; }
         public Person PersonToParticipate { get; set; }
         public Person PersonToRevokeParticipation { get; set; }
         public ObservableCollection<Person> AvailablePeople { get; set; }
         public ObservableCollection<Person> Participants { get; set; }
+        public IEventServices EventProxy { get; set; }
+        public IPersonServices PersonProxy { get; set; }
 
-        public AddEventViewModel(ObservableCollection<Event> eventList)
+        public AddEventViewModel(ObservableCollection<Event> eventList, ObservableCollection<Person> peopleList, IEventServices eventProxy, IPersonServices personProxy)
         {
             AddEventCommand = new RelayCommand(AddEventExecute, AddEventCanExecute);
             AddPraticipantCommand = new RelayCommand(AddPraticipantExecute, AddPraticipantCanExecute);
             RemovePraticipantCommand = new RelayCommand(RemovePraticipantExecute, RemovePraticipantCanExecute);
             EventList = eventList;
+            PeopleList = peopleList;
 
             EventToAdd = new Event();
             PersonToParticipate = new Person();
             PersonToRevokeParticipation = new Person();
             AvailablePeople = new ObservableCollection<Person>();
             Participants = new ObservableCollection<Person>();
+
+            EventProxy = eventProxy;
+            PersonProxy = personProxy;
         }
 
         private void AddEventExecute(object parameter)
         {
             Object[] parameters = parameter as Object[];
 
-            Event scheduledEvent = EventProxy.Instance.EventServices.ScheduleEvent(EventToAdd, Participants.ToList());
+            Event scheduledEvent = EventProxy.ScheduleEvent(EventToAdd, Participants.ToList());
             if(scheduledEvent != null)
             {
-                EventList.Add(scheduledEvent);
+                //EventList.Add(scheduledEvent);
+
+                foreach(Person p in scheduledEvent.Participants)
+                {
+                    Person foundPerson = PeopleList.FirstOrDefault(per => per.JMBG.Equals(p.JMBG));
+                    PeopleList.Remove(foundPerson);
+                    PeopleList.Add(p);
+                }
 
                 MessageBox.Show("Event successfully added.");
                 UserControl uc = parameters[0] as UserControl;
@@ -70,7 +86,8 @@ namespace Client.ViewModels.EventViewModels
             if (parameter == null || !(parameter is Object[] parameters) || EventToAdd.ScheduledDateTimeBeging == null
                                                                          || EventToAdd.ScheduledDateTimeEnd == null
                                                                          || !(parameters[0] is UserControl)
-                                                                         || Participants.Count == 0)
+                                                                         || Participants.Count == 0
+                                                                         || (DateTime.Compare((DateTime)EventToAdd.ScheduledDateTimeBeging, (DateTime)EventToAdd.ScheduledDateTimeEnd) > 0))
             {
                 return false;
             }
@@ -99,7 +116,7 @@ namespace Client.ViewModels.EventViewModels
                 return false;
             }
 
-            foreach (Person p in PersonProxy.Instance.PersonServices.GetAllPeople().Where(per => per.IsAvailableForEvent(EventToAdd.ScheduledDateTimeBeging, EventToAdd.ScheduledDateTimeEnd)))
+            foreach (Person p in PersonProxy.GetAllPeople().Where(per => per.IsAvailableForEvent(EventToAdd.ScheduledDateTimeBeging, EventToAdd.ScheduledDateTimeEnd)))
             {
                 if (!AvailablePeople.Contains(p, new PersonComparer()) && !Participants.Contains(p, new PersonComparer()))
                 {

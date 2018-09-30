@@ -46,54 +46,79 @@ namespace Server.Access
         private EventNotifier _eventNotifier;
 
         #region Person
-        public bool AddPerson(Person personToAdd)
+        public Person AddPerson(Person personToAdd)
         {
             using (EventSchedulerContext dbContext = new EventSchedulerContext())
             {
                 bool found = dbContext.People.Any(p => p.JMBG.Equals(personToAdd.JMBG));
                 if (found)
                 {
-                    return false;
+                    return null;
                 }
 
-                dbContext.People.Add(personToAdd);
+                Person addedPerson = dbContext.People.Add(personToAdd);
                 dbContext.SaveChanges();
 
-                _eventNotifier.RegisterObserver(new PersonObserver(personToAdd));
-                return true;
+                _eventNotifier.RegisterObserver(new PersonObserver(addedPerson));
+                return addedPerson;
             }
         }
 
-        public bool ModifyPerson(Person personToModify)
+        public Person ModifyPerson(Person personToModify)
         {
             using (EventSchedulerContext dbContext = new EventSchedulerContext())
             {
                 bool found = dbContext.People.Any(p => p.JMBG.Equals(personToModify.JMBG));
                 if (found)
                 {
-                    Person foundPerson = dbContext.People.SingleOrDefault(p => p.JMBG.Equals(personToModify.JMBG));
+                    Person foundPerson = dbContext.People.Include(p => p.ScheduledEvents).SingleOrDefault(p => p.JMBG.Equals(personToModify.JMBG));
                     dbContext.People.Attach(foundPerson);
 
                     foundPerson.JMBG = personToModify.JMBG;
                     foundPerson.FirstName = personToModify.FirstName;
                     foundPerson.LastName = personToModify.LastName;
                     foundPerson.LastEditTimeStamp = DateTime.Now;
-                    personToModify.ScheduledEvents.ForEach(e => foundPerson.ScheduleParticipationInEvent(e));
+
+                    foreach (Event e in personToModify.ScheduledEvents)
+                    {
+                        Event foundEvent = dbContext.Events.FirstOrDefault(ev => ev.EventId.Equals(e.EventId));
+                        if(foundEvent != null)
+                        {
+                            dbContext.Events.Attach(foundEvent);
+                            foundEvent.Participants = new List<Person>();
+
+                            if(foundPerson.ScheduledEvents.Contains(foundEvent, new EventComparer()))
+                            {
+                                Event eventInPerson = foundPerson.ScheduledEvents.FirstOrDefault(eve => eve.EventId.Equals(foundEvent.EventId));
+                                foundPerson.ScheduledEvents.Remove(eventInPerson);
+                                foundPerson.ScheduledEvents.Add(foundEvent);
+                            }
+                            else
+                            {
+                                foundPerson.ScheduledEvents.Add(foundEvent);
+                            }
+                        }
+                        else
+                        {
+                            e.Participants = new List<Person>();
+                            foundPerson.ScheduledEvents.Add(e);
+                        }
+                    }
 
                     dbContext.SaveChanges();
 
                     //OVDE NEGDE NOTIFIKACIJA ZA POTENCIJALNI KONFLIKT
                     IObserverPattern personObserver = _eventNotifier.Observers.FirstOrDefault(p => ((Person)p).JMBG.Equals(personToModify.JMBG));
                     _eventNotifier.UnregisterObserver(personObserver);
-                    _eventNotifier.RegisterObserver(new PersonObserver(personToModify));
-                    return true;
+                    _eventNotifier.RegisterObserver(new PersonObserver(foundPerson));
+                    return foundPerson;
                 }
 
-                return false;
+                return null;
             }
         }
 
-        public bool DeletePerson(Person personToDelete)
+        public Person DeletePerson(Person personToDelete)
         {
             using (EventSchedulerContext dbContext = new EventSchedulerContext())
             {
@@ -101,22 +126,17 @@ namespace Server.Access
                 if (found)
                 {
                     Person foundPerson = dbContext.People.SingleOrDefault(p => p.JMBG.Equals(personToDelete.JMBG));
-                    /*
-                    if(dbContext.Accounts.Any(a => a.PersonWithAccount.JMBG.Equals(foundPerson.JMBG)))
-                    {
-                        Account foundAccount = dbContext.Accounts.SingleOrDefault(a => a.PersonWithAccount.JMBG.Equals(foundPerson.JMBG));
-                        DeleteAccount(foundAccount);
-                    }
-                    */
-                    dbContext.People.Remove(foundPerson);
+                    
+                    Person deletedPerson = dbContext.People.Remove(foundPerson);
                     dbContext.SaveChanges();
 
                     IObserverPattern foundObserver = _eventNotifier.Observers.FirstOrDefault(p => ((Person)p).JMBG.Equals(personToDelete.JMBG));
                     _eventNotifier.UnregisterObserver(foundObserver);
-                    return true;
+
+                    return deletedPerson;
                 }
 
-                return false;
+                return null;
             }
         }
         
@@ -173,56 +193,23 @@ namespace Server.Access
         #endregion
 
         #region Account
-        public bool AddAccount(Account accountToAdd)
+        public Account AddAccount(Account accountToAdd)
         {
             using (EventSchedulerContext dbContext = new EventSchedulerContext())
             {
                 bool found = dbContext.Accounts.Any(a => a.Username.Equals(accountToAdd.Username));
                 if (found)
                 {
-                    return false;
+                    return null;
                 }
 
-                /*
-                if(!dbContext.People.Any(p => p.JMBG.Equals(accountToAdd.PersonWithAccount.JMBG)))
-                {
-                    if(!AddPerson(accountToAdd.PersonWithAccount))
-                    {
-                        return false;
-                    }
-                }
-                */
-
-                dbContext.Accounts.Add(accountToAdd);
+                Account addedAccount = dbContext.Accounts.Add(accountToAdd);
                 dbContext.SaveChanges();
-                return true;
+                return addedAccount;
             }
         }
 
-        /*
-        public bool AddAccount(Account accountToAdd, Person personToAdd)
-        {
-            using (EventSchedulerContext dbContext = new EventSchedulerContext())
-            {
-                bool found = dbContext.Accounts.Any(a => a.Username.Equals(accountToAdd.Username));
-                if (found)
-                {
-                    return false;
-                }
-
-                //if(!AddPerson(personToAdd))
-                //{
-                //    return false;
-                //}
-
-                dbContext.Accounts.Add(accountToAdd);
-                dbContext.SaveChanges();
-                return true;
-            }
-        }
-        */
-
-        public bool ModifyAccount(Account accountToModify)
+        public Account ModifyAccount(Account accountToModify)
         {
             using (EventSchedulerContext dbContext = new EventSchedulerContext())
             {
@@ -238,14 +225,14 @@ namespace Server.Access
                     foundAccount.LastName = accountToModify.LastName;
 
                     dbContext.SaveChanges();
-                    return true;
+                    return foundAccount;
                 }
 
-                return false;
+                return null;
             }
         }
 
-        public bool DeleteAccount(Account accountToDelete)
+        public Account DeleteAccount(Account accountToDelete)
         {
             using (EventSchedulerContext dbContext = new EventSchedulerContext())
             {
@@ -253,13 +240,13 @@ namespace Server.Access
                 if (found)
                 {
                     Account foundAccount = dbContext.Accounts.SingleOrDefault(a => a.Username.Equals(accountToDelete.Username));
-                    dbContext.Accounts.Remove(foundAccount);
+                    Account deletedAccount = dbContext.Accounts.Remove(foundAccount);
                     dbContext.SaveChanges();
 
-                    return true;
+                    return deletedAccount;
                 }
 
-                return false;
+                return null;
             }
         }
 
@@ -297,27 +284,65 @@ namespace Server.Access
                     return null;
                 }
 
-                List<String> ParticipantsIds = new List<string>(eventToAdd.Participants.Select(p => p.JMBG));
-                List<Person> SelectedParticipants = new List<Person>(eventToAdd.Participants);
-
-                eventToAdd.EmptyTheListOfParticipants();
-                foreach(String pId in ParticipantsIds)
+                Event eventActualyGoingToBeAdded = new Event()
                 {
-                    Person participant = dbContext.People.FirstOrDefault(p => p.JMBG.Equals(pId));
-                    if(participant == null)
+                    Description = eventToAdd.Description,
+                    EventTitle = eventToAdd.EventTitle,
+                    ScheduledDateTimeBeging = eventToAdd.ScheduledDateTimeBeging,
+                    ScheduledDateTimeEnd = eventToAdd.ScheduledDateTimeEnd,
+                    LastEditTimeStamp = DateTime.Now
+                };
+                foreach (Person p in eventToAdd.Participants)
+                {
+                    Person foundPerson = dbContext.People.FirstOrDefault(per => per.JMBG.Equals(p.JMBG));
+                    if(foundPerson != null)
                     {
-                        participant = new Person(SelectedParticipants.FirstOrDefault(p => p.JMBG.Equals(pId)));
+                        dbContext.People.Attach(foundPerson);
+                        foundPerson.ScheduledEvents = new List<Event>();
+                        eventActualyGoingToBeAdded.Participants.Add(foundPerson);
                     }
-
-                    dbContext.People.Attach(participant);
-                    eventToAdd.AddParticipant(participant);
+                    else
+                    {
+                        p.ScheduledEvents = new List<Event>();
+                        eventActualyGoingToBeAdded.Participants.Add(p);
+                    }
                 }
-
-                Event addedEvent = dbContext.Events.Add(eventToAdd);
+                Event addedEvent = dbContext.Events.Add(eventActualyGoingToBeAdded);
                 dbContext.SaveChanges();
 
+                {
+                    /*
+                    List<String> ParticipantsIds = new List<string>(eventToAdd.Participants.Select(p => p.JMBG));
+                    List<Person> SelectedParticipants = new List<Person>(eventToAdd.Participants);
+
+                    eventToAdd.EmptyTheListOfParticipants();
+                    foreach(String pId in ParticipantsIds)
+                    {
+                        //Include(p => p.ScheduledEvents).
+                        Person participant = dbContext.People.FirstOrDefault(p => p.JMBG.Equals(pId));
+                        if(participant == null)
+                        {
+                            participant = new Person(SelectedParticipants.FirstOrDefault(p => p.JMBG.Equals(pId)));
+                        }
+
+                        dbContext.People.Attach(participant);
+                        eventToAdd.AddParticipant(participant);
+                    }
+
+                    Event addedEvent = dbContext.Events.Add(eventToAdd);
+                    dbContext.SaveChanges();
+                    */
+                }
                 _eventNotifier.EvetToBeNotifiedAbout = addedEvent;
                 _eventNotifier.NotifyAllAdditon();
+
+                //Event evt = dbContext.Events.Include(e => e.Participants).FirstOrDefault(e => e.EventId.Equals(addedEvent.EventId));
+                /*List<Person> updatedPeople = new List<Person>();
+                foreach(Person p in addedEvent.Participants)
+                {
+                    updatedPeople.Add(dbContext.People.First(per => per.JMBG.Equals(p.JMBG)));
+                }
+                addedEvent.Participants = new List<Person>(updatedPeople);*/
                 return addedEvent;
             }
         }
@@ -329,7 +354,7 @@ namespace Server.Access
                 bool found = dbContext.Events.Any(p => p.EventId.Equals(eventToModify.EventId));
                 if (found)
                 {
-                    Event foundEvent = dbContext.Events.SingleOrDefault(e => e.EventId.Equals(eventToModify.EventId));
+                    Event foundEvent = dbContext.Events.Include(e => e.Participants).SingleOrDefault(e => e.EventId.Equals(eventToModify.EventId));
                     dbContext.Events.Attach(foundEvent);
 
                     foundEvent.LastEditTimeStamp = eventToModify.LastEditTimeStamp;
@@ -339,33 +364,37 @@ namespace Server.Access
                     foundEvent.EventTitle = eventToModify.EventTitle;
                     foundEvent.Description = eventToModify.Description;
 
-                    dbContext.SaveChanges();
-
-                    List<String> ParticipantsIds = new List<string>(eventToModify.Participants.Select(p => p.JMBG));
-                    List<Person> SelectedParticipants = new List<Person>(eventToModify.Participants);
-
-                    foundEvent.Participants = new List<Person>();
-                    foreach (String pId in ParticipantsIds)
+                    foreach(Person p in eventToModify.Participants)
                     {
-                        Person participant = dbContext.People.Include(p => p.ScheduledEvents).FirstOrDefault(p => p.JMBG.Equals(pId));
-                        if (participant == null)
+                        if(!foundEvent.Participants.Contains(p, new PersonComparer()))
                         {
-                            participant = new Person(SelectedParticipants.FirstOrDefault(p => p.JMBG.Equals(pId)));
+                            Person foundPerson = dbContext.People.FirstOrDefault(per => per.JMBG.Equals(p.JMBG));
+                            dbContext.People.Attach(foundPerson);
+                            foundEvent.Participants.Add(foundPerson);
                         }
-
-                        dbContext.People.Attach(participant);
-
-                        participant.ScheduledEvents.ForEach(e => e.Participants = new List<Person>());
-
-                        dbContext.Events.Attach(foundEvent); //TREBA LI ATTACH
-                       
-                        foundEvent.AddParticipant(participant);
-                       
-                        dbContext.SaveChanges();                //ORGANIZYJ SAVE CHANGES
+                        else
+                        {
+                            Person foundPerson = foundEvent.Participants.FirstOrDefault(per => per.JMBG.Equals(p.JMBG));
+                            dbContext.People.Attach(foundPerson);
+                            foundEvent.Participants.Remove(foundPerson);
+                            Person newFoundPerson = dbContext.People.FirstOrDefault(pers => pers.JMBG.Equals(p.JMBG));
+                            dbContext.People.Attach(newFoundPerson);
+                            foundEvent.Participants.Add(newFoundPerson);
+                        }
                     }
+                    dbContext.SaveChanges();
 
                     _eventNotifier.EvetToBeNotifiedAbout = foundEvent;
                     _eventNotifier.NotifyAllChange();
+
+                    /*
+                    List<Person> updatedPeople = new List<Person>();
+                    foreach (Person p in foundEvent.Participants)
+                    {
+                        updatedPeople.Add(dbContext.People.First(per => per.JMBG.Equals(p.JMBG)));
+                    }
+                    foundEvent.Participants = new List<Person>(updatedPeople);
+                    */
                     return foundEvent;
                 }
 
@@ -386,6 +415,13 @@ namespace Server.Access
 
                     _eventNotifier.EvetToBeNotifiedAbout = foundEvent;
                     _eventNotifier.NotifyAllRemoval();
+
+                    List<Person> updatedPeople = new List<Person>();
+                    foreach (Person p in removedEvent.Participants)
+                    {
+                        updatedPeople.Add(dbContext.People.First(per => per.JMBG.Equals(p.JMBG)));
+                    }
+                    removedEvent.Participants = new List<Person>(updatedPeople);
                     return removedEvent;
                 }
 

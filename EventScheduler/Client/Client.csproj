@@ -70,6 +70,7 @@
     <Compile Include="EventSchedulerWindowView.xaml.cs">
       <DependentUpon>EventSchedulerWindowView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Proxies\LoginProxy.cs" />
     <Compile Include="Proxies\PersonProxy.cs" />
     <Compile Include="ViewModels\AccountViewModels\DeleteAccountConfirmationViewModel.cs" />
     <Compile Include="ViewModels\EventViewModels\AddEventViewModel.cs" />

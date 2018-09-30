@@ -53,8 +53,10 @@
     <Compile Include="BaseObserverPattern\BaseNotifier.cs" />
     <Compile Include="Contracts\IAccountServices.cs" />
     <Compile Include="Contracts\IEventServices.cs" />
+    <Compile Include="Contracts\ILoginService.cs" />
     <Compile Include="Contracts\IPersonServices.cs" />
     <Compile Include="Enums.cs" />
+    <Compile Include="Helpers\AccountComparer.cs" />
     <Compile Include="Helpers\EventComparer.cs" />
     <Compile Include="Helpers\PersonComparer.cs" />
     <Compile Include="IAccess\IEventDbManager.cs" />
@@ -73,6 +75,8 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="PersonCommands\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

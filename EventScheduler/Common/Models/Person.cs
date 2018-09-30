@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace Common.Models
 {
     [DataContract]
-    public class Person : IPerson, INotifyPropertyChanged, ICloneable
+    public class Person : IPerson, INotifyPropertyChanged
     { 
         #region Fields
         private String _firstName;
@@ -116,7 +116,7 @@ namespace Common.Models
                 return false;
             }
 
-            if(IsAvailableForEvent(e.ScheduledDateTimeBeging, e.ScheduledDateTimeEnd))
+            if(!IsAvailableForEvent(e.ScheduledDateTimeBeging, e.ScheduledDateTimeEnd))
             {
                 //throw new Exception("Person is not available at that time.");
                 return false;
@@ -141,7 +141,7 @@ namespace Common.Models
 
         public bool IsAvailableForEvent(DateTime? begining, DateTime? end)
         {
-            if(begining == null || end == null)
+            if(begining == null || end == null || DateTime.Compare((DateTime)begining, (DateTime)end) > 0)
             {
                 return false;
             }
@@ -180,7 +180,7 @@ namespace Common.Models
 
         public bool IsAvailableForEventExcludingOneSpecificEvent(DateTime? begining, DateTime? end, Event specificEvent)
         {
-            if (begining == null || end == null)
+            if (begining == null || end == null || DateTime.Compare((DateTime)begining, (DateTime)end) > 0)
             {
                 return false;
             }
@@ -217,7 +217,7 @@ namespace Common.Models
             return true;
         }
 
-        public object Clone()
+        public IPerson Duplicate()
         {
             Person personDuplicate = new Person()
             {
@@ -229,7 +229,8 @@ namespace Common.Models
 
             if (this.ScheduledEvents.Count != 0)
             {
-                this.ScheduledEvents.ForEach(e => personDuplicate.ScheduledEvents.Add(e));
+                personDuplicate.ScheduledEvents = this.ScheduledEvents;
+                //this.ScheduledEvents.ForEach(e => personDuplicate.ScheduledEvents.Add(e));
             }
             else
             {

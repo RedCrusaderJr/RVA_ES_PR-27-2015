@@ -1,86 +1,100 @@
 ﻿using Common.Contracts;
+using Common.Helpers;
 using Common.Models;
 using Server.Access;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Server.Providers
 {
+    //TODO: da bi bila fasada mora da se ocisti
+    [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Reentrant)]
     class PersonServices_Provider : IPersonServices
     {
-        //ADAPTIRA METODE BAZE...
-        public bool AddPerson(Person person)
+        public Person AddPerson(Person person)
         {
-            if (DbManager.Instance.AddPerson(person))
+            Person addedPerson = DbManager.Instance.AddPerson(person);
+            if (addedPerson != null)
             {
-                return true;
+                IPersonServicesCallback currentCallbackProxy = OperationContext.Current.GetCallbackChannel<IPersonServicesCallback>();
+                PersonServiceCallback.Instance.NotifyAllPersonAddition(addedPerson, currentCallbackProxy);
+
+                //POTENCIJALNO INF LOOP
+                //addedPerson.ScheduledEvents.ForEach(e => e.Participants = GetAllPeople().Where(p => p.ScheduledEvents.Contains(e, new EventComparer())).ToList());
+                return addedPerson;
             }
 
-            return false;
+            return null;
         }
 
-        //ADAPTIRA METODE BAZE...
-        public bool ModifyPerson(Person person)
+        public Person ModifyPerson(Person person)
         {
-            if(DbManager.Instance.ModifyPerson(person))
+            Person modifiedPerson = DbManager.Instance.ModifyPerson(person);
+            if (modifiedPerson != null)
             {
-                return true;
+                IPersonServicesCallback currentCallbackProxy = OperationContext.Current.GetCallbackChannel<IPersonServicesCallback>();
+                PersonServiceCallback.Instance.NotifyAllPersonModification(modifiedPerson, currentCallbackProxy);
+
+                //POTENCIJALNO INF LOOP
+                //modifiedPerson.ScheduledEvents.ForEach(e => e.Participants = GetAllPeople().Where(p => p.ScheduledEvents.Contains(e, new EventComparer())).ToList());
+                return modifiedPerson;
             }
 
-            return false;
+            return null;
         }
 
-        public bool DeletePerson(Person person)
+        public Person DeletePerson(Person person)
         {
-            if (DbManager.Instance.DeletePerson(person))
+            Person deletedPerson = DbManager.Instance.DeletePerson(person);
+            if (deletedPerson != null)
             {
-                return true;
+                IPersonServicesCallback currentCallbackProxy = OperationContext.Current.GetCallbackChannel<IPersonServicesCallback>();
+                PersonServiceCallback.Instance.NotifyAllPersonRemoval(deletedPerson, currentCallbackProxy);
+
+                //POTENCIJALNO INF LOOP
+                //deletedPerson.ScheduledEvents.ForEach(e => e.Participants = GetAllPeople().Where(p => p.ScheduledEvents.Contains(e, new EventComparer())).ToList());
+                return deletedPerson;
             }
 
-            return false;
+            return null;
         }
 
-        //ADAPTIRA METODE BAZE...
-        /*
-        public Person GetSinglePerson(string jmbg)
-        {
-            Person person = DbManager.Instance.GetSinglePerson(jmbg);
-
-            if(person == null)
-            {
-                throw new NullReferenceException();
-            }
-
-            return person;
-        }
-
-        
-        public List<Person> GetAllPeople()
-        {
-            return DbManager.Instance.GetAllPeople();
-        }
-        */
         public Person GetSinglePerson(string jmbg)
         {
             Person person = DbManager.Instance.GetSinglePerson(jmbg);
 
             if (person == null)
             {
-                throw new NullReferenceException();
+                return null;
             }
 
-            person.ScheduledEvents.ForEach(e => e.Participants = new List<Person>());
+            person.ScheduledEvents.ForEach(e => e.Participants.ForEach(p => p.ScheduledEvents = new List<Event>()));
+            //person.ScheduledEvents.ForEach(e => e.Participants = new List<Person>());
             return person;
         }
 
         public List<Person> GetAllPeople()
         {
             List<Person> people = DbManager.Instance.GetAllPeople();
-            people.ForEach(p => p.ScheduledEvents.ForEach(e => e.Participants = new List<Person>()));
+            people.ForEach(p => p.ScheduledEvents.ForEach(e => e.Participants.ForEach(pa => pa.ScheduledEvents = new List<Event>())));
+            //people.ForEach(p => p.ScheduledEvents.ForEach(e => e.Participants = new List<Person>()));
             return people;
+        }
+
+        public void Subscribe()
+        {
+            IPersonServicesCallback currentCallbackProxy = OperationContext.Current.GetCallbackChannel<IPersonServicesCallback>();
+            PersonServiceCallback.Instance.Subscribe(currentCallbackProxy);
+        }
+
+        public void Unsubscribe()
+        {
+            IPersonServicesCallback currentCallbackProxy = OperationContext.Current.GetCallbackChannel<IPersonServicesCallback>();
+            PersonServiceCallback.Instance.Unsubscribe(currentCallbackProxy);
         }
     }
 }

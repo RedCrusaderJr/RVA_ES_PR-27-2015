@@ -1,10 +1,12 @@
 ﻿using Client.Commands;
 using Client.Proxies;
+using Common.Contracts;
 using Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -21,10 +23,13 @@ namespace Client.ViewModels.PersonViewModels
         public ERole SelectedOption { get; set; }
         public ObservableCollection<Person> PeopleList { get; set; }
 
-        public AddPersonViewModel(ObservableCollection<Person> peopleList)
+        public IPersonServices PersonProxy { get; set; }
+
+        public AddPersonViewModel(ObservableCollection<Person> peopleList, IPersonServices personProxy)
         {
             AddPersonCommand = new RelayCommand(AddPersonExecute, AddPersonCanExecute);
             PeopleList = peopleList;
+            PersonProxy = personProxy;
         }
 
         private void AddPersonExecute(object parameter)
@@ -37,9 +42,10 @@ namespace Client.ViewModels.PersonViewModels
                 JMBG = parameters[2] as String,
             };
 
-            if (PersonProxy.Instance.PersonServices.AddPerson(PersonToAdd))
+            Person addedPerson = PersonProxy.AddPerson(PersonToAdd);
+            if (addedPerson != null)
             {
-                PeopleList.Add(PersonToAdd);
+                //PeopleList.Add(addedPerson);
 
                 MessageBox.Show("Person successfully added.");
                 UserControl uc = parameters[3] as UserControl;

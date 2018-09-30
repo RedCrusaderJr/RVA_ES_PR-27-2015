@@ -69,14 +69,20 @@
     <Compile Include="Access\Configuration.cs" />
     <Compile Include="Access\DbManager.cs" />
     <Compile Include="Access\EventSchedulerContext.cs" />
+    <Compile Include="Providers\LoginService_Provider.cs" />
+    <Compile Include="Servers\BaseServer.cs" />
+    <Compile Include="Servers\LoginService_Server.cs" />
+    <Compile Include="Providers\AccountServiceCallback.cs" />
+    <Compile Include="Providers\EventServiceCallback.cs" />
     <Compile Include="Providers\ObserverPattern\EventNotifier.cs" />
     <Compile Include="Providers\EventServices_Provider.cs" />
     <Compile Include="Providers\ObserverPattern\PersonObserver.cs" />
+    <Compile Include="Providers\PersonServiceCallback.cs" />
     <Compile Include="Providers\PersonServices_Provider.cs" />
     <Compile Include="Providers\AccountServices_Provider.cs" />
-    <Compile Include="EventServices_Server.cs" />
-    <Compile Include="PersonServices_Server.cs" />
-    <Compile Include="AccountServices_Server.cs" />
+    <Compile Include="Servers\EventServices_Server.cs" />
+    <Compile Include="Servers\PersonServices_Server.cs" />
+    <Compile Include="Servers\AccountServices_Server.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
