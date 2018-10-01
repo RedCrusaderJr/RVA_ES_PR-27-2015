@@ -36,6 +36,9 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -49,6 +52,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseCommandPattern\BaseCommand.cs" />
+    <Compile Include="BaseCommandPattern\ICommandInvoker.cs" />
+    <Compile Include="BaseCommandPattern\BaseCommandReceiver.cs" />
     <Compile Include="BaseObserverPattern\IObserver.cs" />
     <Compile Include="BaseObserverPattern\BaseNotifier.cs" />
     <Compile Include="Contracts\IAccountServices.cs" />
@@ -58,6 +64,7 @@
     <Compile Include="Enums.cs" />
     <Compile Include="Helpers\AccountComparer.cs" />
     <Compile Include="Helpers\EventComparer.cs" />
+    <Compile Include="Helpers\LoggerHelper.cs" />
     <Compile Include="Helpers\PersonComparer.cs" />
     <Compile Include="Helpers\UpdateHelper.cs" />
     <Compile Include="IAccess\IEventDbManager.cs" />
@@ -70,14 +77,17 @@
     <Compile Include="Models\Account.cs" />
     <Compile Include="Models\Event.cs" />
     <Compile Include="Models\Person.cs" />
+    <Compile Include="PersonCommands\AddPersonCommand.cs" />
+    <Compile Include="PersonCommands\BasePersonCommand.cs" />
+    <Compile Include="PersonCommands\DeletePersonCommand.cs" />
+    <Compile Include="PersonCommands\ModifyPersonCommand.cs" />
+    <Compile Include="PersonCommands\PersonCommandReciever.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="PersonCommands\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,8 +1,10 @@
 ﻿using Client.Commands;
 using Client.Proxies;
+using Common.BaseCommandPattern;
 using Common.Contracts;
 using Common.IModels;
 using Common.Models;
+using Common.PersonCommands;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -23,8 +25,9 @@ namespace Client.ViewModels.PersonViewModels
         public Person PersonToBeDeleted { get; set; }
         public ObservableCollection<Person> PeopleList { get; set; }
         public IPersonServices PersonProxy { get; set; }
+        public ICommandInvoker CommandInvoker { get; set; }
 
-        public DeletePersonConfirmationViewModel(Person personToBeDeleted, ObservableCollection<Person> peopleList, IPersonServices personProxy)
+        public DeletePersonConfirmationViewModel(Person personToBeDeleted, ObservableCollection<Person> peopleList, IPersonServices personProxy, ICommandInvoker commandInvoker)
         {
             PersonToBeDeleted = personToBeDeleted;
             PeopleList = peopleList;
@@ -32,6 +35,7 @@ namespace Client.ViewModels.PersonViewModels
             DeletePersonCommand = new RelayCommand(DeletePersonConfirmationExecute, DeletePersonConfirmationCanExecute);
 
             PersonProxy = personProxy;
+            CommandInvoker = commandInvoker;
         }
 
         private void DeletePersonConfirmationExecute(object obj)
@@ -39,6 +43,8 @@ namespace Client.ViewModels.PersonViewModels
             Person deletedPerson = PersonProxy.DeletePerson(PersonToBeDeleted);
             if(deletedPerson != null)
             {
+                CommandInvoker.RegisterCommand(new DeletePersonCommand(new PersonCommandReciever(), deletedPerson, PersonProxy));
+
                 MessageBox.Show("Person successfully deleted.");
                 object[] parameters = obj as object[];
                 Window currentWindow = Window.GetWindow((UserControl)parameters[0]);

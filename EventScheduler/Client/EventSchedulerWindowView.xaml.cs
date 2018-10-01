@@ -23,7 +23,6 @@ namespace Client
         public EventSchedulerWindowView()
         {
             InitializeComponent();
-            DataContext = new EventSchedulerWindowViewModel();
         }
 
     }

@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Client.Views
+namespace Client.Views.PersonViews
 {
     /// <summary>
-    /// Interaction logic for MessagesView.xaml
+    /// Interaction logic for SearchView.xaml
     /// </summary>
-    public partial class MessagesView : UserControl
+    public partial class SearchPeopleView : UserControl
     {
-        public MessagesView()
+        public SearchPeopleView()
         {
             InitializeComponent();
         }

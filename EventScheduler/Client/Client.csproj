@@ -34,6 +34,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -48,16 +51,22 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="Vestris.ResourceLib, Version=1.4.1212.0, Culture=neutral, PublicKeyToken=ec632d8ba5e5750d, processorArchitecture=MSIL">
+      <HintPath>..\packages\Xpand.ExpressApp.Win.Para.WindowsIntegration.13.2.6.0\lib\net40\Vestris.ResourceLib.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="Xpand.ExpressApp.Win.Para.WindowsIntegration, Version=13.2.6.0, Culture=neutral, PublicKeyToken=382702571fab6a51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Xpand.ExpressApp.Win.Para.WindowsIntegration.13.2.6.0\lib\net40\Xpand.ExpressApp.Win.Para.WindowsIntegration.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="EventSchedulerWindowViewModel.cs" />
+    <Compile Include="Log4netHelper.cs" />
     <Compile Include="Proxies\AccountProxy.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
@@ -74,7 +83,6 @@
     <Compile Include="Proxies\PersonProxy.cs" />
     <Compile Include="ViewModels\AccountViewModels\DeleteAccountConfirmationViewModel.cs" />
     <Compile Include="ViewModels\EventViewModels\AddEventViewModel.cs" />
-    <Compile Include="ViewModels\MessagesViewModel.cs" />
     <Compile Include="ViewModels\PersonViewModels\AddPersonViewModel.cs" />
     <Compile Include="ViewModels\AccountViewModels\CreateNewAccountViewModel.cs" />
     <Compile Include="ViewModels\EventViewModels\DeleteEventConfirmationViewModel.cs" />
@@ -86,6 +94,7 @@
     <Compile Include="ViewModels\EventViewModels\ModifyEventViewModel.cs" />
     <Compile Include="ViewModels\PersonViewModels\ModifyPersonViewModel.cs" />
     <Compile Include="ViewModels\PersonViewModels\PersonDetailsViewModel.cs" />
+    <Compile Include="ViewModels\PersonViewModels\SearchPeopleViewModel.cs" />
     <Compile Include="Views\AccountViews\CreateNewAccountView.xaml.cs">
       <DependentUpon>CreateNewAccountView.xaml</DependentUpon>
     </Compile>
@@ -113,9 +122,6 @@
     <Compile Include="Views\HomeView.xaml.cs">
       <DependentUpon>HomeView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\MessagesView.xaml.cs">
-      <DependentUpon>MessagesView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\PersonViews\DeletePersonConfirmationView.xaml.cs">
       <DependentUpon>DeletePersonConfirmationView.xaml</DependentUpon>
     </Compile>
@@ -127,6 +133,9 @@
     </Compile>
     <Compile Include="Views\PersonViews\PersonDetailsView.xaml.cs">
       <DependentUpon>PersonDetailsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PersonViews\SearchPeopleView.xaml.cs">
+      <DependentUpon>SearchPeopleView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -147,6 +156,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -202,10 +212,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\MessagesView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\PersonViews\DeletePersonConfirmationView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -219,6 +225,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\PersonViews\PersonDetailsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\PersonViews\SearchPeopleView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

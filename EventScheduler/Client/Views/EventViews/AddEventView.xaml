@@ -4,6 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Client.Views.EventViews"
+             xmlns:window="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
+             xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
              xmlns:converter="clr-namespace:Client.Converters"
              mc:Ignorable="d" 
              Name="AddEventUserControl"
@@ -41,7 +43,11 @@
 
         <TextBox Text="{Binding EventToAdd.EventTitle, UpdateSourceTrigger=PropertyChanged}" Name="EventTitle" Grid.Row="2" Grid.Column="2" Margin="0,30,0,0" Width="250" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20"/>
         <TextBox Text="{Binding EventToAdd.Description, UpdateSourceTrigger=PropertyChanged}" Name="Description" Grid.Row="3" Grid.Column="2" Margin="0,30,0,0" Width="250" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20"/>
-        
+
+        <window:WindowsFormsHost >
+            <wf:DateTimePicker Format="Time" ></wf:DateTimePicker>
+        </window:WindowsFormsHost>
+
         <DatePicker SelectedDate="{Binding EventToAdd.ScheduledDateTimeBeging, UpdateSourceTrigger=PropertyChanged}" Name="ScheduledDateTimeBeging" Grid.Row="4" Grid.Column="2" Margin="0,30,0,0" Width="250" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20"/>
         <DatePicker SelectedDate="{Binding EventToAdd.ScheduledDateTimeEnd, UpdateSourceTrigger=PropertyChanged}" Name="ScheduledDateTimeEnd" Grid.Row="5" Grid.Column="2" Margin="0,30,0,0" Width="250" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20"/>
 

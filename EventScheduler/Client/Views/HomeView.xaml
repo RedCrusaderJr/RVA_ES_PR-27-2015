@@ -9,7 +9,7 @@
         xmlns:converter="clr-namespace:Client.Converters"
         mc:Ignorable="d"
         Background="White"
-        Height="700" Width="1000"
+        Height="700" Width="1300"
         HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
     <UserControl.Resources>
         <converter:MultiCloneConverter x:Key="multiConverter"/>
@@ -20,6 +20,7 @@
             <ColumnDefinition Width="200"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="450"/>
             <ColumnDefinition Width="40"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -40,7 +41,7 @@
             </TextBlock.Text>
         </TextBlock>
 
-        <StatusBar Grid.Row="1" Grid.Column="3" HorizontalAlignment="Right" Background="Transparent">
+        <StatusBar Grid.Row="1" Grid.Column="4" HorizontalAlignment="Right" Background="Transparent">
             <Button Command="{ Binding ModifyPersonalAccountCommand }" Content="Modify" Height="25" Width="100" Margin="0,0,10,0">
                 <Button.CommandParameter>
                     <MultiBinding Converter="{StaticResource multiConverter}">
@@ -111,7 +112,7 @@
         </StatusBar>
 
 
-        <DataGrid Name="PeopleTable" Visibility="Visible" ItemsSource="{Binding PeopleList, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedPerson, Mode=OneWayToSource}" IsReadOnly="True" SelectionMode="Single" AutoGenerateColumns="False" Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="2">
+        <DataGrid Name="PeopleTable" Visibility="Visible" Margin="0,20,0,0" ItemsSource="{Binding PeopleList, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedPerson, Mode=OneWayToSource}" IsReadOnly="True" SelectionMode="Single" AutoGenerateColumns="False" Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="2">
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding JMBG}" Header="JMBG" Width="*"/>
                 <DataGridTextColumn Binding="{Binding FirstName}" Header="First Name" Width="*"/>
@@ -168,6 +169,10 @@
                 <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding AccountDetailsCommand}" CommandParameter="{Binding ElementName=AccountsTable, Path=SelectedItem}"/>
             </DataGrid.InputBindings>
         </DataGrid>
-        <Separator Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" VerticalAlignment="Bottom"/>
+        <Separator Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" VerticalAlignment="Bottom"/>
+
+        <ScrollViewer Grid.Column="4" Grid.Row="2" HorizontalAlignment="Right" Width="400" Margin="0,20,0,0">
+            <TextBlock Text="{Binding LogText}" TextWrapping="Wrap" />
+        </ScrollViewer>
     </Grid>
 </UserControl>

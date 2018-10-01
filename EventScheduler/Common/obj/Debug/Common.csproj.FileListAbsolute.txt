@@ -22,3 +22,5 @@ C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Co
 C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Common\obj\Debug\Common.dll
 C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Common\obj\Debug\Common.pdb
 C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Common\obj\Debug\Common.csprojAssemblyReference.cache
+C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Common\bin\Debug\log4net.dll
+C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Common\bin\Debug\log4net.xml

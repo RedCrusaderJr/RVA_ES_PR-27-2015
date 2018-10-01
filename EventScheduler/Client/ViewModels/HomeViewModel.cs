@@ -3,12 +3,16 @@ using Client.Proxies;
 using Client.ViewModels.AccountViewModels;
 using Client.ViewModels.EventViewModels;
 using Client.ViewModels.PersonViewModels;
+using Common;
+using Common.BaseCommandPattern;
 using Common.Contracts;
 using Common.Helpers;
 using Common.Models;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
@@ -22,7 +26,7 @@ using System.Windows.Threading;
 namespace Client.ViewModels
 {
     [CallbackBehavior(UseSynchronizationContext = false)]
-    public class HomeViewModel : IPersonServicesCallback, IEventServicesCallback, IAccountServicesCallback 
+    public class HomeViewModel : IPersonServicesCallback, IEventServicesCallback, IAccountServicesCallback, ICommandInvoker, INotifyPropertyChanged
     {
         #region ICommands
         public ICommand AddPersonCommand { get; set; }
@@ -33,6 +37,7 @@ namespace Client.ViewModels
         public ICommand UndoPersonCommand { get; set; }
         public ICommand RedoPersonCommand { get; set; }
         public ICommand ShowPeopleCommand { get; set; }
+        public ICommand SearchPersonCommand { get; set; }
 
         public ICommand AddEventCommand { get; set; }
         public ICommand ModifyEventCommand { get; set; }
@@ -49,6 +54,24 @@ namespace Client.ViewModels
         public ICommand LogOutCommand { get; set; }
         #endregion
 
+        private IPersonServices _personProxy;
+        private IAccountServices _accountProxy;
+        private IEventServices _eventProxy;
+        private static readonly ILog logger = Log4netHelper.GetLogger();
+        private StringBuilder _logText;
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string name)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(name));
+            }
+        }
+        #endregion
+
         public Account LoggedInAccount { get; set; }
         public Person SelectedPerson { get; set; }
         public Event SelectedEvent { get; set; }
@@ -57,22 +80,24 @@ namespace Client.ViewModels
         public ObservableCollection<Event> EventsList { get; set; }
         public ObservableCollection<Account> AccountsList { get; set; }
 
-        //public static object SyncLockPerson { get; set; } = new object();
-        //public static object SyncLockAccount { get; set; } = new object();
-        //public static object SyncLockEvent { get; set; } = new object();
-
-        IPersonServices _personProxy;
-        IAccountServices _accountProxy;
-        IEventServices _eventProxy;
-
-        public UserControl MessageUserControl { get; set; }
-        public TextBlock InfoBlock { get; set; }
-
-        public HomeViewModel(Account person, UserControl messageUserControl)
+        public StringBuilder LogText
         {
-            MessageUserControl = messageUserControl;
-            InfoBlock = MessageUserControl.FindName("InfoBlock") as TextBlock;
+            get
+            {
+                return _logText;
+            }
+            set
+            {
+                _logText = value;
+                OnPropertyChanged("LogText");
+            }
+        }
 
+        public int CurrentCommand { get; set; }
+        public List<BaseCommand> ListOfCommands { get; set; }
+
+        public HomeViewModel(Account person)
+        {
             AddPersonCommand = new RelayCommand(AddPersonExecute, AddPersonCanExecute);
             ModifyPersonCommand = new RelayCommand(ModifyPersonExecute, ModifyPersonCanExecute);
             DeletePersonCommand = new RelayCommand(DeletePersonExecute, DeletePersonCanExecute);
@@ -81,6 +106,7 @@ namespace Client.ViewModels
             UndoPersonCommand = new RelayCommand(UndoPersonExecute, UndoPersonCanExecute);
             RedoPersonCommand = new RelayCommand(RedoPersonExecute, RedoPersonCanExecute);
             ShowPeopleCommand = new RelayCommand(ShowPeopleExecute, ShowPeopleCanExecute);
+            SearchPersonCommand = new RelayCommand(SearchPersonExecute, SearchPersonCanExecute);
 
             AddEventCommand = new RelayCommand(AddEventExecute, AddEventCanExecute);
             ModifyEventCommand = new RelayCommand(ModifyEventExecute, ModifyEventCanExecute);
@@ -106,10 +132,18 @@ namespace Client.ViewModels
             _eventProxy.Subscribe();
 
             LoggedInAccount = person;
+            LogText = LoggerHelper.Instance.ClientLogBuilder;
 
             PeopleList = new ObservableCollection<Person>(_personProxy.GetAllPeople());
             AccountsList = new ObservableCollection<Account>(_accountProxy.GetAllAccounts());
             EventsList = new ObservableCollection<Event>(_eventProxy.GetAllEvents());
+
+            ListOfCommands = new List<BaseCommand>();
+            CurrentCommand = 0;
+
+            logger.Info("HomeViewModel constructor success.");
+            LoggerHelper.Instance.LogMessage($"HomeViewModel constructor success.", EEventPriority.INFO, EStringBuilder.CLIENT);
+            LogText = LoggerHelper.Instance.ClientLogBuilder;
         }
 
         #region PersonCommandExecutions
@@ -119,10 +153,11 @@ namespace Client.ViewModels
             {
                 Width = 600,
                 Height = 600,
-                Content = new AddPersonViewModel(PeopleList, _personProxy),
+                Content = new AddPersonViewModel(PeopleList, _personProxy, this as ICommandInvoker),
             };
 
             window.ShowDialog();
+            LogText = LoggerHelper.Instance.ClientLogBuilder;
         }
         private bool AddPersonCanExecute(object paramter)
         {
@@ -137,10 +172,11 @@ namespace Client.ViewModels
             {
                 Width = 500,
                 Height = 600,
-                Content = new ModifyPersonViewModel(SelectedPerson, PeopleList, _personProxy),
+                Content = new ModifyPersonViewModel(SelectedPerson, PeopleList, _personProxy, this as ICommandInvoker),
             };
 
             window.ShowDialog();
+            LogText = LoggerHelper.Instance.ClientLogBuilder;
         }
         private bool ModifyPersonCanExecute(object parameter)
         {
@@ -158,10 +194,11 @@ namespace Client.ViewModels
             {
                 Width = 500,
                 Height = 600,
-                Content = new DeletePersonConfirmationViewModel(SelectedPerson, PeopleList, _personProxy),
+                Content = new DeletePersonConfirmationViewModel(SelectedPerson, PeopleList, _personProxy, this as ICommandInvoker),
             };
 
             window.ShowDialog();
+            LogText = LoggerHelper.Instance.ClientLogBuilder;
         }
         private bool DeletePersonCanExecute(object parameter)
         {
@@ -178,6 +215,7 @@ namespace Client.ViewModels
             };
 
             window.ShowDialog();
+            LogText = LoggerHelper.Instance.ClientLogBuilder;
         }
         private bool PersonDetailsCanExecute(object parameter)
         {
@@ -186,15 +224,29 @@ namespace Client.ViewModels
 
         private void DuplicatePersonExecute(object parameter)
         {
-            Person duplicatedPerson = _personProxy.DuplicatePerson(SelectedPerson);
+            Person duplicatedPerson = null;
+            try
+            {
+                duplicatedPerson = _personProxy.DuplicatePerson(SelectedPerson);
+            }
+            catch (Exception e)
+            {
+                logger.Error($"Error while duplicating. Message: {e.Message}");
+                LoggerHelper.Instance.LogMessage($"Error while duplicating. Message: {e.Message}", EEventPriority.ERROR, EStringBuilder.CLIENT);
+            }
+
             if (duplicatedPerson != null)
             {
-                MessageBox.Show("Successful duplication.");
+                logger.Info("Successful duplication.");
+                LoggerHelper.Instance.LogMessage($"Successful duplication.", EEventPriority.INFO, EStringBuilder.CLIENT);
             }
             else
             {
-                MessageBox.Show("Unsuccessful duplication.");
+                logger.Warn("Unsuccessful duplication.");
+                LoggerHelper.Instance.LogMessage($"Unsuccessful duplication.", EEventPriority.WARN, EStringBuilder.CLIENT);
             }
+
+            LogText = LoggerHelper.Instance.ClientLogBuilder;
         }
         private bool DuplicatePersonCanExecute(object parameter)
         {
@@ -203,20 +255,48 @@ namespace Client.ViewModels
 
         private void UndoPersonExecute(object parameter)
         {
-            throw new NotImplementedException();
+            if (Undo())
+            {
+                logger.Info("Successful 'Undo command'.");
+                LoggerHelper.Instance.LogMessage($"Successful 'Undo command'.", EEventPriority.INFO, EStringBuilder.CLIENT);
+            }
+            else
+            {
+                logger.Warn("Unsuccessful 'Undo'.");
+                LoggerHelper.Instance.LogMessage($"Unsuccessful 'Undo'.", EEventPriority.WARN, EStringBuilder.CLIENT);
+            }
+            LogText = LoggerHelper.Instance.ClientLogBuilder;
         }
         private bool UndoPersonCanExecute(object parameter)
         {
-            return false;
+            if (CurrentCommand == 0)
+            {
+                return false;
+            }
+            return true;
         }
 
         private void RedoPersonExecute(object parameter)
         {
-            throw new NotImplementedException();
+            if (Redo())
+            {
+                logger.Info("Successful 'Redo command'.");
+                LoggerHelper.Instance.LogMessage($"Successful 'Redo command'.", EEventPriority.INFO, EStringBuilder.CLIENT);
+            }
+            else
+            {
+                logger.Warn("Unsuccessful 'Undo'.");
+                LoggerHelper.Instance.LogMessage($"Unsuccessful 'Redo'.", EEventPriority.WARN, EStringBuilder.CLIENT);
+            }
+            LogText = LoggerHelper.Instance.ClientLogBuilder;
         }
         private bool RedoPersonCanExecute(object parameter)
         {
-            return false;
+            if (CurrentCommand == ListOfCommands.Count)
+            {
+                return false;
+            }
+            return true;
         }
 
         private void ShowPeopleExecute(object parameter)
@@ -243,6 +323,24 @@ namespace Client.ViewModels
 
             return true;
         }
+
+        private void SearchPersonExecute(object parameter)
+        {
+            Window window = new Window()
+            {
+                Width = 600,
+                Height = 900,
+                Content = new SearchPeopleViewModel(PeopleList, _personProxy),
+            };
+
+            window.ShowDialog();
+            LogText = LoggerHelper.Instance.ClientLogBuilder;
+        }
+        private bool SearchPersonCanExecute(object parameter)
+        {
+            return true;
+        }
+
         #endregion
 
         #region EventCommandExecutions
@@ -256,10 +354,10 @@ namespace Client.ViewModels
             };
 
             window.ShowDialog();
+            LogText = LoggerHelper.Instance.ClientLogBuilder;
         }
         private bool AddEventCanExecute(object parameter)
         {
-            //UpdateEventsList();
             EventsUpdateTask();
             return true;
         }
@@ -274,6 +372,7 @@ namespace Client.ViewModels
             };
 
             window.ShowDialog();
+            LogText = LoggerHelper.Instance.ClientLogBuilder;
         }
         private bool ModifyEventCanExecute(object parameter)
         {
@@ -295,6 +394,7 @@ namespace Client.ViewModels
             };
 
             window.ShowDialog();
+            LogText = LoggerHelper.Instance.ClientLogBuilder;
         }
         private bool DeleteEventCanExecute(object parameter)
         {
@@ -316,6 +416,7 @@ namespace Client.ViewModels
             };
 
             window.ShowDialog();
+            LogText = LoggerHelper.Instance.ClientLogBuilder;
         }
         private bool EventDetailsCanExecute(object parameter)
         {
@@ -359,7 +460,8 @@ namespace Client.ViewModels
             };
 
             window.ShowDialog();
-            
+            LogText = LoggerHelper.Instance.ClientLogBuilder;
+
         }
         private bool CreateAccountCanExecute(object parameter)
         {
@@ -388,6 +490,7 @@ namespace Client.ViewModels
                 TextBlock tb = parameters[0] as TextBlock;
                 tb.Text = $"Username: {LoggedInAccount.Username}     First name: {LoggedInAccount.FirstName}     Last name: {LoggedInAccount.LastName}";
             }
+            LogText = LoggerHelper.Instance.ClientLogBuilder;
         }
         private bool ModifyAccountCanExecute(object parameter)
         {
@@ -413,7 +516,8 @@ namespace Client.ViewModels
             LoggedInAccount = AccountsList.FirstOrDefault(a => a.Username.Equals(LoggedInAccount.Username));
             Object[] parameters = parameter as Object[];
             TextBlock tb = parameters[0] as TextBlock;
-            tb.Text = $"Username: {LoggedInAccount.Username}     First name: {LoggedInAccount.FirstName}     Last name: {LoggedInAccount.LastName}";         
+            tb.Text = $"Username: {LoggedInAccount.Username}     First name: {LoggedInAccount.FirstName}     Last name: {LoggedInAccount.LastName}";
+            LogText = LoggerHelper.Instance.ClientLogBuilder;
         }
         private bool ModifyPersonalAccountCanExecute(object parameter)
         {
@@ -430,6 +534,8 @@ namespace Client.ViewModels
             };
 
             window.ShowDialog();
+
+            LogText = LoggerHelper.Instance.ClientLogBuilder;
         }
         private bool DeleteAccountCanExecute(object parameter)
         {
@@ -470,11 +576,15 @@ namespace Client.ViewModels
             _eventProxy.Unsubscribe();
 
             UserControl CurrentUserControl = parameters[0] as UserControl;
-            CurrentUserControl.Content = new LoginViewModel(MessageUserControl);
+            CurrentUserControl.Content = new LoginViewModel();
             CurrentUserControl.VerticalContentAlignment = VerticalAlignment.Top;
             CurrentUserControl.HorizontalContentAlignment = HorizontalAlignment.Left;
             CurrentUserControl.Width = 1500;
             CurrentUserControl.Height = 1000;
+
+            logger.Info("LogOut success.");
+            LoggerHelper.Instance.LogMessage($"LogOut success.", EEventPriority.INFO, EStringBuilder.CLIENT);
+            LogText = LoggerHelper.Instance.ClientLogBuilder;
         }
         private bool LogOutCanExecute(object parameter)
         {
@@ -487,6 +597,7 @@ namespace Client.ViewModels
         }
         #endregion
 
+        /*
         private void UpdatePeopleList()
         {
             List<Person> UpdatedListOfPeople = _personProxy.GetAllPeople();
@@ -580,6 +691,7 @@ namespace Client.ViewModels
             }
             eventsToBeRemoved.ForEach(e => EventsList.Remove(e));
         }
+        */
 
         //CALLBACKS
         #region IPersonServicesCallback
@@ -865,5 +977,52 @@ namespace Client.ViewModels
                 UpdateHelper.Instance.AccountCounter = 0;
             }
         }
+
+        #region ICommandInvoker
+        public bool Undo()
+        {
+            if (CurrentCommand == 0)
+            {
+                return false;
+            }
+
+            BaseCommand command = ListOfCommands[--CurrentCommand];
+            command.Unexecute();
+
+            return true;
+        }
+
+        public bool Redo()
+        {
+            if (CurrentCommand == ListOfCommands.Count)
+            {
+                return false;
+            }
+
+            BaseCommand command = ListOfCommands[CurrentCommand++];
+            command.Execute();
+
+            return true;
+        }
+
+        public void RegisterCommand(BaseCommand command)
+        {
+            if(ListOfCommands.Count == CurrentCommand)
+            {
+                ListOfCommands.Add(command);
+                CurrentCommand++;
+            }
+            else
+            {
+                ListOfCommands[CurrentCommand++] = command;
+            }
+            
+
+            if (CurrentCommand < ListOfCommands.Count)
+            {
+                ListOfCommands.RemoveRange(CurrentCommand, ListOfCommands.Count - CurrentCommand);
+            }
+        } 
+        #endregion
     }
 }

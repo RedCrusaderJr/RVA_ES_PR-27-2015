@@ -9,25 +9,28 @@
         xmlns:local="clr-namespace:Client.Views"
         mc:Ignorable="d"
         Background="White"
-        Height="300" Width="400">
+        Height="700" Width="1200">
     <UserControl.Resources>
         <converter:MultiCloneConverter x:Key="multiConverter" />
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="150" />
+            <ColumnDefinition Width="200" />
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="20" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="20"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="100"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
-
+        
+        
         <Label Content="Username" Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="25" />
         <Label Content="Password" Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="25" />
 
@@ -44,5 +47,9 @@
                 </MultiBinding>
             </Button.CommandParameter>
         </Button>
+
+        <ScrollViewer Grid.Column="3" Grid.Row="1" Grid.RowSpan="4" HorizontalAlignment="Right" Width="700">
+            <TextBlock Text="{Binding LogText}" TextWrapping="Wrap" />
+        </ScrollViewer>
     </Grid>
 </UserControl>

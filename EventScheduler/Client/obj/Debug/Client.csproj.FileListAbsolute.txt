@@ -43,7 +43,6 @@ C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Cl
 C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Client\obj\Debug\Views\EventViews\ModifyEventView.g.cs
 C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Client\obj\Debug\Views\PersonViews\AddPersonView.g.cs
 C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Client\obj\Debug\Views\HomeView.g.cs
-C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Client\obj\Debug\Views\MessagesView.g.cs
 C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Client\obj\Debug\Views\PersonViews\DeletePersonConfirmationView.g.cs
 C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Client\obj\Debug\Views\PersonViews\ModifyPersonView.g.cs
 C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Client\obj\Debug\Views\LoginView.g.cs
@@ -62,7 +61,6 @@ C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Cl
 C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Client\obj\Debug\Views\EventViews\ModifyEventView.baml
 C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Client\obj\Debug\Views\PersonViews\AddPersonView.baml
 C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Client\obj\Debug\Views\HomeView.baml
-C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Client\obj\Debug\Views\MessagesView.baml
 C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Client\obj\Debug\Views\PersonViews\DeletePersonConfirmationView.baml
 C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Client\obj\Debug\Views\PersonViews\ModifyPersonView.baml
 C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Client\obj\Debug\Views\LoginView.baml
@@ -74,3 +72,7 @@ C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Cl
 C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Client\obj\Debug\Client.csproj.CopyComplete
 C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Client\obj\Debug\Client.exe
 C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Client\obj\Debug\Client.pdb
+C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Client\obj\Debug\Views\PersonViews\SearchPeopleView.g.cs
+C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Client\obj\Debug\Views\PersonViews\SearchPeopleView.baml
+C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Client\bin\Debug\log4net.dll
+C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Client\bin\Debug\log4net.xml

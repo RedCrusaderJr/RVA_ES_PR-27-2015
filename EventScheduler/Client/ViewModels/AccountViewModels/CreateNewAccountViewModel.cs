@@ -1,5 +1,6 @@
 ﻿using Client.Commands;
 using Client.Proxies;
+using Common;
 using Common.Contracts;
 using Common.Models;
 using System;

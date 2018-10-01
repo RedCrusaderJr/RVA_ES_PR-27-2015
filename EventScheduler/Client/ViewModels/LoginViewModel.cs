@@ -18,13 +18,10 @@ namespace Client.ViewModels
         public ICommand LoginCommand { get; set; }
         public UserControl CurrentUserControl { get; set; }
         public Account LoggedInPerson { get; set; }
-        public UserControl MessagesUserControl { get; set; }
-        public TextBlock InfoBlock { get; set; }
 
-        public LoginViewModel(UserControl messagesUserControl)
+        public LoginViewModel()
         {
             LoginCommand = new RelayCommand(Execute, CanExecute);
-            MessagesUserControl = messagesUserControl;
         }
 
         private void Execute(object parameter)
@@ -46,7 +43,7 @@ namespace Client.ViewModels
                 {
                     MessageBox.Show("Successfull login!");
 
-                    CurrentUserControl.Content = new HomeViewModel(account, MessagesUserControl);
+                    CurrentUserControl.Content = new HomeViewModel(account);
                     CurrentUserControl.VerticalContentAlignment = VerticalAlignment.Top;
                     CurrentUserControl.HorizontalContentAlignment = HorizontalAlignment.Left;
                     CurrentUserControl.Width = 1500;

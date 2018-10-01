@@ -32,3 +32,5 @@ C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Se
 C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Server\obj\Debug\Server.csproj.CopyComplete
 C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Server\obj\Debug\Server.exe
 C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Server\obj\Debug\Server.pdb
+C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Server\bin\Debug\log4net.dll
+C:\Users\dimitrijemitic1996\source\repos\RVA\RVA_ES_PR-27-2015\EventScheduler\Server\bin\Debug\log4net.xml

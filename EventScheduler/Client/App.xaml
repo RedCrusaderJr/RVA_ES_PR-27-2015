@@ -12,18 +12,11 @@
              xmlns:pv="clr-namespace:Client.Views.PersonViews"
              StartupUri="EventSchedulerWindowView.xaml">
     <Application.Resources>
-        <DataTemplate DataType="{x:Type local:EventSchedulerWindowViewModel}">
-            <local:EventSchedulerWindowView/>
-        </DataTemplate>
-        
         <DataTemplate DataType="{x:Type vm:HomeViewModel}">
             <v:HomeView/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:LoginViewModel}">
             <v:LoginView/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:MessagesViewModel}">
-            <v:MessagesView/>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type avm:CreateNewAccountViewModel}">
@@ -62,6 +55,9 @@
         </DataTemplate>
         <DataTemplate DataType="{x:Type pvm:PersonDetailsViewModel}">
             <pv:PersonDetailsView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type pvm:SearchPeopleViewModel}">
+            <pv:SearchPeopleView/>
         </DataTemplate>
 
     </Application.Resources>

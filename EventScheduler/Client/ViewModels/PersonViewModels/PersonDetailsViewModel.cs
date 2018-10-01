@@ -1,7 +1,10 @@
 ﻿using Client.Commands;
 using Client.Proxies;
 using Client.ViewModels.EventViewModels;
+using Common;
+using Common.Helpers;
 using Common.Models;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +18,8 @@ namespace Client.ViewModels.PersonViewModels
 {
     class PersonDetailsViewModel
     {
+        private static readonly ILog logger = Log4netHelper.GetLogger();
+
         public ICommand ClosePersonDetailsCommand { get; set; }
         public ICommand EventDetailsCommand { get; set; }
         public Person SelectedPerson { get; set; }
@@ -26,6 +31,9 @@ namespace Client.ViewModels.PersonViewModels
 
             ClosePersonDetailsCommand = new RelayCommand(ClosePersonDetailsCommandExecute, ClosePersonDetailsCommandCanExecute);
             EventDetailsCommand = new RelayCommand(EventDetailsExecute, EventDetailsCanExecute);
+
+            logger.Debug("PersonDetailsViewModel constructor success.");
+            LoggerHelper.Instance.LogMessage($"PersonDetailsViewModel constructor success.", EEventPriority.DEBUG, EStringBuilder.CLIENT);
         }
 
         private void ClosePersonDetailsCommandExecute(object obj)

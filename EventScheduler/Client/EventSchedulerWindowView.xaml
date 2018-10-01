@@ -6,7 +6,7 @@
 		xmlns:local="clr-namespace:Client"
 		xmlns:view="clr-namespace:Client.Views"
 		mc:Ignorable="d"
-		Title="EventShedulerWindow" Height="1000" Width="2000">
+		Title="EventShedulerWindow" Height="700" Width="1200">
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="20"/>
@@ -16,15 +16,8 @@
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="20"/>
 			<ColumnDefinition Width="*"/>
-			<ColumnDefinition Width="400"/>
 			<ColumnDefinition Width="20"/>
 		</Grid.ColumnDefinitions>
-		<UserControl Content="{Binding MainUserControl, UpdateSourceTrigger=PropertyChanged}" Name="MainUserControl" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" />
-		<UserControl Content="{Binding MessagesUserControl, UpdateSourceTrigger=PropertyChanged}" Name="MessagesUserControl" Grid.Row="1" Grid.Column="2" />
-		<!--<view:LoginView Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-		<UserControl Content="{Binding MessageInfoBlockUserContorl}"  Grid.Row="1" Grid.Column="2" x:Name="messagePanel"/>-->
-		<StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left">
-			<Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" FontWeight="UltraBold"/>
-		</StackPanel>
+		<view:LoginView Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" />
 	</Grid>
 </Window>
