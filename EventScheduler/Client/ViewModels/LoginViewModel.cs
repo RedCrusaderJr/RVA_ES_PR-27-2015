@@ -1,6 +1,7 @@
 ﻿using Client.Commands;
 using Client.Proxies;
 using Common.Models;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,8 @@ namespace Client.ViewModels
 {
     public class LoginViewModel
     {
+        private static readonly ILog logger = Log4netHelper.GetLogger();
+
         public ICommand LoginCommand { get; set; }
         public UserControl CurrentUserControl { get; set; }
         public Account LoggedInPerson { get; set; }

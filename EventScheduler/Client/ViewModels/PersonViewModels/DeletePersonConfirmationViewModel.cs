@@ -1,10 +1,14 @@
 ﻿using Client.Commands;
 using Client.Proxies;
+using Common;
 using Common.BaseCommandPattern;
+using Common.BaseCommandPattern.PersonCommands;
 using Common.Contracts;
+using Common.Helpers;
 using Common.IModels;
 using Common.Models;
 using Common.PersonCommands;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -20,6 +24,7 @@ namespace Client.ViewModels.PersonViewModels
 {
     class DeletePersonConfirmationViewModel
     {
+        private static readonly ILog logger = Log4netHelper.GetLogger();
 
         public ICommand DeletePersonCommand { get; set; }
         public Person PersonToBeDeleted { get; set; }
@@ -45,14 +50,17 @@ namespace Client.ViewModels.PersonViewModels
             {
                 CommandInvoker.RegisterCommand(new DeletePersonCommand(new PersonCommandReciever(), deletedPerson, PersonProxy));
 
-                MessageBox.Show("Person successfully deleted.");
+                logger.Error("Person successfully deleted.");
+                LoggerHelper.Instance.LogMessage($"Person successfully deleted.", EEventPriority.INFO, EStringBuilder.CLIENT);
                 object[] parameters = obj as object[];
                 Window currentWindow = Window.GetWindow((UserControl)parameters[0]);
                 currentWindow.Close();
             }
             else
             {
-                MessageBox.Show("Error while deleting - server side");
+                logger.Error("Person successfully deleted.");
+                LoggerHelper.Instance.LogMessage($"Person successfully deleted.", EEventPriority.INFO, EStringBuilder.CLIENT);
+
                 object[] parameters = obj as object[];
                 Window currentWindow = Window.GetWindow((UserControl)parameters[0]);
                 currentWindow.Close();

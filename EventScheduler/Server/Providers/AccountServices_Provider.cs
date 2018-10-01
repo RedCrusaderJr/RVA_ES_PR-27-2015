@@ -1,5 +1,6 @@
 ﻿using Common.Contracts;
 using Common.Models;
+using log4net;
 using Server.Access;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ namespace Server.Providers
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Reentrant)]
     class AccountServices_Provider : IAccountServices
     {
+        private static readonly ILog logger = Log4netHelper.GetLogger();
         public Account CreateNewAccount(Account accountToCreate)
         {
             Account createdAccount = DbManager.Instance.AddAccount(accountToCreate);

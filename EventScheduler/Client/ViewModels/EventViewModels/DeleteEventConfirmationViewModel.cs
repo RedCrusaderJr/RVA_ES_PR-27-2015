@@ -2,6 +2,7 @@
 using Client.Proxies;
 using Common.Contracts;
 using Common.Models;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,6 +18,8 @@ namespace Client.ViewModels.EventViewModels
 {
     class DeleteEventConfirmationViewModel
     {
+        private static readonly ILog logger = Log4netHelper.GetLogger();
+
         public ICommand DeleteEventCommand { get; set; }
         public Event EventToBeDeleted { get; set; }
         public ObservableCollection<Event> EventList { get; set; }

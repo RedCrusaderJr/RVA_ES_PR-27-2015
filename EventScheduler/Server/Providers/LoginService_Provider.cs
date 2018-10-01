@@ -1,5 +1,6 @@
 ﻿using Common.Contracts;
 using Common.Models;
+using log4net;
 using Server.Access;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,8 @@ namespace Server.Providers
 {
     class LoginService_Provider : ILoginService
     {
+        private static readonly ILog logger = Log4netHelper.GetLogger();
+
         public Account Login(string username, string password)
         {
             Account account = DbManager.Instance.GetSingleAccountByUsername(username);

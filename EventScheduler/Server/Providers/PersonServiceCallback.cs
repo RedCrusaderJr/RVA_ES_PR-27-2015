@@ -1,6 +1,7 @@
 ﻿using Common.Contracts;
 using Common.Helpers;
 using Common.Models;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +39,7 @@ namespace Server.Providers
             }
         }
         #endregion
-
+        private static readonly ILog logger = Log4netHelper.GetLogger();
         private List<IPersonServicesCallback> _subscribers;
 
         public void Subscribe(IPersonServicesCallback currentCallbackProxy)

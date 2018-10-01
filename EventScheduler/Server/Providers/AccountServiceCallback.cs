@@ -1,5 +1,6 @@
 ﻿using Common.Contracts;
 using Common.Models;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,7 +37,7 @@ namespace Server.Providers
             }
         }
         #endregion
-
+        private static readonly ILog logger = Log4netHelper.GetLogger();
         private List<IAccountServicesCallback> _subscribers;
 
         public void Subscribe(IAccountServicesCallback currentCallbackProxy)
@@ -62,10 +63,6 @@ namespace Server.Providers
                 foreach (IAccountServicesCallback sub in _subscribers)
                 {
                     sub.NotifyAccountAddition(addedAccount);
-                    //if (sub != currentCallbackProxy)
-                    //{
-                    //    sub.NotifyAccountAddition(addedAccount);
-                    //}
                 }
             }
         }
@@ -77,10 +74,6 @@ namespace Server.Providers
                 foreach (IAccountServicesCallback sub in _subscribers)
                 {
                     sub.NotifyAccountRemoval(removedAccount);
-                    //if (sub != currentCallbackProxy)
-                    //{
-                    //    sub.NotifyAccountRemoval(removedAccount);
-                    //}
                 }
             }
         }
@@ -92,10 +85,6 @@ namespace Server.Providers
                 foreach (IAccountServicesCallback sub in _subscribers)
                 {
                     sub.NotifyAccountModification(modifiedAccount);
-                    //if (sub != currentCallbackProxy)
-                    //{
-                    //    sub.NotifyAccountModification(modifiedAccount);
-                    //}
                 }
             }
         }

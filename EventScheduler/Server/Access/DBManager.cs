@@ -3,6 +3,7 @@ using Common.Helpers;
 using Common.IAccess;
 using Common.IModels;
 using Common.Models;
+using log4net;
 using Server.Providers.ObserverPattern;
 using System;
 using System.Collections.Generic;
@@ -43,6 +44,7 @@ namespace Server.Access
         }
         #endregion
 
+        private static readonly ILog logger = Log4netHelper.GetLogger();
         private EventNotifier _eventNotifier;
 
         #region Person
@@ -80,7 +82,15 @@ namespace Server.Access
                 
                 personToAdd.LastEditTimeStamp = DateTime.Now;
                 Person addedPerson = dbContext.People.Add(personToAdd);
-                dbContext.SaveChanges();
+                try
+                {
+                    dbContext.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    logger.Error($"Error in DbMenager. Message: {e.Message}");
+                }
+                logger.Info($"AddPerson successful");
 
                 _eventNotifier.RegisterObserver(new PersonObserver(addedPerson));
                 return addedPerson;
@@ -127,8 +137,15 @@ namespace Server.Access
                         }
                     }
 
-                    dbContext.SaveChanges();
-
+                    try
+                    {
+                        dbContext.SaveChanges();
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error($"Error in DbMenager. Message: {e.Message}");
+                    }
+                    logger.Info($"ModifyPerson successful");
                     IObserverPattern personObserver = _eventNotifier.Observers.FirstOrDefault(p => ((Person)p).JMBG.Equals(personToModify.JMBG));
                     _eventNotifier.UnregisterObserver(personObserver);
                     _eventNotifier.RegisterObserver(new PersonObserver(foundPerson));
@@ -154,7 +171,15 @@ namespace Server.Access
                     }
 
                     Person deletedPerson = dbContext.People.Remove(foundPerson);
-                    dbContext.SaveChanges();
+                    try
+                    {
+                        dbContext.SaveChanges();
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error($"Error in DbMenager. Message: {e.Message}");
+                    }
+                    logger.Info($"DeletePerson successful");
 
                     IObserverPattern foundObserver = _eventNotifier.Observers.FirstOrDefault(p => ((Person)p).JMBG.Equals(personToDelete.JMBG));
                     _eventNotifier.UnregisterObserver(foundObserver);
@@ -206,7 +231,15 @@ namespace Server.Access
                 }
 
                 Account addedAccount = dbContext.Accounts.Add(accountToAdd);
-                dbContext.SaveChanges();
+                try
+                {
+                    dbContext.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    logger.Error($"Error in DbMenager. Message: {e.Message}");
+                }
+                logger.Info($"AddAccount successful");
                 return addedAccount;
             }
         }
@@ -226,7 +259,15 @@ namespace Server.Access
                     foundAccount.FirstName = accountToModify.FirstName;
                     foundAccount.LastName = accountToModify.LastName;
 
-                    dbContext.SaveChanges();
+                    try
+                    {
+                        dbContext.SaveChanges();
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error($"Error in DbMenager. Message: {e.Message}");
+                    }
+                    logger.Info($"ModifyAccount successful");
                     return foundAccount;
                 }
 
@@ -243,8 +284,15 @@ namespace Server.Access
                 {
                     Account foundAccount = dbContext.Accounts.SingleOrDefault(a => a.Username.Equals(accountToDelete.Username));
                     Account deletedAccount = dbContext.Accounts.Remove(foundAccount);
-                    dbContext.SaveChanges();
-
+                    try
+                    {
+                        dbContext.SaveChanges();
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error($"Error in DbMenager. Message: {e.Message}");
+                    }
+                    logger.Info($"DeleteAccount successful");
                     return deletedAccount;
                 }
 
@@ -309,7 +357,15 @@ namespace Server.Access
                     }
                 }
                 Event addedEvent = dbContext.Events.Add(eventActualyGoingToBeAdded);
-                dbContext.SaveChanges();
+                try
+                {
+                    dbContext.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    logger.Error($"Error in DbMenager. Message: {e.Message}");
+                }
+                logger.Info($"AddEvent successful");
 
                 _eventNotifier.EvetToBeNotifiedAbout = addedEvent;
                 _eventNotifier.NotifyAllAdditon();
@@ -358,10 +414,18 @@ namespace Server.Access
                             Person foundPerson = dbContext.People.FirstOrDefault(per => per.JMBG.Equals(p.JMBG));
                             dbContext.People.Attach(foundPerson);
                             foundPerson.LastEditTimeStamp = DateTime.Now;
-                            foundEvent.Participants.Add(foundPerson);//?????????????????????????
+                            foundEvent.Participants.Add(foundPerson);
                         }
                     }
-                    dbContext.SaveChanges();
+                    try
+                    {
+                        dbContext.SaveChanges();
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error($"Error in DbMenager. Message: {e.Message}");
+                    }
+                    logger.Info($"ModifyEvent successful");
 
                     _eventNotifier.EvetToBeNotifiedAbout = foundEvent;
                     _eventNotifier.NotifyAllChange();
@@ -382,14 +446,21 @@ namespace Server.Access
                 {
                     Event foundEvent = dbContext.Events.Include(e => e.Participants).SingleOrDefault(e => e.EventId.Equals(eventToDelete.EventId));
                     List<Person> updatedPeople = new List<Person>();
-                    foreach (Person p in foundEvent.Participants)///////////////////////////////////OPREZ
+                    foreach (Person p in foundEvent.Participants)
                     {
                         updatedPeople.Add(dbContext.People.First(per => per.JMBG.Equals(p.JMBG)));
                     }
 
                     Event removedEvent = dbContext.Events.Remove(foundEvent);
-                    dbContext.SaveChanges();
-
+                    try
+                    {
+                        dbContext.SaveChanges();
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error($"Error in DbMenager. Message: {e.Message}");
+                    }
+                    logger.Info($"DeleteEvent successful");
                     _eventNotifier.EvetToBeNotifiedAbout = foundEvent;
                     _eventNotifier.NotifyAllRemoval();
 

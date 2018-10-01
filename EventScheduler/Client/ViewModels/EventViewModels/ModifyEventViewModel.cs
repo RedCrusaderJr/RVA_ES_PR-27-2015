@@ -1,8 +1,10 @@
 ﻿using Client.Commands;
 using Client.Proxies;
+using Common;
 using Common.Contracts;
 using Common.Helpers;
 using Common.Models;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -19,6 +21,8 @@ namespace Client.ViewModels.EventViewModels
 {
     class ModifyEventViewModel
     {
+        private static readonly ILog logger = Log4netHelper.GetLogger();
+
         public ICommand ModifyEventCommand { get; set; }
         public ICommand AddPraticipantCommand { get; set; }
         public ICommand RemovePraticipantCommand { get; set; }
@@ -77,14 +81,17 @@ namespace Client.ViewModels.EventViewModels
             Event editedEvent = EventProxy.EditEvent(EventToModify);
             if (editedEvent != null)
             {
-                MessageBox.Show("Event successfully modified.");
+                logger.Info($"Event successfully modified.");
+                LoggerHelper.Instance.LogMessage($"Event successfully modified.", EEventPriority.INFO, EStringBuilder.CLIENT);
                 UserControl uc = parameters[0] as UserControl;
                 CurrentWindow = Window.GetWindow(uc);
                 CurrentWindow.Close();
             }
             else
             {
-                MessageBox.Show("Error on server.");
+                logger.Error($"Error on server.");
+                LoggerHelper.Instance.LogMessage($"Error on server.", EEventPriority.ERROR, EStringBuilder.CLIENT);
+
                 UserControl uc = parameters[0] as UserControl;
                 CurrentWindow = Window.GetWindow(uc);
                 CurrentWindow.Close();

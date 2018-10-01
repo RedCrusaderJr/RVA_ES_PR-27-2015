@@ -1,4 +1,5 @@
-﻿using Server.Servers;
+﻿using log4net;
+using Server.Servers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,6 +12,8 @@ namespace Server
 {
     class Program
     {
+        private static readonly ILog logger = Log4netHelper.GetLogger();
+
         static void Main(string[] args)
         {
             string path = Directory.GetCurrentDirectory();

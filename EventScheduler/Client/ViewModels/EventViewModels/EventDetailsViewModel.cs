@@ -1,6 +1,7 @@
 ﻿using Client.Commands;
 using Client.Proxies;
 using Common.Models;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -16,6 +17,8 @@ namespace Client.ViewModels.EventViewModels
 {
     class EventDetailsViewModel
     {
+        private static readonly ILog logger = Log4netHelper.GetLogger();
+
         public ICommand CloseEventDetailsCommand { get; set; }
         public Event SelectedEvent { get; set; }
         public ObservableCollection<Person> Participants { get; set; }

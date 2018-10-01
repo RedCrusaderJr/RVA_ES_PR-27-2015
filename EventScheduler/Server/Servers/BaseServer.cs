@@ -1,10 +1,13 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.ServiceModel;
 
 namespace Server.Servers
 {
     internal abstract class BaseServer : IDisposable
     {
+        private static readonly ILog logger = Log4netHelper.GetLogger();
+
         protected ServiceHost _serviceHost;
         private String _serviceName;
 

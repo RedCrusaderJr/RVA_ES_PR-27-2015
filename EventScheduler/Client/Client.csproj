@@ -57,9 +57,7 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="Xpand.ExpressApp.Win.Para.WindowsIntegration, Version=13.2.6.0, Culture=neutral, PublicKeyToken=382702571fab6a51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Xpand.ExpressApp.Win.Para.WindowsIntegration.13.2.6.0\lib\net40\Xpand.ExpressApp.Win.Para.WindowsIntegration.dll</HintPath>
-    </Reference>
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">

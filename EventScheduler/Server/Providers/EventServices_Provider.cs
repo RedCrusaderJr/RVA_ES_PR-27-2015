@@ -1,6 +1,7 @@
 ﻿using Common.Contracts;
 using Common.Helpers;
 using Common.Models;
+using log4net;
 using Server.Access;
 using Server.Providers.ObserverPattern;
 using System;
@@ -16,6 +17,8 @@ namespace Server.Providers
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Reentrant)]
     public class EventServices_Provider : IEventServices 
     {
+        private static readonly ILog logger = Log4netHelper.GetLogger();
+
         public Event ScheduleEvent(Event eventToSchedule, List<Person> participants)
         {
             List<Person> participantsToAdd = participants.Where(p => !eventToSchedule.Participants.Contains(p, new PersonComparer())).ToList();

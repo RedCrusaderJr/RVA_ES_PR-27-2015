@@ -77,11 +77,11 @@
     <Compile Include="Models\Account.cs" />
     <Compile Include="Models\Event.cs" />
     <Compile Include="Models\Person.cs" />
-    <Compile Include="PersonCommands\AddPersonCommand.cs" />
-    <Compile Include="PersonCommands\BasePersonCommand.cs" />
-    <Compile Include="PersonCommands\DeletePersonCommand.cs" />
-    <Compile Include="PersonCommands\ModifyPersonCommand.cs" />
-    <Compile Include="PersonCommands\PersonCommandReciever.cs" />
+    <Compile Include="BaseCommandPattern\PersonCommands\AddPersonCommand.cs" />
+    <Compile Include="BaseCommandPattern\PersonCommands\BasePersonCommand.cs" />
+    <Compile Include="BaseCommandPattern\PersonCommands\DeletePersonCommand.cs" />
+    <Compile Include="BaseCommandPattern\PersonCommands\ModifyPersonCommand.cs" />
+    <Compile Include="BaseCommandPattern\PersonCommands\PersonCommandReciever.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

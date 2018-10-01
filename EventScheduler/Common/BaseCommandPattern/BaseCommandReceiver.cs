@@ -11,8 +11,8 @@ namespace Common.PersonCommands
 {
     public abstract class BaseCommandReceiver
     {
-        public abstract void Addition(Person personToAdd, IPersonServices proxy);
-        public abstract void Removal(Person personToRemove, IPersonServices proxy);
-        public abstract void Modification(Person personToModify, IPersonServices proxy);
+        public abstract Person Addition(Person personToAdd, IPersonServices proxy);
+        public abstract Person Removal(Person personToRemove, IPersonServices proxy);
+        public abstract Person Modification(Person personToModify, IPersonServices proxy);
     }
 }

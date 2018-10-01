@@ -1,6 +1,7 @@
 ﻿using Common.Contracts;
 using Common.Helpers;
 using Common.Models;
+using log4net;
 using Server.Access;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,8 @@ namespace Server.Providers
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Reentrant)]
     class PersonServices_Provider : IPersonServices
     {
+
+        private static readonly ILog logger = Log4netHelper.GetLogger();
         public Person AddPerson(Person person)
         {
             Person addedPerson = DbManager.Instance.AddPerson(person);

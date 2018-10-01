@@ -2,6 +2,7 @@
 using Client.Proxies;
 using Common;
 using Common.BaseCommandPattern;
+using Common.BaseCommandPattern.PersonCommands;
 using Common.Contracts;
 using Common.Helpers;
 using Common.Models;

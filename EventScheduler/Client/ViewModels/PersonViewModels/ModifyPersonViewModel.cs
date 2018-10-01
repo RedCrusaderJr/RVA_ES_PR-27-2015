@@ -2,6 +2,7 @@
 using Client.Proxies;
 using Common;
 using Common.BaseCommandPattern;
+using Common.BaseCommandPattern.PersonCommands;
 using Common.Contracts;
 using Common.Helpers;
 using Common.Models;
@@ -62,8 +63,8 @@ namespace Client.ViewModels.PersonViewModels
             catch (Exception e)
             {
 
-                logger.Error("Person successfully modified.");
-                LoggerHelper.Instance.LogMessage($"Person successfully modified.", EEventPriority.ERROR, EStringBuilder.CLIENT);
+                logger.Error($"Error while modifying. Message: {e.Message}");
+                LoggerHelper.Instance.LogMessage($"Error while modifying. Message: {e.Message}", EEventPriority.ERROR, EStringBuilder.CLIENT);
             }
             
             if (modifiedPerson != null)

@@ -2,7 +2,9 @@
 using Client.Proxies;
 using Common;
 using Common.Contracts;
+using Common.Helpers;
 using Common.Models;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,6 +20,8 @@ namespace Client.ViewModels.AccountViewModels
 {
     class CreateNewAccountViewModel
     {
+        private static readonly ILog logger = Log4netHelper.GetLogger();
+
         public ICommand CreateNewAccountCommand { get; set; }
 
         public Window CurrentWindow { get; set; }
@@ -53,18 +57,33 @@ namespace Client.ViewModels.AccountViewModels
                 Role = (bool)roleRegular ? ERole.REGULAR : ERole.ADMIN,
             };
 
-            Account createdAccount = AccountProxy.CreateNewAccount(AccountToAdd);
+
+            Account createdAccount = null;
+            try
+            {
+                createdAccount = AccountProxy.CreateNewAccount(AccountToAdd);
+            }
+            catch (Exception e)
+            {
+
+                logger.Error($"Error while deleting - server side. Message: {e.Message}");
+                LoggerHelper.Instance.LogMessage($"Error while deleting - server side. Message: {e.Message}", EEventPriority.ERROR, EStringBuilder.CLIENT);
+            }
             if (createdAccount != null)
             {
                 AccountsList.Add(createdAccount);
 
-                MessageBox.Show("Account successfuly added.");
+                logger.Error($"Account successfuly added.");
+                LoggerHelper.Instance.LogMessage($"Account successfuly added.", EEventPriority.ERROR, EStringBuilder.CLIENT);
+
                 CurrentWindow = Window.GetWindow(CreateNewAccountUserControl);
                 CurrentWindow.Close();
             }
             else
             {
-                MessageBox.Show("Error on server or username already exists.");
+                logger.Error($"Error on server or username already exists.");
+                LoggerHelper.Instance.LogMessage($"Error on server or username already exists.", EEventPriority.ERROR, EStringBuilder.CLIENT);
+
                 CurrentWindow = Window.GetWindow(CreateNewAccountUserControl);
                 CurrentWindow.Close();
             }

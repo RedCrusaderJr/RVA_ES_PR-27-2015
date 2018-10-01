@@ -10,13 +10,18 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Client.Commands;
 using Client.Proxies;
+using Common;
 using Common.Contracts;
+using Common.Helpers;
 using Common.Models;
+using log4net;
 
 namespace Client.ViewModels.AccountViewModels
 {
     class ModifyAccountViewModel
     {
+        private static readonly ILog logger = Log4netHelper.GetLogger();
+
         public ICommand ModifyAccountCommand { get; set; }
         public Window CurrentWindow { get; set; }
         public Account SelectedAccount { get; set; }
@@ -43,21 +48,36 @@ namespace Client.ViewModels.AccountViewModels
         {
             Object[] parameters = parameter as Object[];
 
-            Account modifiedAccount = AccountProxy.ModifyAccount(AccountToModify);
+
+            Account modifiedAccount = null;
+            try
+            {
+                modifiedAccount = AccountProxy.ModifyAccount(AccountToModify);
+            }
+            catch (Exception e)
+            {
+
+                logger.Error($"Error while deleting - server side. Message: {e.Message}");
+                LoggerHelper.Instance.LogMessage($"Error while deleting - server side. Message: {e.Message}", EEventPriority.ERROR, EStringBuilder.CLIENT);
+            }
+            
             if (modifiedAccount != null)
             {
                 Account foundAccount = AccountsList.FirstOrDefault(a => a.Username.Equals(modifiedAccount.Username));
                 AccountsList.Remove(foundAccount);
                 AccountsList.Add(modifiedAccount);
 
-                MessageBox.Show("Account successfully modified.");
+                logger.Info($"Account successfully modified.");
+                LoggerHelper.Instance.LogMessage($"Account successfully modified.", EEventPriority.INFO, EStringBuilder.CLIENT);
                 UserControl uc = parameters[0] as UserControl;
                 Window window = Window.GetWindow(uc);
                 window.Close();
             }
             else
             {
-                MessageBox.Show("Error while modifying - server side");
+
+                logger.Error($"Error while deleting - server side.");
+                LoggerHelper.Instance.LogMessage($"Error while deleting - server side.", EEventPriority.ERROR, EStringBuilder.CLIENT);
                 UserControl uc = parameters[0] as UserControl;
                 Window window = Window.GetWindow(uc);
                 window.Close();

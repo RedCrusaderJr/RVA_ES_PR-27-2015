@@ -1,8 +1,10 @@
 ﻿using Client.Commands;
 using Client.Proxies;
+using Common;
 using Common.Contracts;
 using Common.Helpers;
 using Common.Models;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -19,6 +21,8 @@ namespace Client.ViewModels.EventViewModels
 {
     class AddEventViewModel
     {
+        private static readonly ILog logger = Log4netHelper.GetLogger();
+
         public ICommand AddEventCommand { get; set; }
         public ICommand AddPraticipantCommand { get; set; }
         public ICommand RemovePraticipantCommand { get; set; }
@@ -58,22 +62,16 @@ namespace Client.ViewModels.EventViewModels
             Event scheduledEvent = EventProxy.ScheduleEvent(EventToAdd, Participants.ToList());
             if(scheduledEvent != null)
             {
-                /*
-                foreach(Person p in scheduledEvent.Participants)
-                {
-                    Person foundPerson = PeopleList.FirstOrDefault(per => per.JMBG.Equals(p.JMBG));
-                    PeopleList.Remove(foundPerson);
-                    PeopleList.Add(p);
-                }
-                */
-                MessageBox.Show("Event successfully added.");
+                logger.Info($"Event successfully added.");
+                LoggerHelper.Instance.LogMessage($"Account successfully modified.", EEventPriority.INFO, EStringBuilder.CLIENT);
                 UserControl uc = parameters[0] as UserControl;
                 CurrentWindow = Window.GetWindow(uc);
                 CurrentWindow.Close();
             }
             else
             {
-                MessageBox.Show("Error on server.");
+                logger.Error($"Error on server.");
+                LoggerHelper.Instance.LogMessage($"Error on server.", EEventPriority.ERROR, EStringBuilder.CLIENT);
                 UserControl uc = parameters[0] as UserControl;
                 CurrentWindow = Window.GetWindow(uc);
                 CurrentWindow.Close();

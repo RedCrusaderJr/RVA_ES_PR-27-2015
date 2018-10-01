@@ -1,7 +1,10 @@
 ﻿using Client.Commands;
 using Client.Proxies;
+using Common;
 using Common.Contracts;
+using Common.Helpers;
 using Common.Models;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,6 +20,8 @@ namespace Client.ViewModels.AccountViewModels
 {
     class DeleteAccountConfirmationViewModel
     {
+        private static readonly ILog logger = Log4netHelper.GetLogger();
+
         public ICommand DeleteAccountCommand { get; set; }
         public Account AccountToDelete { get; set; }
         public ObservableCollection<Account> Accounts { get; set; }
@@ -34,20 +39,36 @@ namespace Client.ViewModels.AccountViewModels
 
         private void DeleteAccountExecute(object obj)
         {
-            Account deletedAccount = AccountProxy.DeleteAccount(AccountToDelete);
-            if(deletedAccount != null)
+            Account deletedAccount = null;
+            try
+            {
+                deletedAccount = AccountProxy.DeleteAccount(AccountToDelete);
+            }
+            catch (Exception e)
+            {
+
+                logger.Error($"Error while deleting - server side. Message: {e.Message}");
+                LoggerHelper.Instance.LogMessage($"Error while deleting - server side. Message: {e.Message}", EEventPriority.ERROR, EStringBuilder.CLIENT);
+
+            }
+
+            if (deletedAccount != null)
             {
                 Account foundAccount = Accounts.FirstOrDefault(a => a.Username.Equals(deletedAccount.Username));
                 Accounts.Remove(foundAccount);
 
-                MessageBox.Show("Account successfully deleted.");
+                logger.Info("Account successfully deleted.");
+                LoggerHelper.Instance.LogMessage($"Account successfully deleted.", EEventPriority.INFO, EStringBuilder.CLIENT);
+                
                 object[] parameters = obj as object[];
                 Window currentWindow = Window.GetWindow((UserControl)parameters[0]);
                 currentWindow.Close();
             }
             else
             {
-                MessageBox.Show("Error while deleting - server side.");
+                logger.Error("Error while deleting - server side.");
+                LoggerHelper.Instance.LogMessage($"Account successfully deleted.", EEventPriority.ERROR, EStringBuilder.CLIENT);
+
                 object[] parameters = obj as object[];
                 Window currentWindow = Window.GetWindow((UserControl)parameters[0]);
                 currentWindow.Close();
