@@ -9,7 +9,6 @@ namespace Common.Helpers
 {
     public class PersonComparer : IEqualityComparer<Person>
     {
-        //STA CE BITI SA KOPIJAMA OBJEKATA
         public bool Equals(Person x, Person y)
         {
             return x.JMBG == y.JMBG;

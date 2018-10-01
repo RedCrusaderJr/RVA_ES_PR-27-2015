@@ -44,11 +44,6 @@ namespace Client.ViewModels.PersonViewModels
             Person modifiedPerson = PersonProxy.ModifyPerson(PersonToModify);
             if (modifiedPerson != null)
             {
-                /*
-                Person foundPerson = PeopleList.FirstOrDefault(p => p.JMBG.Equals(modifiedPerson.JMBG));
-                PeopleList.Remove(foundPerson);
-                PeopleList.Add(modifiedPerson);
-                */
                 MessageBox.Show("Person successfully modified");
                 UserControl uc = parameters[0] as UserControl;
                 Window window = Window.GetWindow(uc);

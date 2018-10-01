@@ -57,45 +57,53 @@ namespace Server.Providers
 
         public void NotifyAllEventAddition(Event addedEvent, IEventServicesCallback currentCallbackProxy)
         {
+            addedEvent.Participants.ForEach(p => p.ScheduledEvents.ForEach(e => e.Participants.ForEach(pa => pa.ScheduledEvents = new List<Event>())));
+
             if (_subscribers.Count > 0)
             {
                 foreach (IEventServicesCallback sub in _subscribers)
                 {
-                    if (sub != currentCallbackProxy)
-                    {
-                        sub.NotifyEventAddition(addedEvent);
-                    }
+                    sub.NotifyEventAddition(addedEvent);
+                //    if (sub != currentCallbackProxy)
+                //    {
+                //        sub.NotifyEventAddition(addedEvent);
+                //    }
                 }
             }
         }
 
         public void NotifyAllEventRemoval(Event removedEvent, IEventServicesCallback currentCallbackProxy)
         {
+            removedEvent.Participants.ForEach(p => p.ScheduledEvents.ForEach(e => e.Participants.ForEach(pa => pa.ScheduledEvents = new List<Event>())));
+
             if (_subscribers.Count > 0)
             {
                 foreach (IEventServicesCallback sub in _subscribers)
                 {
-                    if (sub != currentCallbackProxy)
-                    {
-                        sub.NotifyEventRemoval(removedEvent);
-                    }
+                    sub.NotifyEventRemoval(removedEvent);
+                    //if (sub != currentCallbackProxy)
+                    //{
+                    //    sub.NotifyEventRemoval(removedEvent);
+                    //}
                 }
             }
         }
 
         public void NotifyAllEventModification(Event modifiedEvent, IEventServicesCallback currentCallbackProxy)
         {
+            modifiedEvent.Participants.ForEach(p => p.ScheduledEvents.ForEach(e => e.Participants.ForEach(pa => pa.ScheduledEvents = new List<Event>())));
+
             if (_subscribers.Count > 0)
             {
                 foreach (IEventServicesCallback sub in _subscribers)
                 {
-                    if (sub != currentCallbackProxy)
-                    {
-                        sub.NotifyEventModification(modifiedEvent);
-                    }
+                    sub.NotifyEventModification(modifiedEvent);
+                //    if (sub != currentCallbackProxy)
+                //    {
+                //        sub.NotifyEventModification(modifiedEvent);
+                //    }
                 }
             }
         }
-
     }
 }

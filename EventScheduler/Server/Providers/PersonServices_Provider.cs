@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Server.Providers
 {
-    //TODO: da bi bila fasada mora da se ocisti
+    //TODO: FASADA
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Reentrant)]
     class PersonServices_Provider : IPersonServices
     {
@@ -23,8 +23,7 @@ namespace Server.Providers
                 IPersonServicesCallback currentCallbackProxy = OperationContext.Current.GetCallbackChannel<IPersonServicesCallback>();
                 PersonServiceCallback.Instance.NotifyAllPersonAddition(addedPerson, currentCallbackProxy);
 
-                //POTENCIJALNO INF LOOP
-                //addedPerson.ScheduledEvents.ForEach(e => e.Participants = GetAllPeople().Where(p => p.ScheduledEvents.Contains(e, new EventComparer())).ToList());
+                addedPerson.ScheduledEvents = new List<Event>();
                 return addedPerson;
             }
 
@@ -39,8 +38,7 @@ namespace Server.Providers
                 IPersonServicesCallback currentCallbackProxy = OperationContext.Current.GetCallbackChannel<IPersonServicesCallback>();
                 PersonServiceCallback.Instance.NotifyAllPersonModification(modifiedPerson, currentCallbackProxy);
 
-                //POTENCIJALNO INF LOOP
-                //modifiedPerson.ScheduledEvents.ForEach(e => e.Participants = GetAllPeople().Where(p => p.ScheduledEvents.Contains(e, new EventComparer())).ToList());
+                modifiedPerson.ScheduledEvents = new List<Event>();
                 return modifiedPerson;
             }
 
@@ -55,8 +53,7 @@ namespace Server.Providers
                 IPersonServicesCallback currentCallbackProxy = OperationContext.Current.GetCallbackChannel<IPersonServicesCallback>();
                 PersonServiceCallback.Instance.NotifyAllPersonRemoval(deletedPerson, currentCallbackProxy);
 
-                //POTENCIJALNO INF LOOP
-                //deletedPerson.ScheduledEvents.ForEach(e => e.Participants = GetAllPeople().Where(p => p.ScheduledEvents.Contains(e, new EventComparer())).ToList());
+                deletedPerson.ScheduledEvents = new List<Event>();
                 return deletedPerson;
             }
 
@@ -72,16 +69,14 @@ namespace Server.Providers
                 return null;
             }
 
-            person.ScheduledEvents.ForEach(e => e.Participants.ForEach(p => p.ScheduledEvents = new List<Event>()));
-            //person.ScheduledEvents.ForEach(e => e.Participants = new List<Person>());
+            person.ScheduledEvents.ForEach(e => e.Participants.ForEach(p => p.ScheduledEvents.ForEach(ev => ev.Participants = new List<Person>())));
             return person;
         }
 
         public List<Person> GetAllPeople()
         {
             List<Person> people = DbManager.Instance.GetAllPeople();
-            people.ForEach(p => p.ScheduledEvents.ForEach(e => e.Participants.ForEach(pa => pa.ScheduledEvents = new List<Event>())));
-            //people.ForEach(p => p.ScheduledEvents.ForEach(e => e.Participants = new List<Person>()));
+            people.ForEach(p => p.ScheduledEvents.ForEach(e => e.Participants.ForEach(pa => pa.ScheduledEvents.ForEach(ev => ev.Participants = new List<Person>()))));
             return people;
         }
 
@@ -95,6 +90,30 @@ namespace Server.Providers
         {
             IPersonServicesCallback currentCallbackProxy = OperationContext.Current.GetCallbackChannel<IPersonServicesCallback>();
             PersonServiceCallback.Instance.Unsubscribe(currentCallbackProxy);
+        }
+
+        public Person DuplicatePerson(Person person)
+        {
+            Person personToDuplicate = person.Duplicate() as Person;
+            List<Event> eventsToSchedule = new List<Event>(personToDuplicate.ScheduledEvents);
+            personToDuplicate.ScheduledEvents = new List<Event>();
+
+            Person duplicatedPerson = DbManager.Instance.AddPerson(personToDuplicate);
+            if(duplicatedPerson != null)
+            { 
+                duplicatedPerson.ScheduledEvents = new List<Event>(eventsToSchedule);
+
+                Person successfullyDuplicatedPerson = DbManager.Instance.ModifyPerson(duplicatedPerson);
+                if(successfullyDuplicatedPerson != null)
+                {
+                    IPersonServicesCallback currentCallbackProxy = OperationContext.Current.GetCallbackChannel<IPersonServicesCallback>();
+                    PersonServiceCallback.Instance.NotifyAllPersonDuplication(duplicatedPerson, currentCallbackProxy);
+
+                    successfullyDuplicatedPerson.ScheduledEvents = new List<Event>();
+                    return successfullyDuplicatedPerson;
+                }
+            }
+            return null;
         }
     }
 }

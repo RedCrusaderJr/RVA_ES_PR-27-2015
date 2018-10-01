@@ -12,10 +12,12 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace Client.ViewModels
 {
@@ -54,6 +56,10 @@ namespace Client.ViewModels
         public ObservableCollection<Person> PeopleList { get; set; }
         public ObservableCollection<Event> EventsList { get; set; }
         public ObservableCollection<Account> AccountsList { get; set; }
+
+        //public static object SyncLockPerson { get; set; } = new object();
+        //public static object SyncLockAccount { get; set; } = new object();
+        //public static object SyncLockEvent { get; set; } = new object();
 
         IPersonServices _personProxy;
         IAccountServices _accountProxy;
@@ -106,13 +112,6 @@ namespace Client.ViewModels
             EventsList = new ObservableCollection<Event>(_eventProxy.GetAllEvents());
         }
 
-        ~HomeViewModel()
-        {
-            _personProxy.Unsubscribe();
-            _accountProxy.Unsubscribe();
-            _eventProxy.Unsubscribe();
-        }
-
         #region PersonCommandExecutions
         private void AddPersonExecute(object parameter)
         {
@@ -127,35 +126,8 @@ namespace Client.ViewModels
         }
         private bool AddPersonCanExecute(object paramter)
         {
-            List<Person> UpdatedListOfPeople = _personProxy.GetAllPeople();
-
-            foreach(Person p in UpdatedListOfPeople)
-            {
-                if(!PeopleList.Contains(p, new PersonComparer()))
-                {
-                    PeopleList.Add(p);
-                }
-                else
-                {
-                    Person foundPerson = PeopleList.FirstOrDefault(pe => pe.JMBG.Equals(p.JMBG));
-                    if(foundPerson.LastEditTimeStamp != p.LastEditTimeStamp)
-                    {
-                        PeopleList.Remove(foundPerson);
-                        PeopleList.Add(p);
-                    }
-                }
-            }
-
-            List<Person> peopleToBeRemoved = new List<Person>();
-            foreach (Person p in PeopleList)
-            {
-                if (!UpdatedListOfPeople.Contains(p, new PersonComparer()))
-                {
-                    peopleToBeRemoved.Add(p);
-                }
-            }
-            peopleToBeRemoved.ForEach(p => PeopleList.Remove(p));
-
+            //UpdatePeopleList();
+            PeopleUpdateTask();
             return true;
         }
 
@@ -214,11 +186,10 @@ namespace Client.ViewModels
 
         private void DuplicatePersonExecute(object parameter)
         {
-            Person duplicatedPerson = _personProxy.AddPerson((Person)SelectedPerson.Duplicate());
+            Person duplicatedPerson = _personProxy.DuplicatePerson(SelectedPerson);
             if (duplicatedPerson != null)
             {
                 MessageBox.Show("Successful duplication.");
-                PeopleList.Add(duplicatedPerson);
             }
             else
             {
@@ -288,35 +259,8 @@ namespace Client.ViewModels
         }
         private bool AddEventCanExecute(object parameter)
         {
-            List<Event> UpdatedListOfEvents = _eventProxy.GetAllEvents();
-             
-            foreach (Event e in UpdatedListOfEvents)
-            {
-                if (!EventsList.Contains(e, new EventComparer()))
-                {
-                    EventsList.Add(e);
-                }
-                else
-                {
-                    Event foundEvent = EventsList.FirstOrDefault(ev => ev.EventId.Equals(e.EventId));
-                    if(foundEvent.LastEditTimeStamp != e.LastEditTimeStamp)
-                    {
-                        EventsList.Remove(foundEvent);
-                        EventsList.Add(e);
-                    }
-                }
-            }
-
-            List<Event> eventsToBeRemoved = new List<Event>();
-            foreach (Event e in EventsList)
-            {
-                if (!UpdatedListOfEvents.Contains(e, new EventComparer()))
-                {
-                    eventsToBeRemoved.Add(e);
-                }
-            }
-            eventsToBeRemoved.ForEach(e => EventsList.Remove(e));
-
+            //UpdateEventsList();
+            EventsUpdateTask();
             return true;
         }
 
@@ -419,6 +363,7 @@ namespace Client.ViewModels
         }
         private bool CreateAccountCanExecute(object parameter)
         {
+            AccountsUpdateTask();
             return LoggedInAccount.Role == ERole.ADMIN;
         }
 
@@ -520,6 +465,10 @@ namespace Client.ViewModels
         {
             Object[] parameters = parameter as Object[];
 
+            _personProxy.Unsubscribe();
+            _accountProxy.Unsubscribe();
+            _eventProxy.Unsubscribe();
+
             UserControl CurrentUserControl = parameters[0] as UserControl;
             CurrentUserControl.Content = new LoginViewModel(MessageUserControl);
             CurrentUserControl.VerticalContentAlignment = VerticalAlignment.Top;
@@ -538,13 +487,115 @@ namespace Client.ViewModels
         }
         #endregion
 
+        private void UpdatePeopleList()
+        {
+            List<Person> UpdatedListOfPeople = _personProxy.GetAllPeople();
+
+            foreach (Person p in UpdatedListOfPeople)
+            {
+                if (!PeopleList.Contains(p, new PersonComparer()))
+                {
+                    PeopleList.Add(p);
+                }
+                else
+                {
+                    Person foundPerson = PeopleList.FirstOrDefault(pe => pe.JMBG.Equals(p.JMBG));
+                    if (DateTime.Compare(foundPerson.LastEditTimeStamp, p.LastEditTimeStamp) != 0 || foundPerson.ScheduledEvents.Count != p.ScheduledEvents.Count)
+                    {
+                        PeopleList.Remove(foundPerson);
+                        PeopleList.Add(p);
+                    }
+                    else 
+                    {
+                        foreach(Event e in foundPerson.ScheduledEvents)
+                        {
+                            if(!p.ScheduledEvents.TrueForAll(ev => ev.EventId.Equals(e.EventId) 
+                                                               && ev.Description.Equals(e.Description)
+                                                               && ev.EventTitle.Equals(e.EventTitle)
+                                                               && ev.ScheduledDateTimeBeging.Equals(e.ScheduledDateTimeBeging)
+                                                               && ev.ScheduledDateTimeEnd.Equals(e.ScheduledDateTimeEnd)
+                                                               && ev.LastEditTimeStamp.Equals(e.LastEditTimeStamp)))
+                            {
+                                PeopleList.Remove(foundPerson);
+                                PeopleList.Add(p);
+                            }
+                        }
+                    }
+                }
+            }
+
+            List<Person> peopleToBeRemoved = new List<Person>();
+            foreach (Person p in PeopleList)
+            {
+                if (!UpdatedListOfPeople.Contains(p, new PersonComparer()))
+                {
+                    peopleToBeRemoved.Add(p);
+                }
+            }
+            peopleToBeRemoved.ForEach(p => PeopleList.Remove(p));
+        }
+        private void UpdateEventsList()
+        {
+            List<Event> UpdatedListOfEvents = _eventProxy.GetAllEvents();
+
+            foreach (Event e in UpdatedListOfEvents)
+            {
+                if (!EventsList.Contains(e, new EventComparer()))
+                {
+                    EventsList.Add(e);
+                }
+                else
+                {
+                    Event foundEvent = EventsList.FirstOrDefault(ev => ev.EventId.Equals(e.EventId));
+                    if (DateTime.Compare(foundEvent.LastEditTimeStamp, e.LastEditTimeStamp) != 0 || foundEvent.Participants.Count != e.Participants.Count)
+                    {
+                        EventsList.Remove(foundEvent);
+                        EventsList.Add(e);
+                    }
+                    else
+                    {
+                        foreach (Person p in foundEvent.Participants)
+                        {
+                            if (!e.Participants.TrueForAll(pe => pe.JMBG.Equals(p.JMBG)
+                                                                && pe.FirstName.Equals(p.FirstName)
+                                                                && pe.LastName.Equals(p.LastName)
+                                                                && pe.LastEditTimeStamp.Equals(p.LastEditTimeStamp)))
+
+                            {
+                                EventsList.Remove(foundEvent);
+                                EventsList.Add(e);
+                            }
+                        }
+                    }
+                }
+            }
+
+            List<Event> eventsToBeRemoved = new List<Event>();
+            foreach (Event e in EventsList)
+            {
+                if (!UpdatedListOfEvents.Contains(e, new EventComparer()))
+                {
+                    eventsToBeRemoved.Add(e);
+                }
+            }
+            eventsToBeRemoved.ForEach(e => EventsList.Remove(e));
+        }
+
         //CALLBACKS
         #region IPersonServicesCallback
         public void NotifyPersonAddition(Person addedPerson)
         {
             if(!PeopleList.Contains(addedPerson, new PersonComparer()))
             {
-                PeopleList.Add(addedPerson);
+                UpdateHelper.Instance.PeopleListAdditionHelper.Add(addedPerson);
+            }
+        }
+
+        public void NotifyPersonDuplicate(Person addedPerson)
+        {
+            if (!PeopleList.Contains(addedPerson, new PersonComparer()))
+            {
+                UpdateHelper.Instance.PeopleListAdditionHelper.Add(addedPerson);
             }
         }
 
@@ -552,8 +603,7 @@ namespace Client.ViewModels
         {
             if(PeopleList.Contains(removedPerson, new PersonComparer()))
             {
-                Person foundPerson = PeopleList.FirstOrDefault(p => p.JMBG.Equals(removedPerson.JMBG));
-                PeopleList.Remove(foundPerson);
+                UpdateHelper.Instance.PeopleListRemovalHelper.Add(removedPerson);
             }
         }
 
@@ -561,9 +611,7 @@ namespace Client.ViewModels
         {
             if (PeopleList.Contains(modifiedPerson, new PersonComparer()))
             {
-                Person foundPerson = PeopleList.FirstOrDefault(p => p.JMBG.Equals(modifiedPerson.JMBG));
-                PeopleList.Remove(foundPerson);
-                PeopleList.Add(modifiedPerson);
+                UpdateHelper.Instance.PeopleListModificationHelper.Add(modifiedPerson);
             }
         }
         #endregion
@@ -573,7 +621,7 @@ namespace Client.ViewModels
         {
             if (!EventsList.Contains(addedEvent, new EventComparer()))
             {
-                EventsList.Add(addedEvent);
+                UpdateHelper.Instance.EventsListAdditionHelper.Add(addedEvent);
             }
         }
 
@@ -581,8 +629,7 @@ namespace Client.ViewModels
         {
             if (EventsList.Contains(removedEvent, new EventComparer()))
             {
-                Event foundEvent = EventsList.FirstOrDefault(e => e.EventId.Equals(removedEvent.EventId));
-                EventsList.Remove(foundEvent);
+                UpdateHelper.Instance.EventsListRemovalHelper.Add(removedEvent);
             }
         }
 
@@ -590,9 +637,7 @@ namespace Client.ViewModels
         {
             if (EventsList.Contains(modifiedEvent, new EventComparer()))
             {
-                Event foundEvent = EventsList.FirstOrDefault(e => e.EventId.Equals(modifiedEvent.EventId));
-                EventsList.Remove(foundEvent);
-                EventsList.Add(modifiedEvent);
+                UpdateHelper.Instance.EventsListModificationHelper.Add(modifiedEvent);
             }
         }
         #endregion
@@ -602,7 +647,7 @@ namespace Client.ViewModels
         {
             if (!AccountsList.Contains(addedAccount, new AccountComparer()))
             {
-                AccountsList.Add(addedAccount);
+                UpdateHelper.Instance.AccountsListAdditionHelper.Add(addedAccount);
             }
         }
 
@@ -610,8 +655,7 @@ namespace Client.ViewModels
         {
             if (AccountsList.Contains(removedAccount, new AccountComparer()))
             {
-                Account foundAccount = AccountsList.FirstOrDefault(a => a.Username.Equals(removedAccount.Username));
-                AccountsList.Remove(foundAccount);
+                UpdateHelper.Instance.AccountsListRemovalHelper.Add(removedAccount);
             }
         }
 
@@ -619,11 +663,207 @@ namespace Client.ViewModels
         {
             if (AccountsList.Contains(modifiedAccount, new AccountComparer()))
             {
-                Account foundAccount = AccountsList.FirstOrDefault(a => a.Username.Equals(modifiedAccount.Username));
-                AccountsList.Remove(foundAccount);
-                AccountsList.Add(modifiedAccount);
+                UpdateHelper.Instance.AccountsListModificationHelper.Add(modifiedAccount);
             }
         }
         #endregion
+
+        private void PeopleUpdateTask()
+        {
+            if (UpdateHelper.Instance.PeopleListAdditionHelper.Count != 0)
+            {
+                foreach (Person p in UpdateHelper.Instance.PeopleListAdditionHelper)
+                {
+                    if (!PeopleList.Contains(p, new PersonComparer()))
+                    {
+                        PeopleList.Add(p);
+
+                        foreach (Event e in p.ScheduledEvents)
+                        {
+                            Event foundEvent = EventsList.First(ev => ev.EventId.Equals(e.EventId));
+                            EventsList.Remove(foundEvent);
+                            foundEvent.Participants.Add(p);
+                            EventsList.Add(foundEvent); //OPREZ
+
+                        }
+                    }
+                }
+            }
+
+            if (UpdateHelper.Instance.PeopleListRemovalHelper.Count != 0)
+            {
+                foreach (Person p in UpdateHelper.Instance.PeopleListRemovalHelper)
+                {
+                    if (PeopleList.Contains(p, new PersonComparer()))
+                    {
+                        Person foundPerson = PeopleList.FirstOrDefault(pe => pe.JMBG.Equals(p.JMBG));
+                        PeopleList.Remove(foundPerson);
+
+                        foreach(Event e in p.ScheduledEvents)
+                        {
+                            Event foundEvent = EventsList.First(ev => ev.EventId.Equals(e.EventId));
+                            EventsList.Remove(foundEvent);
+                            foundEvent.Participants = new List<Person>(foundEvent.Participants.Where(per => per.JMBG != p.JMBG));
+                            EventsList.Add(foundEvent);
+                            
+                        }
+                    }
+                }
+            }
+
+            if (UpdateHelper.Instance.PeopleListModificationHelper.Count != 0)
+            {
+                foreach (Person p in UpdateHelper.Instance.PeopleListModificationHelper)
+                {
+                    if (PeopleList.Contains(p, new PersonComparer()))
+                    {
+                        Person foundPerson = PeopleList.FirstOrDefault(pe => pe.JMBG.Equals(p.JMBG));
+                        PeopleList.Remove(foundPerson);
+                        PeopleList.Add(p);
+
+                        foreach (Event e in p.ScheduledEvents)
+                        {
+                            Event foundEvent = EventsList.First(ev => ev.EventId.Equals(e.EventId));
+                            EventsList.Remove(foundEvent);
+                            foundEvent.Participants = new List<Person>(foundEvent.Participants.Where(per => per.JMBG != p.JMBG));
+                            foundEvent.Participants.Add(p);
+                            EventsList.Add(foundEvent);
+
+                        }
+                    }
+                }
+            }
+
+            if (++UpdateHelper.Instance.PersonCounter >= UpdateHelper.Instance.Limit - 1)
+            {
+                UpdateHelper.Instance.PeopleListAdditionHelper = new List<Person>();
+                UpdateHelper.Instance.PeopleListRemovalHelper = new List<Person>();
+                UpdateHelper.Instance.PeopleListModificationHelper = new List<Person>();
+
+                UpdateHelper.Instance.PersonCounter = 0;
+            }
+        }
+
+        private void EventsUpdateTask()
+        {
+            if (UpdateHelper.Instance.EventsListAdditionHelper.Count != 0)
+            {
+                foreach (Event e in UpdateHelper.Instance.EventsListAdditionHelper)
+                {
+                    if (!EventsList.Contains(e, new EventComparer()))
+                    {
+                        EventsList.Add(e);
+
+                        foreach (Person p in e.Participants)
+                        {
+                            Person foundPerson = PeopleList.First(pe => pe.JMBG.Equals(p.JMBG));
+                            PeopleList.Remove(foundPerson);
+                            foundPerson.ScheduledEvents.Add(e);
+                            PeopleList.Add(foundPerson); //OPREZ
+
+                        }
+                    }
+                }
+            }
+
+            if (UpdateHelper.Instance.EventsListRemovalHelper.Count != 0)
+            {
+                foreach (Event e in UpdateHelper.Instance.EventsListRemovalHelper)
+                {
+                    if (EventsList.Contains(e, new EventComparer()))
+                    {
+                        Event foundEvent = EventsList.FirstOrDefault(ev => ev.EventId.Equals(e.EventId));
+                        EventsList.Remove(foundEvent);
+
+                        foreach (Person p in e.Participants)
+                        {
+                            Person foundPerson = PeopleList.First(pe => pe.JMBG.Equals(p.JMBG));
+                            PeopleList.Remove(foundPerson);
+                            foundPerson.ScheduledEvents = new List<Event>(foundPerson.ScheduledEvents.Where(ev => ev.EventId != e.EventId));
+                            PeopleList.Add(foundPerson);
+                        }
+                    }
+                }
+            }
+
+            if (UpdateHelper.Instance.EventsListModificationHelper.Count != 0)
+            {
+                foreach (Event e in UpdateHelper.Instance.EventsListModificationHelper)
+                {
+                    if (EventsList.Contains(e, new EventComparer()))
+                    {
+                        Event foundEvent = EventsList.FirstOrDefault(ev => ev.EventId.Equals(e.EventId));
+                        EventsList.Remove(foundEvent);
+                        EventsList.Add(e);
+
+                        foreach (Person p in e.Participants)
+                        {
+                            Person foundPerson = PeopleList.First(pe => pe.JMBG.Equals(p.JMBG));
+                            PeopleList.Remove(foundPerson);
+                            foundPerson.ScheduledEvents = new List<Event>(foundPerson.ScheduledEvents.Where(ev => ev.EventId != e.EventId));
+                            foundPerson.ScheduledEvents.Add(e);
+                            PeopleList.Add(foundPerson);
+                        }
+                    }
+                }
+            }
+
+            if (++UpdateHelper.Instance.EventCounter >= UpdateHelper.Instance.Limit - 1)
+            {
+                UpdateHelper.Instance.EventsListAdditionHelper = new List<Event>();
+                UpdateHelper.Instance.EventsListRemovalHelper = new List<Event>();
+                UpdateHelper.Instance.EventsListModificationHelper = new List<Event>();
+
+                UpdateHelper.Instance.EventCounter = 0;
+            }
+        }
+
+        private void AccountsUpdateTask()
+        {
+            if (UpdateHelper.Instance.AccountsListAdditionHelper.Count != 0)
+            {
+                foreach (Account a in UpdateHelper.Instance.AccountsListAdditionHelper)
+                {
+                    if (!AccountsList.Contains(a, new AccountComparer()))
+                    {
+                        AccountsList.Add(a);
+                    }
+                }
+            }
+
+            if (UpdateHelper.Instance.AccountsListModificationHelper.Count != 0)
+            {
+                foreach (Account a in UpdateHelper.Instance.AccountsListModificationHelper)
+                {
+                    if (AccountsList.Contains(a, new AccountComparer()))
+                    {
+                        Account foundAccount = AccountsList.FirstOrDefault(ac => ac.Username.Equals(a.Username));
+                        AccountsList.Remove(foundAccount);
+                    }
+                }
+            }
+
+            if (UpdateHelper.Instance.AccountsListRemovalHelper.Count != 0)
+            {
+                foreach (Account a in UpdateHelper.Instance.AccountsListRemovalHelper)
+                {
+                    if (AccountsList.Contains(a, new AccountComparer()))
+                    {
+                        Account foundAccount = AccountsList.FirstOrDefault(ac => ac.Username.Equals(a.Username));
+                        AccountsList.Remove(foundAccount);
+                        AccountsList.Add(a);
+                    }
+                }
+            }
+
+            if (++UpdateHelper.Instance.AccountCounter >= UpdateHelper.Instance.Limit - 1)
+            {
+                UpdateHelper.Instance.AccountsListAdditionHelper = new List<Account>();
+                UpdateHelper.Instance.AccountsListRemovalHelper = new List<Account>();
+                UpdateHelper.Instance.AccountsListModificationHelper = new List<Account>();
+
+                UpdateHelper.Instance.AccountCounter = 0;
+            }
+        }
     }
 }

@@ -59,6 +59,7 @@
     <Compile Include="Helpers\AccountComparer.cs" />
     <Compile Include="Helpers\EventComparer.cs" />
     <Compile Include="Helpers\PersonComparer.cs" />
+    <Compile Include="Helpers\UpdateHelper.cs" />
     <Compile Include="IAccess\IEventDbManager.cs" />
     <Compile Include="IAccess\IPersonDbManager.cs" />
     <Compile Include="IAccess\IAccountDbManager.cs" />

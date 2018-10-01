@@ -15,6 +15,9 @@ namespace Common.Contracts
         Person AddPerson(Person person);
 
         [OperationContract]
+        Person DuplicatePerson(Person person);
+
+        [OperationContract]
         Person ModifyPerson(Person person);
 
         [OperationContract]
@@ -37,6 +40,9 @@ namespace Common.Contracts
     {
         [OperationContract]
         void NotifyPersonAddition(Person addedPerson);
+
+        [OperationContract]
+        void NotifyPersonDuplicate(Person addedPerson);
 
         [OperationContract]
         void NotifyPersonRemoval(Person removedPerson);

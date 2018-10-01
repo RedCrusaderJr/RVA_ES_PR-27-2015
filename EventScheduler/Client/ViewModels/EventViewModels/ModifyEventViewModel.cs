@@ -77,38 +77,6 @@ namespace Client.ViewModels.EventViewModels
             Event editedEvent = EventProxy.EditEvent(EventToModify);
             if (editedEvent != null)
             {
-                /*              
-  *              Event foundEvent = EventList.FirstOrDefault(e => e.EventId.Equals(editedEvent.EventId));
-                EventList.Remove(foundEvent);
-                EventList.Add(editedEvent);
-
-                foreach(Person p in editedEvent.Participants)
-                {
-                    Person foundPerson = PeopleList.FirstOrDefault(per => per.JMBG.Equals(p.JMBG));
-                    PeopleList.Remove(foundPerson);
-                    PeopleList.Add(p);
-                }
-               */
-                 /*
-                foreach (Person p in editedEvent.Participants)
-                {
-                    if(!eventInList.Participants.Contains(p, new PersonComparer()))
-                    {
-                        eventInList.AddParticipant(p);
-                    }
-                }
-
-                peopleToBeRemoved = new List<Person>();
-                foreach (Person p in eventInList.Participants)
-                {
-                    if (!editedEvent.Participants.Contains(p, new PersonComparer()))
-                    {
-                        peopleToBeRemoved.Add(p);
-                    }
-                }
-                peopleToBeRemoved.ForEach(p => eventInList.RemoveParticipant(p));
-                */
-       
                 MessageBox.Show("Event successfully modified.");
                 UserControl uc = parameters[0] as UserControl;
                 CurrentWindow = Window.GetWindow(uc);

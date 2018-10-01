@@ -25,8 +25,6 @@ namespace Client.ViewModels
         {
             LoginCommand = new RelayCommand(Execute, CanExecute);
             MessagesUserControl = messagesUserControl;
-            //TAKO BLIZU A TAKO DALEKO
-            InfoBlock = MessagesUserControl.FindName("InfoBlock") as TextBlock;
         }
 
         private void Execute(object parameter)
@@ -41,13 +39,11 @@ namespace Client.ViewModels
             {
                 Account account = LoginProxy.ConnectToLoginService().Login(username, password);
                 if(account == null)
-                {
-                    //InfoBlock.Text += "Username or password is incorrect.\n";
+                { 
                     MessageBox.Show("Username or password is incorrect.");
                 }
                 else
                 {
-                    //InfoBlock.Text += "Successfull login!\n";
                     MessageBox.Show("Successfull login!");
 
                     CurrentUserControl.Content = new HomeViewModel(account, MessagesUserControl);
@@ -59,7 +55,6 @@ namespace Client.ViewModels
             }
             catch(Exception e)
             {
-                //InfoBlock.Text += $"Problem with connection. Message: {e.Message}";
                 MessageBox.Show($"Problem with connection. Message: {e.Message}");
             }
         }

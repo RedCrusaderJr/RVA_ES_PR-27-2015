@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Server.Providers
 {
-    [ServiceBehavior(ConcurrencyMode=ConcurrencyMode.Reentrant)]
+    [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Reentrant)]
     class AccountServices_Provider : IAccountServices
     {
         public Account CreateNewAccount(Account accountToCreate)

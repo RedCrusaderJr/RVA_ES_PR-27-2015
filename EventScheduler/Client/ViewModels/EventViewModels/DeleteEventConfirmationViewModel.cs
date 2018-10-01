@@ -41,17 +41,6 @@ namespace Client.ViewModels.EventViewModels
             Event deletedEvent = EventProxy.CancleEvent(EventToBeDeleted);
             if (deletedEvent != null)
             {
-                /*
-                Event foundEvent = EventList.FirstOrDefault(e => e.EventId.Equals(deletedEvent.EventId));
-                EventList.Remove(foundEvent);
-
-                foreach(Person p in deletedEvent.Participants)
-                {
-                    Person foundPerson = PeopleList.FirstOrDefault(per => per.JMBG.Equals(p.JMBG));
-                    PeopleList.Remove(foundPerson);
-                    PeopleList.Add(p);
-                }
-                */
                 object[] parameters = obj as object[];
                 Window currentWindow = Window.GetWindow((UserControl)parameters[0]);
                 currentWindow.Close();

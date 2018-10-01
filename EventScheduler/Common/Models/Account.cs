@@ -20,7 +20,6 @@ namespace Common.Models
         private String _firstName;
         private String _lastName;
         private ERole _role;
-        //private Person _personWithAccount;
         #endregion
 
         #region Properties
@@ -47,18 +46,6 @@ namespace Common.Models
                 OnPropertyChanged("Password");
             }
         }
-        [Required]
-        /*
-        [DataMember]
-        public Person PersonWithAccount
-        {
-            get => _personWithAccount;
-            set
-            {
-                _personWithAccount = value;
-            }
-        }
-        */
         [DataMember]
         public string FirstName
         {

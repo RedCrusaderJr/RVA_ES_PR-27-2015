@@ -45,8 +45,6 @@ namespace Client.ViewModels.PersonViewModels
             Person addedPerson = PersonProxy.AddPerson(PersonToAdd);
             if (addedPerson != null)
             {
-                //PeopleList.Add(addedPerson);
-
                 MessageBox.Show("Person successfully added.");
                 UserControl uc = parameters[3] as UserControl;
                 CurrentWindow = Window.GetWindow(uc);

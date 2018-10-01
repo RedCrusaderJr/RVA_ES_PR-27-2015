@@ -101,7 +101,7 @@ namespace Common.Models
         public Person(Person person)
         {
             JMBG = person.JMBG;
-            LastEditTimeStamp = person.LastEditTimeStamp;
+            LastEditTimeStamp = DateTime.Now;
             ScheduledEvents = new List<Event>(person.ScheduledEvents);
 
             FirstName = person.FirstName;
@@ -153,7 +153,6 @@ namespace Common.Models
                     return false;
                 }
 
-                //slobodno vreme pre sastanka?
                 if(DateTime.Compare((DateTime)begining, (DateTime)e.ScheduledDateTimeBeging) < 0)
                 {
                     if(DateTime.Compare((DateTime)end, (DateTime)e.ScheduledDateTimeBeging) > 0)
@@ -161,7 +160,6 @@ namespace Common.Models
                         return false;
                     }
                 }
-                //slobodno vreme posle sastanka?
                 else if(DateTime.Compare((DateTime)begining, (DateTime)e.ScheduledDateTimeBeging) > 0)
                 {
                     if (DateTime.Compare((DateTime)begining, (DateTime)e.ScheduledDateTimeEnd) < 0)
@@ -192,7 +190,6 @@ namespace Common.Models
                     return false;
                 }
 
-                //slobodno vreme pre sastanka?
                 if (DateTime.Compare((DateTime)begining, (DateTime)e.ScheduledDateTimeBeging) < 0)
                 {
                     if (DateTime.Compare((DateTime)end, (DateTime)e.ScheduledDateTimeBeging) > 0)
@@ -200,7 +197,6 @@ namespace Common.Models
                         return false;
                     }
                 }
-                //slobodno vreme posle sastanka?
                 else if (DateTime.Compare((DateTime)begining, (DateTime)e.ScheduledDateTimeBeging) > 0)
                 {
                     if (DateTime.Compare((DateTime)begining, (DateTime)e.ScheduledDateTimeEnd) < 0)
@@ -224,13 +220,13 @@ namespace Common.Models
                 JMBG = this.JMBG + "_copy",
                 FirstName = this.FirstName,
                 LastName = this.LastName,
-                LastEditTimeStamp = this.LastEditTimeStamp,
+                LastEditTimeStamp = DateTime.Now,
             };
 
             if (this.ScheduledEvents.Count != 0)
             {
-                personDuplicate.ScheduledEvents = this.ScheduledEvents;
-                //this.ScheduledEvents.ForEach(e => personDuplicate.ScheduledEvents.Add(e));
+                //personDuplicate.ScheduledEvents = this.ScheduledEvents;
+                this.ScheduledEvents.ForEach(e => personDuplicate.ScheduledEvents.Add(new Event(e)));
             }
             else
             {

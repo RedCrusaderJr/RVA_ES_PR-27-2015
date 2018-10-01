@@ -14,7 +14,5 @@ namespace Common.IModels
         String FirstName { get; set; }
         String LastName { get; set; }
         ERole Role { get; set; }
-
-        //Person PersonWithAccount { get; set; }
     }
 }

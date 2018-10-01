@@ -111,6 +111,18 @@ namespace Common.Models
             Description = description;
         }
 
+        public Event(Event e)
+        {
+            EventId = e.EventId;
+            EventTitle = e.EventTitle;
+            Description = e.Description;
+            CreatedTimeStamp = DateTime.Now;
+            LastEditTimeStamp = DateTime.Now;
+            ScheduledDateTimeBeging = e.ScheduledDateTimeBeging;
+            ScheduledDateTimeEnd = e.ScheduledDateTimeEnd;
+            Participants = new List<Person>(e.Participants);
+        }
+
         public bool AddParticipant(Person participant)
         {
             if(ScheduledDateTimeBeging == null || ScheduledDateTimeEnd == null)

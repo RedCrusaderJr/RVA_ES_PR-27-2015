@@ -22,11 +22,6 @@ namespace Server.Access
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            /*
-            modelBuilder.Entity<Event>().Property(e => e.EventId)
-                                        .HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
-            */
-
             modelBuilder.Entity<Event>().HasMany(e => e.Participants)
                                         .WithMany(p => p.ScheduledEvents)
                                         .Map(m => {

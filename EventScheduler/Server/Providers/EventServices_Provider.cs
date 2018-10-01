@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Server.Providers
 {
-    //TODO: da bi bila fasada mora da se ocisti
+    //TODO: FASADA
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Reentrant)]
     public class EventServices_Provider : IEventServices 
     {
@@ -27,7 +27,7 @@ namespace Server.Providers
                 IEventServicesCallback currentCallbackProxy = OperationContext.Current.GetCallbackChannel<IEventServicesCallback>();
                 EventServiceCallback.Instance.NotifyAllEventAddition(scheduledEvent, currentCallbackProxy);
 
-                //scheduledEvent.Participants.ForEach(p => p.ScheduledEvents = GetAllEvents().Where(e => e.Participants.Contains(p, new PersonComparer())).ToList());
+                scheduledEvent.Participants = new List<Person>();
                 return scheduledEvent;
             }
 
@@ -42,7 +42,7 @@ namespace Server.Providers
                 IEventServicesCallback currentCallbackProxy = OperationContext.Current.GetCallbackChannel<IEventServicesCallback>();
                 EventServiceCallback.Instance.NotifyAllEventRemoval(cancledEvent, currentCallbackProxy);
 
-                //cancledEvent.Participants.ForEach(p => p.ScheduledEvents = GetAllEvents().Where(e => e.Participants.Contains(p, new PersonComparer())).ToList());
+                cancledEvent.Participants = new List<Person>();
                 return cancledEvent;
             }
 
@@ -57,7 +57,7 @@ namespace Server.Providers
                 IEventServicesCallback currentCallbackProxy = OperationContext.Current.GetCallbackChannel<IEventServicesCallback>();
                 EventServiceCallback.Instance.NotifyAllEventModification(editedEvent, currentCallbackProxy);
 
-                //editedEvent.Participants.ForEach(p => p.ScheduledEvents = GetAllEvents().Where(e => e.Participants.Contains(p, new PersonComparer())).ToList());
+                editedEvent.Participants = new List<Person>();
                 return editedEvent;
             }
 
@@ -82,7 +82,7 @@ namespace Server.Providers
                 IEventServicesCallback currentCallbackProxy = OperationContext.Current.GetCallbackChannel<IEventServicesCallback>();
                 EventServiceCallback.Instance.NotifyAllEventModification(rescheduledEvent, currentCallbackProxy);
 
-                //rescheduledEvent.Participants.ForEach(p => p.ScheduledEvents = GetAllEvents().Where(e => e.Participants.Contains(p, new PersonComparer())).ToList());
+                rescheduledEvent.Participants = new List<Person>();
                 return rescheduledEvent;
             }
 
@@ -106,7 +106,7 @@ namespace Server.Providers
                 IEventServicesCallback currentCallbackProxy = OperationContext.Current.GetCallbackChannel<IEventServicesCallback>();
                 EventServiceCallback.Instance.NotifyAllEventModification(modifiedEvent, currentCallbackProxy);
 
-                //modifiedEvent.Participants.ForEach(p => p.ScheduledEvents = GetAllEvents().Where(e => e.Participants.Contains(p, new PersonComparer())).ToList());
+                modifiedEvent.Participants = new List<Person>();
                 return modifiedEvent;
             }
 
@@ -130,7 +130,7 @@ namespace Server.Providers
                 IEventServicesCallback currentCallbackProxy = OperationContext.Current.GetCallbackChannel<IEventServicesCallback>();
                 EventServiceCallback.Instance.NotifyAllEventModification(modifiedEvent, currentCallbackProxy);
 
-                //modifiedEvent.Participants.ForEach(p => p.ScheduledEvents = GetAllEvents().Where(e => e.Participants.Contains(p, new PersonComparer())).ToList());
+                modifiedEvent.Participants = new List<Person>();
                 return modifiedEvent;
             }
 
@@ -153,7 +153,7 @@ namespace Server.Providers
                 IEventServicesCallback currentCallbackProxy = OperationContext.Current.GetCallbackChannel<IEventServicesCallback>();
                 EventServiceCallback.Instance.NotifyAllEventModification(modifiedEvent, currentCallbackProxy);
 
-                //modifiedEvent.Participants.ForEach(p => p.ScheduledEvents = GetAllEvents().Where(e => e.Participants.Contains(p, new PersonComparer())).ToList());
+                modifiedEvent.Participants = new List<Person>();
                 return modifiedEvent;
             }
 
@@ -169,14 +169,14 @@ namespace Server.Providers
                 return null;
             }
 
-            foundEvent.Participants.ForEach(p => p.ScheduledEvents.ForEach(e => e.Participants = new List<Person>()));
+            foundEvent.Participants.ForEach(p => p.ScheduledEvents.ForEach(e => e.Participants.ForEach(pa => pa.ScheduledEvents = new List<Event>())));
             return foundEvent;
         }
 
         public List<Event> GetAllEvents()
         {
             List<Event> events = DbManager.Instance.GetAllEvents();
-            events.ForEach(e => e.Participants.ForEach(p => p.ScheduledEvents.ForEach(ev => ev.Participants = new List<Person>())));
+            events.ForEach(e => e.Participants.ForEach(p => p.ScheduledEvents.ForEach(ev => ev.Participants.ForEach(pa => pa.ScheduledEvents = new List<Event>()))));
             return events;
         }
 

@@ -29,20 +29,16 @@ namespace Client.ViewModels.PersonViewModels
             PersonToBeDeleted = personToBeDeleted;
             PeopleList = peopleList;
 
-            DeletePersonCommand = new RelayCommand(DeleteAccountExecute, DeleteAccountCanExecute);
+            DeletePersonCommand = new RelayCommand(DeletePersonConfirmationExecute, DeletePersonConfirmationCanExecute);
 
             PersonProxy = personProxy;
         }
 
-        private void DeleteAccountExecute(object obj)
+        private void DeletePersonConfirmationExecute(object obj)
         {
             Person deletedPerson = PersonProxy.DeletePerson(PersonToBeDeleted);
             if(deletedPerson != null)
             {
-                /*
-                Person foundPerson = PeopleList.FirstOrDefault(p => p.JMBG.Equals(deletedPerson.JMBG));
-                PeopleList.Remove(foundPerson);
-                */
                 MessageBox.Show("Person successfully deleted.");
                 object[] parameters = obj as object[];
                 Window currentWindow = Window.GetWindow((UserControl)parameters[0]);
@@ -57,7 +53,7 @@ namespace Client.ViewModels.PersonViewModels
             }
         }
 
-        private bool DeleteAccountCanExecute(object arg)
+        private bool DeletePersonConfirmationCanExecute(object arg)
         {
             if (arg == null || !(arg is Object[] parameters) || parameters.Length != 1
                                                              || !(parameters[0] is UserControl))

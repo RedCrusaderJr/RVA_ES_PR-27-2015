@@ -10,7 +10,6 @@ namespace Common.Helpers
 {
     public class EventComparer : IEqualityComparer<Event>
     {
-        //STA CE BITI SA KOPIJAMA OBJEKATA
         public bool Equals(Event x, Event y)
         {
             return x.EventId == y.EventId;

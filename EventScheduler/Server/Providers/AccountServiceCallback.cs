@@ -61,10 +61,11 @@ namespace Server.Providers
             {
                 foreach (IAccountServicesCallback sub in _subscribers)
                 {
-                    if (sub != currentCallbackProxy)
-                    {
-                        sub.NotifyAccountAddition(addedAccount);
-                    }
+                    sub.NotifyAccountAddition(addedAccount);
+                    //if (sub != currentCallbackProxy)
+                    //{
+                    //    sub.NotifyAccountAddition(addedAccount);
+                    //}
                 }
             }
         }
@@ -75,10 +76,11 @@ namespace Server.Providers
             {
                 foreach (IAccountServicesCallback sub in _subscribers)
                 {
-                    if (sub != currentCallbackProxy)
-                    {
-                        sub.NotifyAccountRemoval(removedAccount);
-                    }
+                    sub.NotifyAccountRemoval(removedAccount);
+                    //if (sub != currentCallbackProxy)
+                    //{
+                    //    sub.NotifyAccountRemoval(removedAccount);
+                    //}
                 }
             }
         }
@@ -89,10 +91,11 @@ namespace Server.Providers
             {
                 foreach (IAccountServicesCallback sub in _subscribers)
                 {
-                    if (sub != currentCallbackProxy)
-                    {
-                        sub.NotifyAccountModification(modifiedAccount);
-                    }
+                    sub.NotifyAccountModification(modifiedAccount);
+                    //if (sub != currentCallbackProxy)
+                    //{
+                    //    sub.NotifyAccountModification(modifiedAccount);
+                    //}
                 }
             }
         }

@@ -58,15 +58,14 @@ namespace Client.ViewModels.EventViewModels
             Event scheduledEvent = EventProxy.ScheduleEvent(EventToAdd, Participants.ToList());
             if(scheduledEvent != null)
             {
-                //EventList.Add(scheduledEvent);
-
+                /*
                 foreach(Person p in scheduledEvent.Participants)
                 {
                     Person foundPerson = PeopleList.FirstOrDefault(per => per.JMBG.Equals(p.JMBG));
                     PeopleList.Remove(foundPerson);
                     PeopleList.Add(p);
                 }
-
+                */
                 MessageBox.Show("Event successfully added.");
                 UserControl uc = parameters[0] as UserControl;
                 CurrentWindow = Window.GetWindow(uc);
